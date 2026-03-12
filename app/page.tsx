@@ -166,7 +166,7 @@ export default function Home() {
             ✦
           </button>
         </div>
-        <p style={{ textAlign:'center',marginTop:6,fontSize:10,color:'#b5a88a' }}>Running on your local Llama — completely private 🌿</p>
+        <p style={{ textAlign:'center',marginTop:6,fontSize:10,color:'#b5a88a' }}>Powered by AyuraHealth AI 🌿 🌿</p>
       </div>
     </div>
   );
