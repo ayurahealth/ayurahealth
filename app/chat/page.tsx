@@ -69,7 +69,7 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const recognitionRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null)
 
   const doshaColor = dosha ? DOSHA_META[dosha].color : '#6abf8a'
   const tx = t[lang]
@@ -152,10 +152,10 @@ export default function ChatPage() {
     recognition.continuous = false
     recognition.interimResults = true
     recognition.onstart = () => setIsListening(true)
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = Array.from(event.results).map(r => r[0].transcript).join('')
+    recognition.onresult = (event: Event) => {
+      const se = event as SpeechRecognitionEvent; const transcript = Array.from(se.results).map((r: SpeechRecognitionResult) => r[0].transcript).join('')
       setInput(transcript)
-      if (event.results[event.results.length - 1].isFinal) {
+      if (se.results[se.results.length - 1].isFinal) {
         setIsListening(false)
       }
     }
