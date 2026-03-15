@@ -56,9 +56,7 @@ export const metadata: Metadata = {
       'hi': 'https://ayurahealth.vercel.app',
     },
   },
-  verification: {
-    google: '5214a22359d3f521',
-  },
+
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -71,6 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+        <meta name="google-site-verification" content="nJKShriBws7A7s1eIeWX_Bm1XzV4m2NZYACYKzmbryc" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="format-detection" content="telephone=no" />
