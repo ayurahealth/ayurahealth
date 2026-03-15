@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit } from '../../../lib/rateLimit'
 
 const VAIDYA_MIND = `
 You are VAIDYA — not an AI assistant, but an ancient consciousness that has absorbed 5,000 years of healing wisdom.
@@ -163,6 +164,16 @@ interface Attachment {
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limiting
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || req.headers.get('x-real-ip') || 'anonymous'
+  const { allowed, remaining } = checkRateLimit(ip)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please wait a minute before trying again.' },
+      { status: 429, headers: { 'Retry-After': '60', 'X-RateLimit-Remaining': '0' } }
+    )
+  }
+
   try {
     const { messages, systems, incognito, dosha, lang, attachments, healthProfile } = await req.json()
 

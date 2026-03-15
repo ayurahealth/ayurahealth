@@ -210,6 +210,11 @@ export default function LandingPage() {
         <p style={{ color: '#4a6a3a', fontSize: '0.75rem', marginTop: '0.4rem' }}>
           Built with ancient wisdom &amp; modern AI
         </p>
+        <div style={{ marginTop: '0.75rem', display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+          <a href="/privacy" style={{ color: '#4a6a3a', fontSize: '0.75rem', textDecoration: 'none' }}>Privacy Policy</a>
+          <a href="/terms" style={{ color: '#4a6a3a', fontSize: '0.75rem', textDecoration: 'none' }}>Terms of Service</a>
+          <a href="mailto:hello@ayurahealth.com" style={{ color: '#4a6a3a', fontSize: '0.75rem', textDecoration: 'none' }}>Contact</a>
+        </div>
       </footer>
 
     </main>
