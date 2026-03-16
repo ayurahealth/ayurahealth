@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages, systems, incognito, dosha, lang, attachments, healthProfile } = await req.json()
+    const { messages, systems, incognito, dosha, lang, attachments, healthProfile, thinkingMode } = await req.json()
 
     const langInstruction: Record<string, string> = {
       en: 'Respond in clear, elegant English.',
@@ -211,7 +211,11 @@ Today's context: You are consulting with a patient right now. Be present, attent
 
     // Build messages with attachments
     const hasImages = attachments?.some((a: Attachment) => a.type === 'image')
-    const model = hasImages ? 'meta-llama/llama-4-scout-17b-16e-instruct' : 'llama-3.3-70b-versatile'
+    const model = hasImages 
+      ? 'meta-llama/llama-4-scout-17b-16e-instruct' 
+      : thinkingMode 
+        ? 'deepseek-r1-distill-llama-70b'  // Deep reasoning for complex health questions
+        : 'llama-3.3-70b-versatile'         // Fast for normal questions
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const groqMessages: any[] = []
