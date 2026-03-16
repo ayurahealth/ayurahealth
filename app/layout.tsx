@@ -72,30 +72,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="google-site-verification" content="nJKShriBws7A7s1eIeWX_Bm1XzV4m2NZYACYKzmbryc" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="format-detection" content="telephone=no" />
-        
-        <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          "name": "AyuraHealth",
-          "description": "AI-powered holistic health companion combining Ayurveda, TCM, and 6 other healing traditions",
-          "url": "https://ayurahealth.vercel.app",
-          "applicationCategory": "HealthApplication",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-          },
-          "operatingSystem": "Any",
-          "inLanguage": ["en", "ja", "hi"],
-          "author": {
-            "@type": "Organization",
-            "name": "AyuraHealth"
-          }
-        }
-        </script>
-        
+             <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "AyuraHealth",
+              "description": "AI-powered holistic health companion combining Ayurveda, TCM, and 6 other healing traditions",
+              "url": "https://ayurahealth.vercel.app",
+              "applicationCategory": "HealthApplication",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "operatingSystem": "Any",
+              "genre": "Health & Wellness",
+              "browserRequirements": "Requires JavaScript",
+              "featureList": "AI Health Consultation, Dosha Analysis, Personalized Wellness Plans, Multi-tradition Knowledge Base"
+            })
+          }}
+        />   
       </head>
       <body>
         {children}

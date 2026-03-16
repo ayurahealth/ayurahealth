@@ -559,6 +559,10 @@ export default function ChatPage() {
       {/* CHAT */}
       {screen === 'chat' && (
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 57px)' }}>
+          <div style={{ padding: '0.6rem 1rem', background: 'rgba(5,16,10,0.6)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(106,191,138,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h1 style={{ color: '#f0e6c8', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>🌿 AyuraHealth Chat</h1>
+            <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.5)', fontSize: '0.8rem', cursor: 'pointer' }}>Exit</button>
+          </div>
           {/* System pills */}
           <div style={{ padding: '0.6rem 1rem', display: 'flex', gap: '0.35rem', flexWrap: 'wrap', borderBottom: '1px solid rgba(106,191,138,0.08)', background: 'rgba(5,16,10,0.6)', backdropFilter: 'blur(10px)' }}>
             {MEDICINE_SYSTEMS.map(sys => (
@@ -602,7 +606,7 @@ export default function ChatPage() {
           </div>
 
           {/* Input area */}
-          <div style={{ padding: '0.6rem 1rem 0.75rem', background: 'rgba(5,16,10,0.85)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(106,191,138,0.08)' }}>
+          <div style={{ padding: '1rem', background: 'rgba(5,16,10,0.85)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(106,191,138,0.08)' }}>
 
             {/* Attachment previews */}
             {attachments.length > 0 && (

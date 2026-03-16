@@ -211,17 +211,17 @@ Today's context: You are consulting with a patient right now. Be present, attent
 
     // Build messages with attachments
     const hasImages = attachments?.some((a: Attachment) => a.type === 'image')
-    const model = hasImages 
-      ? 'meta-llama/llama-4-scout-17b-16e-instruct' 
-      : thinkingMode 
-        ? 'deepseek-r1-distill-llama-70b'  // Deep reasoning for complex health questions
-        : 'llama-3.3-70b-versatile'         // Fast for normal questions
+    
+    // Use the provided OpenAI-compatible API in the sandbox
+    const model = hasImages ? 'gpt-4.1-mini' : (thinkingMode ? 'gpt-4.1-mini' : 'gpt-4.1-mini')
+    const apiKey = process.env.OPENAI_API_KEY
+    const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1'
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const groqMessages: any[] = []
+    const apiMessages: any[] = []
 
     for (let i = 0; i < messages.length - 1; i++) {
-      groqMessages.push({ role: messages[i].role, content: messages[i].content })
+      apiMessages.push({ role: messages[i].role, content: messages[i].content })
     }
 
     const lastMessage = messages[messages.length - 1]
@@ -241,38 +241,39 @@ Today's context: You are consulting with a patient right now. Be present, attent
         attachments.filter((a: Attachment) => a.type === 'image').forEach((a: Attachment) => {
           contentParts.push({ type: 'image_url', image_url: { url: `data:${a.mimeType || 'image/jpeg'};base64,${a.content}` } })
         })
-        groqMessages.push({ role: 'user', content: contentParts })
+        apiMessages.push({ role: 'user', content: contentParts })
       } else {
-        groqMessages.push({ role: 'user', content: lastMessage.content + textContext })
+        apiMessages.push({ role: 'user', content: lastMessage.content + textContext })
       }
     } else {
-      groqMessages.push({ role: 'user', content: lastMessage.content })
+      apiMessages.push({ role: 'user', content: lastMessage.content })
     }
 
-    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const apiResponse = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
-        messages: [{ role: 'system', content: systemPrompt }, ...groqMessages],
+        messages: [{ role: 'system', content: systemPrompt }, ...apiMessages],
         max_tokens: 2500, temperature: 0.7, stream: true,
       }),
     })
 
-    if (!groqResponse.ok) {
-      const error = await groqResponse.text()
+    if (!apiResponse.ok) {
+      const error = await apiResponse.text()
       return NextResponse.json({ error }, { status: 500 })
     }
 
     const stream = new ReadableStream({
       async start(controller) {
-        const reader = groqResponse.body?.getReader()
+        const reader = apiResponse.body?.getReader()
         const decoder = new TextDecoder()
         if (!reader) { controller.close(); return }
         while (true) {
           const { done, value } = await reader.read()
           if (done) { controller.close(); break }
-          for (const line of decoder.decode(value).split('\n')) {
+          const chunk = decoder.decode(value)
+          for (const line of chunk.split('\n')) {
             if (line.startsWith('data: ') && line !== 'data: [DONE]') {
               try {
                 const data = JSON.parse(line.slice(6))
