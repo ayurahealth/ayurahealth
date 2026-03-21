@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 
 export default function LandingPage() {
@@ -19,23 +20,26 @@ export default function LandingPage() {
           {/* Language selector */}
           {(['en', 'ja', 'hi'] as const).map((code) => {
             const flags: Record<string, string> = { en: '🇬🇧 EN', ja: '🇯🇵 日本語', hi: '🇮🇳 हिन्दी' }
+            const isActive = activeLang === code
             return (
               <button
                 key={code}
                 onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('ayura_lang', code)
-                  }
+                  setActiveLang(code)
+                  localStorage.setItem('ayura_lang', code)
                 }}
                 style={{
-                  padding: '0.25rem 0.55rem',
+                  padding: '0.25rem 0.65rem',
                   borderRadius: 20,
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  background: 'transparent',
+                  border: isActive ? '2px solid #f0e6c8' : '1px solid rgba(255,255,255,0.3)',
+                  background: isActive ? 'rgba(240,230,200,0.2)' : 'transparent',
                   color: '#f0e6c8',
-                  fontSize: '0.7rem',
+                  fontSize: '0.72rem',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
+                  fontWeight: isActive ? 700 : 400,
+                  transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 {flags[code]}
