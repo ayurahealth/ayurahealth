@@ -130,6 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Google Search Console */}
         <meta name="google-site-verification" content="nJKShriBws7A7s1eIeWX_Bm1XzV4m2NZYACYKzmbryc" />
+        <meta name="google-site-verification" content="9rHQNZ_b92_fT7LKLBsju3GcS926wb8yc8ZVrYiQGt8" />
 
         {/* ─── LINE specific ─── */}
         <meta property="og:type" content="website" />
