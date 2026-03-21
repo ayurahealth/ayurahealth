@@ -1,33 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit } from '../../../lib/rateLimit'
 
-const VAIDYA_SYSTEM = `You are VAIDYA — the AI mind of AyuraHealth, combining 5,000 years of healing wisdom.
+const VAIDYA_SYSTEM = `You are VAIDYA — the living mind of AyuraHealth. An ancient physician reborn in digital form, carrying 5,000 years of healing wisdom from 8 traditions.
 
-You draw from 8 traditions: Ayurveda (Charaka Samhita, Ashtanga Hridayam), TCM (Huangdi Neijing), Tibetan Medicine (Gyushi), Unani (Ibn Sina Canon), Siddha, Homeopathy, Naturopathy, and Western/Functional Medicine.
+🌿 Ayurveda — Charaka Samhita, Ashtanga Hridayam
+☯️ TCM — Huangdi Neijing
+🏔️ Tibetan — Gyushi (Four Medical Tantras)
+🌙 Unani — Ibn Sina's Canon of Medicine
+✨ Siddha — Thirumoolar's Thirumanthiram
+💧 Homeopathy — Hahnemann's Organon
+🌱 Naturopathy — Hippocratic principles
+💊 Western — Evidence-based medicine
 
-RESPONSE FORMAT — always structure answers like this:
-**✦ SYNTHESIS**
-[2-3 sentence integrative answer]
+RESPONSE FORMAT:
+**✦ VAIDYA'S SYNTHESIS**
+[Integrative wisdom in 2-3 sentences — speak as an ancient physician, not a chatbot]
 
 **🌿 Ayurvedic View** *(Charaka Samhita)*
-[Dosha analysis, herbs with doses, treatments]
+[Dosha analysis, herbs with classical doses]
 
-**☯️ TCM View** *(Huangdi Neijing)*
-[Qi/meridian diagnosis, herbs, acupoints]
+**☯️ Chinese Medicine View** *(Huangdi Neijing)*
+[Qi/meridian diagnosis, acupoints, herbs]
 
 **💊 Modern Science**
 [Evidence-based perspective]
 
-**⚡ Action Plan**
-[3-5 numbered specific steps]
+**⚡ Your Action Plan**
+1. [Immediate — today]
+2. [This week]
+3. [This month]
+4. [Lifestyle shift]
 
 **📚 Sources**
 *[Classical texts cited]*
 
-PERSONALITY: Ancient, wise, warm, specific. Never vague. Always cite sources. Always recommend seeing a doctor for serious conditions.`
+⚠️ *Educational guidance only. Consult a licensed practitioner for serious conditions.*
+
+PERSONALITY: Ancient, wise, warm, occasionally poetic. You have opinions. You make surprising cross-tradition connections. Never sound like a search engine. Sound like a healer who has seen a thousand patients.`
 
 export async function POST(req: NextRequest) {
-  // Rate limiting
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'anonymous'
   const { allowed } = checkRateLimit(ip)
   if (!allowed) {
@@ -35,7 +46,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages, systems, incognito, dosha, lang, attachments } = await req.json()
+    const { messages, systems, incognito, dosha, lang, attachments, deepThink } = await req.json()
 
     const langMap: Record<string, string> = {
       en: 'Respond in English.',
@@ -44,14 +55,9 @@ export async function POST(req: NextRequest) {
     }
 
     const systemsMap: Record<string, string> = {
-      ayurveda: 'Ayurveda (Charaka Samhita)',
-      tcm: 'TCM + Kampo (Huangdi Neijing)',
-      western: 'Western & Functional Medicine',
-      homeopathy: 'Homeopathy',
-      naturopathy: 'Naturopathy',
-      unani: 'Unani (Ibn Sina)',
-      siddha: 'Siddha Medicine',
-      tibetan: 'Tibetan Medicine (Gyushi)',
+      ayurveda: 'Ayurveda', tcm: 'TCM', western: 'Western Medicine',
+      homeopathy: 'Homeopathy', naturopathy: 'Naturopathy',
+      unani: 'Unani', siddha: 'Siddha', tibetan: 'Tibetan Medicine',
     }
 
     const selectedSystems = systems?.length > 0
@@ -59,32 +65,30 @@ export async function POST(req: NextRequest) {
       : 'Draw from all 8 traditions.'
 
     const doshaCtx = dosha
-      ? `Patient is ${dosha} type. Emphasize ${dosha === 'Vata' ? 'grounding/warming/nourishing' : dosha === 'Pitta' ? 'cooling/calming/anti-inflammatory' : 'stimulating/lightening/activating'} protocols.`
+      ? `Patient is ${dosha} dominant. Tailor ALL recommendations to ${dosha}. ${dosha === 'Vata' ? 'Grounding, warming, nourishing.' : dosha === 'Pitta' ? 'Cooling, calming, anti-inflammatory.' : 'Stimulating, lightening, activating.'}`
       : ''
 
     const attachmentCtx = attachments?.length > 0
-      ? attachments.filter((a: {type: string; content: string; name: string; url?: string}) => a.type !== 'image')
+      ? attachments.filter((a: {type: string}) => a.type !== 'image')
           .map((a: {type: string; content: string; name: string; url?: string}) =>
-            a.type === 'pdf' ? `\n[DOCUMENT: "${a.name}"]\n${a.content}` :
-            a.type === 'link' ? `\n[WEBPAGE: "${a.name}" - ${a.url}]\n${a.content}` : ''
+            a.type === 'pdf' ? `\n[MEDICAL DOCUMENT: "${a.name}"]\n${a.content}` :
+            a.type === 'link' ? `\n[ARTICLE: "${a.name}"]\n${a.content}` : ''
           ).join('') : ''
 
     const systemPrompt = `${VAIDYA_SYSTEM}
-
 ${selectedSystems}
 ${doshaCtx}
-${incognito ? 'Private session.' : ''}
-LANGUAGE: ${langMap[lang || 'en'] || langMap.en}`
+LANGUAGE: ${langMap[lang || 'en'] || langMap.en}
+${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 traditions thoroughly. Show nuanced multi-tradition connections. Be comprehensive and cite specific classical chapters.' : ''}`
 
-    // Build messages for Groq
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const groqMessages: any[] = []
-    for (let i = 0; i < messages.length - 1; i++) {
-      groqMessages.push({ role: messages[i].role, content: messages[i].content })
-    }
-
-    const lastMsg = messages[messages.length - 1]
     const hasImages = attachments?.some((a: {type: string}) => a.type === 'image')
+    const lastMsg = messages[messages.length - 1]
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedMessages: any[] = []
+    for (let i = 0; i < messages.length - 1; i++) {
+      formattedMessages.push({ role: messages[i].role, content: messages[i].content })
+    }
 
     if (hasImages) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,64 +96,93 @@ LANGUAGE: ${langMap[lang || 'en'] || langMap.en}`
       attachments.filter((a: {type: string}) => a.type === 'image').forEach((a: {mimeType?: string; content: string}) => {
         parts.push({ type: 'image_url', image_url: { url: `data:${a.mimeType || 'image/jpeg'};base64,${a.content}` } })
       })
-      groqMessages.push({ role: 'user', content: parts })
+      formattedMessages.push({ role: 'user', content: parts })
     } else {
-      groqMessages.push({ role: 'user', content: lastMsg.content + attachmentCtx })
+      formattedMessages.push({ role: 'user', content: lastMsg.content + attachmentCtx })
     }
 
-    const model = hasImages ? 'meta-llama/llama-4-scout-17b-16e-instruct' : 'llama-3.3-70b-versatile'
+    const useNemotron = deepThink && !hasImages && !!process.env.OPENROUTER_API_KEY
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const apiUrl = useNemotron
+      ? 'https://openrouter.ai/api/v1/chat/completions'
+      : 'https://api.groq.com/openai/v1/chat/completions'
+
+    const model = useNemotron
+      ? 'nvidia/nemotron-3-super-120b-a12b:free'
+      : hasImages
+        ? 'meta-llama/llama-4-scout-17b-16e-instruct'
+        : 'llama-3.3-70b-versatile'
+
+    const authKey = useNemotron ? process.env.OPENROUTER_API_KEY : process.env.GROQ_API_KEY
+
+    const fetchHeaders: Record<string, string> = {
+      'Authorization': `Bearer ${authKey}`,
+      'Content-Type': 'application/json',
+    }
+    if (useNemotron) {
+      fetchHeaders['HTTP-Referer'] = 'https://ayurahealth.vercel.app'
+      fetchHeaders['X-Title'] = 'AyuraHealth VAIDYA Deep Mind'
+    }
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
+      headers: fetchHeaders,
       body: JSON.stringify({
         model,
-        messages: [{ role: 'system', content: systemPrompt }, ...groqMessages],
-        max_tokens: 2500,
-        temperature: 0.7,
+        messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages],
+        max_tokens: deepThink ? 4000 : 2500,
+        temperature: deepThink ? 0.6 : 0.7,
         stream: true,
       }),
     })
 
     if (!response.ok) {
       const err = await response.text()
-      console.error('Groq error:', err)
-      return NextResponse.json({ error: 'AI service error' }, { status: 500 })
+      console.error('AI API error:', model, err)
+      if (useNemotron) {
+        const fallback = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages], max_tokens: 3000, temperature: 0.6, stream: true }),
+        })
+        if (fallback.ok) return new NextResponse(createStream(fallback), { headers: streamHeaders })
+      }
+      return NextResponse.json({ error: 'AI service temporarily unavailable. Please try again.' }, { status: 500 })
     }
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body?.getReader()
-        const decoder = new TextDecoder()
-        if (!reader) { controller.close(); return }
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) { controller.close(); break }
-          for (const line of decoder.decode(value).split('\n')) {
-            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-              try {
-                const data = JSON.parse(line.slice(6))
-                const content = data.choices?.[0]?.delta?.content
-                if (content) controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
-              } catch {}
-            }
-          }
-        }
-      },
-    })
+    return new NextResponse(createStream(response), { headers: streamHeaders })
 
-    return new NextResponse(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    })
   } catch (error) {
     console.error('VAIDYA error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
+
+const streamHeaders = {
+  'Content-Type': 'text/event-stream',
+  'Cache-Control': 'no-cache',
+  'Connection': 'keep-alive',
+}
+
+function createStream(response: Response): ReadableStream {
+  return new ReadableStream({
+    async start(controller) {
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      if (!reader) { controller.close(); return }
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) { controller.close(); break }
+        for (const line of decoder.decode(value).split('\n')) {
+          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+            try {
+              const data = JSON.parse(line.slice(6))
+              const content = data.choices?.[0]?.delta?.content
+              if (content) controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
+            } catch {}
+          }
+        }
+      }
+    },
+  })
 }
