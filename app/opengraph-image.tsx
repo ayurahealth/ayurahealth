@@ -50,7 +50,7 @@ export default async function Image() {
 
           {/* URL */}
           <div style={{ background: 'rgba(45,90,27,0.5)', border: '1px solid rgba(106,191,138,0.25)', borderRadius: '100px', padding: '12px 28px', display: 'flex' }}>
-            <span style={{ color: '#e8dfc8', fontSize: '18px' }}>ayurahealth.vercel.app</span>
+            <span style={{ color: '#e8dfc8', fontSize: '18px' }}>ayurahealth.com</span>
           </div>
         </div>
       </div>

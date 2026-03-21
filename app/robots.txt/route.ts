@@ -7,7 +7,7 @@ Allow: /chat
 
 Disallow: /api/
 
-Sitemap: https://ayurahealth.vercel.app/sitemap.xml`
+Sitemap: https://ayurahealth.com/sitemap.xml`
   return new NextResponse(content, {
     headers: { 'Content-Type': 'text/plain' }
   })

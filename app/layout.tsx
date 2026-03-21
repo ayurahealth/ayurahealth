@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/react'
 import './globals.css'
 
-const BASE_URL = 'https://ayurahealth.vercel.app'
+const BASE_URL = 'https://ayurahealth.com'
 
 export const viewport: Viewport = {
   themeColor: '#05100a',

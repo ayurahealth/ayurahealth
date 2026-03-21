@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const sections = [
   {
     title: '1. Who We Are',
-    content: 'AyuraHealth ("we", "our", "us") is an AI-powered holistic health companion providing educational health information based on Ayurveda, Traditional Chinese Medicine, and 6 other healing traditions. We are not a medical provider. Website: ayurahealth.vercel.app · Based in Tokyo, Japan.',
+    content: 'AyuraHealth ("we", "our", "us") is an AI-powered holistic health companion providing educational health information based on Ayurveda, Traditional Chinese Medicine, and 6 other healing traditions. We are not a medical provider. Website: ayurahealth.com · Based in Tokyo, Japan.',
   },
   {
     title: '2. What Data We Collect',

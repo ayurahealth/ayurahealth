@@ -138,7 +138,7 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
       'Content-Type': 'application/json',
     }
     if (useNemotron) {
-      fetchHeaders['HTTP-Referer'] = 'https://ayurahealth.vercel.app'
+      fetchHeaders['HTTP-Referer'] = 'https://ayurahealth.com'
       fetchHeaders['X-Title'] = 'AyuraHealth VAIDYA Deep Mind'
     }
 

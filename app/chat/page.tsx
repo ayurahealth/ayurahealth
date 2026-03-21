@@ -284,7 +284,7 @@ export default function ChatPage() {
       canvas.toBlob(async (blob: Blob | null) => {
         if (!blob) { setIsSharing(false); return }
         const file = new File([blob], `my-${dosha.toLowerCase()}-dosha.png`, { type: 'image/png' })
-        const shareData = { title: `I am ${dosha} — AyuraHealth`, text: `I just discovered my Ayurvedic dosha is ${dosha} ${DOSHA_META[dosha].emoji}\n\nFind yours free → ayurahealth.vercel.app`, files: [file] }
+        const shareData = { title: `I am ${dosha} — AyuraHealth`, text: `I just discovered my Ayurvedic dosha is ${dosha} ${DOSHA_META[dosha].emoji}\n\nFind yours free → ayurahealth.com`, files: [file] }
         if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
           await navigator.share(shareData); setShareSuccess(true); setTimeout(() => setShareSuccess(false), 3000)
         } else {
@@ -554,7 +554,7 @@ export default function ChatPage() {
               </div>
               <div style={{ position: 'absolute', bottom: 28, left: 0, right: 0, textAlign: 'center' }}>
                 <div style={{ color: '#c9a84c', fontSize: 16, fontWeight: 700, letterSpacing: '0.04em' }}>🌿 AyuraHealth</div>
-                <div style={{ color: 'rgba(200,200,200,0.3)', fontSize: 11, marginTop: 4, letterSpacing: '0.06em' }}>ayurahealth.vercel.app</div>
+                <div style={{ color: 'rgba(200,200,200,0.3)', fontSize: 11, marginTop: 4, letterSpacing: '0.06em' }}>ayurahealth.com</div>
               </div>
             </div>
             <button onClick={() => startChat(dosha)} style={{ width: '100%', padding: '1rem', background: `linear-gradient(135deg, ${DOSHA_META[dosha].color}90, ${DOSHA_META[dosha].color}60)`, color: '#fff', border: `1px solid ${DOSHA_META[dosha].color}50`, borderRadius: 16, fontSize: '1rem', fontWeight: 600, cursor: 'pointer', marginBottom: '0.75rem' }}>{tx.start_consult}</button>
