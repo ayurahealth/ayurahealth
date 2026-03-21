@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = `${VAIDYA_SYSTEM}
 ${selectedSystems}
 ${doshaCtx}
-LANGUAGE: ${langMap[lang || 'en'] || langMap.en}
+LANGUAGE: Respond entirely and only in ${langName}. Every word of your response must be in ${langName}.
 ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 traditions thoroughly. Show nuanced multi-tradition connections. Be comprehensive and cite specific classical chapters.' : ''}`
 
     const hasImages = attachments?.some((a: {type: string}) => a.type === 'image')
