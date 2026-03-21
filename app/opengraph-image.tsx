@@ -33,7 +33,7 @@ export default async function Image() {
 
           {/* Badge */}
           <div style={{ display: 'flex', marginBottom: '24px', background: 'rgba(106,191,138,0.08)', border: '1px solid rgba(106,191,138,0.2)', borderRadius: '100px', padding: '6px 18px' }}>
-            <span style={{ fontSize: '13px', color: 'rgba(106,191,138,0.9)', letterSpacing: '0.08em' }}>NVIDIA Nemotron · 8 Healing Traditions · Free</span>
+            <span style={{ fontSize: '13px', color: 'rgba(106,191,138,0.9)', letterSpacing: '0.08em' }}>VAIDYA Deep Mind · 8 Healing Traditions · Free</span>
           </div>
 
           {/* Title */}

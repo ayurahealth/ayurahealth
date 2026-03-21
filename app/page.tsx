@@ -229,7 +229,7 @@ export default function LandingPage() {
         <div className="glow" style={{ bottom: '10%', right: '10%', width: 300, height: 300, background: 'radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%)' }} />
 
         <div className="fade" style={{ position: 'relative', zIndex: 1, fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(106,191,138,0.6)', marginBottom: '1.75rem', fontFamily: '-apple-system, sans-serif' }}>
-          NVIDIA Nemotron · 8 Traditions · Always Free
+          8 Ancient Traditions · Always Free
         </div>
 
         <h1 className="hero-text fade-2" style={{ position: 'relative', zIndex: 1, marginBottom: '2rem' }}>
@@ -274,7 +274,7 @@ export default function LandingPage() {
         {[
           { n: '01', t: 'Discover Your Constitution', d: 'A 5-question assessment reveals your Vata, Pitta, or Kapha type — drawn from 5,000 years of Ayurvedic wisdom.', badge: null },
           { n: '02', t: 'VAIDYA Consults All Traditions', d: 'Cross-references Charaka Samhita, Huangdi Neijing, and 6 other classical texts. Ancient wisdom meets modern evidence.', badge: null },
-          { n: '03', t: 'Deep Mind Mode', d: 'Powered by NVIDIA Nemotron 120B. Deeper reasoning for complex conditions — more thorough cross-tradition analysis.', badge: 'NVIDIA Nemotron' },
+          { n: '03', t: 'Deep Mind Mode', d: 'Advanced reasoning across all 8 traditions. Deeper cross-tradition analysis for complex health questions.', badge: 'VAIDYA Deep Mind' },
         ].map((s, i) => (
           <div key={i} className="step-row">
             <div className="step-num">{s.n}</div>
