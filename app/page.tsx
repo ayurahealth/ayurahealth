@@ -251,36 +251,39 @@ export default function LandingPage() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #05100a; }
-        .hero-text { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(3rem, 8vw, 6.5rem); font-weight: 300; line-height: 1.08; letter-spacing: -0.02em; white-space: pre-line; background: linear-gradient(160deg, #e8dfc8 0%, #c9a84c 50%, #6abf8a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-tagline { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; white-space: pre-line; background: linear-gradient(160deg, #e8dfc8 0%, #c9a84c 50%, #6abf8a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .fade { animation: fadeUp 0.9s ease forwards; }
-        .fade-2 { animation: fadeUp 0.9s 0.15s ease forwards; opacity: 0; }
-        .fade-3 { animation: fadeUp 0.9s 0.3s ease forwards; opacity: 0; }
-        .fade-4 { animation: fadeUp 0.9s 0.45s ease forwards; opacity: 0; }
-        @keyframes fadeUp { from { opacity:0; transform: translateY(28px); } to { opacity:1; transform: translateY(0); } }
-        .btn-primary { display: inline-block; background: linear-gradient(135deg, #2d5a1b, #3d7a28); color: #e8dfc8; padding: 0.9rem 2.2rem; border-radius: 980px; font-size: 0.95rem; font-weight: 500; text-decoration: none; transition: all 0.25s; box-shadow: 0 4px 24px rgba(45,90,27,0.35); }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(45,90,27,0.5); }
-        .btn-ghost { display: inline-block; color: rgba(232,223,200,0.4); padding: 0.9rem 1.2rem; font-size: 0.9rem; text-decoration: none; transition: color 0.2s; }
-        .btn-ghost:hover { color: #e8dfc8; }
-        .lang-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(106,191,138,0.15); color: rgba(232,223,200,0.6); padding: 0.28rem 0.85rem; border-radius: 980px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
-        .lang-btn:hover { border-color: rgba(106,191,138,0.35); color: #e8dfc8; background: rgba(106,191,138,0.08); }
+        .fade-2 { animation: fadeUp 0.9s 0.1s ease forwards; opacity: 0; }
+        .fade-3 { animation: fadeUp 0.9s 0.2s ease forwards; opacity: 0; }
+        .fade-4 { animation: fadeUp 0.9s 0.3s ease forwards; opacity: 0; }
+        .fade-5 { animation: fadeUp 0.9s 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+        .btn-primary { display: inline-block; background: linear-gradient(135deg, #2d5a1b, #3d7a28); color: #e8dfc8; padding: 1rem 2.4rem; border-radius: 980px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.25s; box-shadow: 0 4px 24px rgba(45,90,27,0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(45,90,27,0.55); }
+        .btn-secondary { display: inline-block; color: #e8dfc8; padding: 1rem 1.8rem; border-radius: 980px; font-size: 0.95rem; font-weight: 500; text-decoration: none; transition: all 0.2s; border: 1px solid rgba(232,223,200,0.3); }
+        .btn-secondary:hover { background: rgba(232,223,200,0.08); border-color: rgba(232,223,200,0.6); }
+        .lang-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(106,191,138,0.2); color: rgba(232,223,200,0.85); padding: 0.28rem 0.85rem; border-radius: 980px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+        .lang-btn:hover { border-color: rgba(106,191,138,0.5); color: #e8dfc8; background: rgba(106,191,138,0.08); }
+        .nav-link { color: rgba(232,223,200,0.75); font-size: 0.82rem; text-decoration: none; transition: all 0.2s; border: 1px solid rgba(106,191,138,0.2); padding: 0.28rem 0.85rem; border-radius: 980px; }
+        .nav-link:hover { color: #e8dfc8; border-color: rgba(106,191,138,0.5); }
         .picker-overlay { position: fixed; inset: 0; z-index: 999; display: flex; align-items: flex-start; justify-content: flex-end; padding: 56px 1rem 0; }
         .picker-box { background: rgba(12,22,12,0.97); border: 1px solid rgba(106,191,138,0.15); border-radius: 14px; width: 280px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); backdrop-filter: blur(20px); }
         .picker-search { width: 100%; background: rgba(255,255,255,0.04); border: none; border-bottom: 1px solid rgba(106,191,138,0.08); color: #e8dfc8; padding: 0.75rem 1rem; font-size: 0.85rem; outline: none; font-family: -apple-system, sans-serif; }
-        .picker-search::placeholder { color: rgba(232,223,200,0.25); }
+        .picker-search::placeholder { color: rgba(232,223,200,0.3); }
         .picker-list { max-height: 320px; overflow-y: auto; }
         .picker-list::-webkit-scrollbar { width: 3px; }
         .picker-list::-webkit-scrollbar-thumb { background: rgba(106,191,138,0.2); border-radius: 2px; }
         .lang-item { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 1rem; cursor: pointer; transition: background 0.15s; }
         .lang-item:hover { background: rgba(106,191,138,0.06); }
         .lang-item.active { background: rgba(106,191,138,0.08); }
+        .feature-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(106,191,138,0.1); border-radius: 16px; padding: 1.5rem; transition: all 0.25s; }
+        .feature-card:hover { background: rgba(106,191,138,0.05); border-color: rgba(106,191,138,0.25); transform: translateY(-2px); }
         .trad-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(106,191,138,0.08); border-radius: 16px; padding: 1.25rem; transition: all 0.25s; }
         .trad-card:hover { background: rgba(106,191,138,0.06); border-color: rgba(106,191,138,0.2); transform: translateY(-3px); }
         .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(106,191,138,0.12), transparent); }
         .step-row { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; align-items: start; padding: 2.5rem 0; border-bottom: 1px solid rgba(106,191,138,0.08); }
         .step-row:last-child { border-bottom: none; }
         .step-num { font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 300; line-height: 1; color: rgba(201,168,76,0.45); }
-        .nav-link { color: rgba(232,223,200,0.35); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
-        .nav-link:hover { color: #e8dfc8; }
         .glow { position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
         @media (max-width: 600px) { .step-row { grid-template-columns: 56px 1fr; gap: 1rem; } .step-num { font-size: 2.8rem; } .picker-overlay { justify-content: center; padding-top: 56px; } .picker-box { width: calc(100vw - 2rem); } }
       `}</style>
@@ -295,7 +298,7 @@ export default function LandingPage() {
                 <div key={l.code} className={`lang-item${l.code === lang ? ' active' : ''}`} onClick={() => selectLang(l.code)}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
                     <span style={{ fontSize: '0.85rem', color: '#e8dfc8' }}>{l.native}</span>
-                    {l.native !== l.name && <span style={{ fontSize: '0.7rem', color: 'rgba(232,223,200,0.3)' }}>{l.name}</span>}
+                    {l.native !== l.name && <span style={{ fontSize: '0.7rem', color: 'rgba(232,223,200,0.35)' }}>{l.name}</span>}
                   </div>
                   {l.code === lang && <span style={{ color: '#6abf8a', fontSize: '0.85rem' }}>✓</span>}
                 </div>
@@ -305,45 +308,57 @@ export default function LandingPage() {
         </div>
       )}
 
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 2rem', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: scrolled ? 'rgba(5,16,10,0.88)' : 'transparent', backdropFilter: scrolled ? 'blur(20px)' : 'none', borderBottom: scrolled ? '1px solid rgba(106,191,138,0.1)' : 'none', transition: 'all 0.35s' }}>
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 2rem', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: scrolled ? 'rgba(5,16,10,0.92)' : 'transparent', backdropFilter: scrolled ? 'blur(20px)' : 'none', borderBottom: scrolled ? '1px solid rgba(106,191,138,0.12)' : 'none', transition: 'all 0.35s' }}>
         <span style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.15rem', fontWeight: 600, color: '#c9a84c', letterSpacing: '0.02em' }}>🌿 AyuraHealth</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <button className="lang-btn" onClick={() => setShowPicker(!showPicker)}>
             <span style={{ fontSize: '0.8rem' }}>🌐</span>
             <span>{currentLang.native}</span>
-            <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>▾</span>
+            <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>▾</span>
           </button>
-          <Link href="/clinic" className="nav-link" style={{ border: '1px solid rgba(106,191,138,0.15)', padding: '0.25rem 0.7rem', borderRadius: 20 }}>{t.clinic}</Link>
+          <Link href="/clinic" className="nav-link">{t.clinic}</Link>
         </div>
       </nav>
 
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '8rem 2rem 5rem', position: 'relative', overflow: 'hidden' }}>
-        <div className="glow" style={{ top: '15%', left: '50%', transform: 'translateX(-50%)', width: 800, height: 600, background: 'radial-gradient(ellipse, rgba(45,90,27,0.2) 0%, transparent 65%)' }} />
-        <div className="fade" style={{ position: 'relative', zIndex: 1, fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(106,191,138,0.6)', marginBottom: '1.75rem', fontFamily: '-apple-system, sans-serif' }}>
-          VAIDYA DEEP MIND · 8 TRADITIONS · ALWAYS FREE
+      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '7rem 2rem 4rem', position: 'relative', overflow: 'hidden' }}>
+        <div className="glow" style={{ top: '10%', left: '50%', transform: 'translateX(-50%)', width: 900, height: 700, background: 'radial-gradient(ellipse, rgba(45,90,27,0.18) 0%, transparent 65%)' }} />
+        <div className="fade" style={{ position: 'relative', zIndex: 1, display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(106,191,138,0.08)', border: '1px solid rgba(106,191,138,0.2)', borderRadius: 980, padding: '0.35rem 1rem', marginBottom: '1.75rem' }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6abf8a', display: 'inline-block' }}/>
+          <span style={{ fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(106,191,138,0.85)', fontFamily: '-apple-system, sans-serif' }}>Free · No account required · Private</span>
         </div>
-        <h1 className="hero-text fade-2" style={{ position: 'relative', zIndex: 1, marginBottom: '2rem' }}>{t.tagline}</h1>
-        <p className="fade-3" style={{ position: 'relative', zIndex: 1, fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', color: 'rgba(232,223,200,0.45)', maxWidth: 520, lineHeight: 1.75, marginBottom: '2.5rem', fontFamily: '-apple-system, sans-serif' }}>{t.sub}</p>
-        <div className="fade-4" style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Link href={`/chat?lang=${lang}`} className="btn-primary">{t.cta}</Link>
-            <Link href={`/chat?lang=${lang}`} className="btn-ghost">Deep Mind Consultation →</Link>
+        <h1 className="fade-2" style={{ position: 'relative', zIndex: 1, fontFamily: '-apple-system, sans-serif', fontSize: 'clamp(1.5rem, 3.5vw, 2.6rem)', fontWeight: 600, color: '#e8dfc8', lineHeight: 1.2, marginBottom: '1rem', maxWidth: 680, letterSpacing: '-0.02em' }}>
+          Personalized health guidance from Ayurveda, Chinese Medicine & 6 healing traditions — powered by AI
+        </h1>
+        <div className="hero-tagline fade-3" style={{ position: 'relative', zIndex: 1, marginBottom: '1.5rem' }}>{t.tagline}</div>
+        <p className="fade-4" style={{ position: 'relative', zIndex: 1, fontSize: 'clamp(0.9rem, 2vw, 1rem)', color: 'rgba(232,223,200,0.55)', maxWidth: 520, lineHeight: 1.75, marginBottom: '2.5rem', fontFamily: '-apple-system, sans-serif' }}>
+          Describe your symptoms. VAIDYA responds with guidance from Charaka Samhita, Huangdi Neijing and 6 classical texts — in your language. In minutes.
+        </p>
+        <div className="fade-5" style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link href={`/chat?lang=${lang}`} className="btn-primary">Start Your Assessment →</Link>
+            <Link href="/diet" className="btn-secondary">🌿 Get Diet Chart</Link>
           </div>
-          <span style={{ fontSize: '0.7rem', color: 'rgba(232,223,200,0.2)', letterSpacing: '0.05em', fontFamily: '-apple-system, sans-serif' }}>{t.free}</span>
+          <span style={{ fontSize: '0.72rem', color: 'rgba(232,223,200,0.3)', letterSpacing: '0.05em', fontFamily: '-apple-system, sans-serif' }}>50+ languages · Sanskrit included · always free</span>
         </div>
       </section>
 
       <div className="divider" />
 
-      <section style={{ padding: '6rem 2rem', maxWidth: 960, margin: '0 auto' }}>
-        <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 300, textAlign: 'center', marginBottom: '0.6rem', color: '#e8dfc8' }}>{t.traditions}</h2>
-        <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.25)', fontSize: '0.8rem', marginBottom: '3rem', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>{t.tradSub}</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: '0.75rem' }}>
-          {TRADITIONS.map((item, i) => (
-            <div key={i} className="trad-card">
-              <div style={{ fontSize: '1.6rem', marginBottom: '0.65rem' }}>{item.icon}</div>
-              <div style={{ fontSize: '0.88rem', fontWeight: 500, color: '#e8dfc8', marginBottom: '0.25rem', fontFamily: '-apple-system, sans-serif' }}>{item.name}</div>
-              <div style={{ fontSize: '0.7rem', color: 'rgba(232,223,200,0.25)', fontFamily: '-apple-system, sans-serif' }}>{item.origin}</div>
+      <section style={{ padding: '5rem 2rem', maxWidth: 980, margin: '0 auto' }}>
+        <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.3)', fontSize: '0.75rem', marginBottom: '2.5rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>What AyuraHealth does for you</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+          {[
+            { icon: '🧬', title: 'Discover Your Dosha', desc: 'A 5-question quiz identifies your Vata, Pitta or Kapha body type. Every recommendation is then personalized to you.' },
+            { icon: '🌿', title: 'Herb & Diet Guidance', desc: 'Specific herbs with classical doses from Charaka Samhita. Generate a personalized 7-day diet chart for your constitution.' },
+            { icon: '📄', title: 'Blood Report Analysis', desc: 'Upload your lab reports. VAIDYA analyzes each biomarker from both modern medicine and Ayurvedic perspectives.' },
+            { icon: '🧠', title: 'VAIDYA Deep Mind', desc: 'Advanced reasoning across all 8 traditions for complex conditions. Deeper analysis with classical citations.' },
+            { icon: '🌍', title: '50+ Languages', desc: 'Consult in Hindi, Tamil, Japanese, Arabic, Sanskrit and 45+ more. Ancient wisdom in your own language.' },
+            { icon: '🔒', title: 'Private by Default', desc: 'Your conversations stay in your browser only. Nothing stored on servers. No account needed. Ever.' },
+          ].map((f, i) => (
+            <div key={i} className="feature-card">
+              <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>{f.icon}</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#e8dfc8', marginBottom: '0.5rem', fontFamily: '-apple-system, sans-serif' }}>{f.title}</div>
+              <div style={{ fontSize: '0.83rem', color: 'rgba(232,223,200,0.45)', lineHeight: 1.7, fontFamily: '-apple-system, sans-serif' }}>{f.desc}</div>
             </div>
           ))}
         </div>
@@ -351,7 +366,79 @@ export default function LandingPage() {
 
       <div className="divider" />
 
-      <section style={{ padding: '6rem 2rem', maxWidth: 760, margin: '0 auto' }}>
+      <section style={{ padding: '5rem 2rem', maxWidth: 700, margin: '0 auto' }}>
+        <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.3)', fontSize: '0.75rem', marginBottom: '1rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>Sample VAIDYA Response</p>
+        <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 300, textAlign: 'center', color: '#e8dfc8', marginBottom: '2rem' }}>Ask anything. Get wisdom from 5,000 years.</h2>
+        <div style={{ background: 'rgba(5,16,10,0.8)', border: '1px solid rgba(106,191,138,0.15)', borderRadius: 20, padding: '1.5rem 2rem', fontFamily: '-apple-system, sans-serif' }}>
+          <div style={{ background: 'rgba(45,90,27,0.15)', border: '1px solid rgba(106,191,138,0.1)', borderRadius: 12, padding: '0.75rem 1rem', marginBottom: '1.25rem', fontSize: '0.88rem', color: 'rgba(232,223,200,0.6)' }}>
+            💬 "I feel anxious, sleep poorly, and my digestion is irregular. What should I do?"
+          </div>
+          <p style={{ color: '#c9a84c', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>✦ VAIDYA'S SYNTHESIS</p>
+          <p style={{ fontSize: '0.85rem', color: 'rgba(232,223,200,0.7)', lineHeight: 1.8, marginBottom: '0.85rem' }}>These three symptoms together point to classic <strong style={{ color: '#6abf8a' }}>Vata imbalance</strong> — your air and space elements are in excess. Charaka Samhita describes this exact pattern in Nidanasthana Ch.1.</p>
+          <p style={{ color: '#6abf8a', fontWeight: 600, marginBottom: '0.35rem', fontSize: '0.8rem' }}>🌿 Ayurvedic View</p>
+          <p style={{ fontSize: '0.82rem', color: 'rgba(232,223,200,0.55)', lineHeight: 1.7, marginBottom: '0.85rem' }}>Ashwagandha 500mg with warm milk at night. Brahmi for the mind. Sesame oil self-massage before bed. Warm cooked foods only.</p>
+          <p style={{ color: '#6abf8a', fontWeight: 600, marginBottom: '0.35rem', fontSize: '0.8rem' }}>☯️ Chinese Medicine View</p>
+          <p style={{ fontSize: '0.82rem', color: 'rgba(232,223,200,0.4)', lineHeight: 1.7, marginBottom: '1.25rem' }}>Heart and Spleen Qi deficiency. Jujube seed tea (酸枣仁) before sleep. Acupoints HT-7, SP-6 recommended...</p>
+          <Link href="/chat" style={{ display: 'inline-block', fontSize: '0.82rem', color: '#6abf8a', textDecoration: 'none', border: '1px solid rgba(106,191,138,0.25)', padding: '0.5rem 1rem', borderRadius: 980 }}>
+            Get your full personalized response →
+          </Link>
+        </div>
+      </section>
+
+      <div className="divider" />
+
+      <section style={{ padding: '5rem 2rem', maxWidth: 860, margin: '0 auto' }}>
+        <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.3)', fontSize: '0.75rem', marginBottom: '3rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>Why people trust AyuraHealth</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+          {[
+            { quote: 'Finally explains WHY I should take turmeric — not just that I should. The Charaka Samhita citations are real.', name: 'Priya S.', location: 'Mumbai, India' },
+            { quote: 'I uploaded my blood report and VAIDYA mapped my high cortisol to Pitta aggravation. My Ayurvedic doctor agreed completely.', name: 'Kenji T.', location: 'Tokyo, Japan' },
+            { quote: 'Most authentic AI health tool I have found. It actually knows the classical texts and uses them properly.', name: 'Arjun M.', location: 'Bangalore, India' },
+          ].map((item, i) => (
+            <div key={i} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(106,191,138,0.08)', borderRadius: 16, padding: '1.5rem' }}>
+              <div style={{ fontSize: '1.2rem', color: '#c9a84c', marginBottom: '0.75rem' }}>❝</div>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(232,223,200,0.6)', lineHeight: 1.7, fontFamily: '-apple-system, sans-serif', marginBottom: '1rem' }}>{item.quote}</p>
+              <div style={{ fontSize: '0.78rem', color: '#6abf8a', fontFamily: '-apple-system, sans-serif' }}>{item.name}</div>
+              <div style={{ fontSize: '0.72rem', color: 'rgba(232,223,200,0.3)', fontFamily: '-apple-system, sans-serif' }}>{item.location}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: 'rgba(45,90,27,0.06)', border: '1px solid rgba(106,191,138,0.1)', borderRadius: 16, padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+          {[
+            { icon: '📚', title: 'Classical Sources', desc: 'Every recommendation traces to primary texts — Charaka Samhita, Ashtanga Hridayam, Huangdi Neijing. Not generic internet wellness.' },
+            { icon: '🔬', title: 'How the AI Works', desc: 'VAIDYA cross-references 8 healing tradition databases simultaneously. Deep Mind uses a 120B parameter model for complex analysis.' },
+            { icon: '⚕️', title: 'Safety First', desc: 'Educational guidance only. Not a substitute for professional medical care. Always consult a qualified practitioner for serious conditions.' },
+          ].map((item, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.4rem', flexShrink: 0 }}>{item.icon}</span>
+              <div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#e8dfc8', marginBottom: '0.35rem', fontFamily: '-apple-system, sans-serif' }}>{item.title}</div>
+                <div style={{ fontSize: '0.78rem', color: 'rgba(232,223,200,0.4)', lineHeight: 1.6, fontFamily: '-apple-system, sans-serif' }}>{item.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="divider" />
+
+      <section style={{ padding: '5rem 2rem', maxWidth: 960, margin: '0 auto' }}>
+        <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 300, textAlign: 'center', marginBottom: '0.5rem', color: '#e8dfc8' }}>{t.traditions}</h2>
+        <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.3)', fontSize: '0.78rem', marginBottom: '2.5rem', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>{t.tradSub}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: '0.75rem' }}>
+          {TRADITIONS.map((item, i) => (
+            <div key={i} className="trad-card">
+              <div style={{ fontSize: '1.6rem', marginBottom: '0.65rem' }}>{item.icon}</div>
+              <div style={{ fontSize: '0.88rem', fontWeight: 500, color: '#e8dfc8', marginBottom: '0.25rem', fontFamily: '-apple-system, sans-serif' }}>{item.name}</div>
+              <div style={{ fontSize: '0.7rem', color: 'rgba(232,223,200,0.3)', fontFamily: '-apple-system, sans-serif' }}>{item.origin}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="divider" />
+
+      <section style={{ padding: '5rem 2rem', maxWidth: 760, margin: '0 auto' }}>
         <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 300, marginBottom: '3rem', color: '#e8dfc8' }}>{t.how}</h2>
         {[
           { n: '01', title: t.s1t, desc: t.s1d, badge: null },
@@ -365,7 +452,7 @@ export default function LandingPage() {
                 <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.45rem', fontWeight: 400, color: '#e8dfc8' }}>{s.title}</h3>
                 {s.badge && <span style={{ fontSize: '0.62rem', background: 'rgba(118,185,0,0.12)', border: '1px solid rgba(118,185,0,0.3)', color: 'rgba(118,185,0,0.85)', padding: '0.15rem 0.5rem', borderRadius: 980, letterSpacing: '0.05em', fontFamily: '-apple-system, sans-serif', whiteSpace: 'nowrap' }}>{s.badge}</span>}
               </div>
-              <p style={{ color: 'rgba(232,223,200,0.38)', fontSize: '0.9rem', lineHeight: 1.8, fontFamily: '-apple-system, sans-serif' }}>{s.desc}</p>
+              <p style={{ color: 'rgba(232,223,200,0.45)', fontSize: '0.9rem', lineHeight: 1.8, fontFamily: '-apple-system, sans-serif' }}>{s.desc}</p>
             </div>
           </div>
         ))}
@@ -373,23 +460,27 @@ export default function LandingPage() {
 
       <div className="divider" />
 
-      <section style={{ padding: '8rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '7rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div className="glow" style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 700, height: 500, background: 'radial-gradient(ellipse, rgba(45,90,27,0.15) 0%, transparent 65%)' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>🌿</div>
           <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 300, lineHeight: 1.15, marginBottom: '1rem', color: '#e8dfc8' }}>{t.finalCta}</h2>
-          <p style={{ color: 'rgba(232,223,200,0.3)', marginBottom: '2.5rem', fontSize: '0.95rem', fontFamily: '-apple-system, sans-serif' }}>{t.finalSub}</p>
-          <Link href={`/chat?lang=${lang}`} className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.8rem' }}>{t.cta}</Link>
+          <p style={{ color: 'rgba(232,223,200,0.4)', marginBottom: '2.5rem', fontSize: '0.95rem', fontFamily: '-apple-system, sans-serif' }}>{t.finalSub}</p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href={`/chat?lang=${lang}`} className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.8rem' }}>Start Free Assessment →</Link>
+            <Link href="/diet" className="btn-secondary">Generate Diet Chart</Link>
+          </div>
+          <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'rgba(232,223,200,0.2)', fontFamily: '-apple-system, sans-serif' }}>⚕️ Educational guidance only · Not a substitute for professional medical advice</p>
         </div>
       </section>
 
       <footer style={{ borderTop: '1px solid rgba(106,191,138,0.08)', padding: '2rem', textAlign: 'center', background: 'rgba(0,0,0,0.2)' }}>
-        <p style={{ color: 'rgba(232,223,200,0.15)', fontSize: '0.72rem', marginBottom: '1rem', fontFamily: '-apple-system, sans-serif' }}>{t.footer}</p>
+        <p style={{ color: 'rgba(232,223,200,0.2)', fontSize: '0.72rem', marginBottom: '1rem', fontFamily: '-apple-system, sans-serif' }}>{t.footer}</p>
         <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {[['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['For Clinics', '/clinic'], ['Contact', '/contact']].map(([label, href]) => (
-            <a key={href} href={href} style={{ color: 'rgba(232,223,200,0.2)', fontSize: '0.72rem', textDecoration: 'none', fontFamily: '-apple-system, sans-serif' }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,223,200,0.5)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,223,200,0.2)')}
+          {[['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['For Clinics', '/clinic'], ['Diet Chart', '/diet'], ['Contact', '/contact']].map(([label, href]) => (
+            <a key={href} href={href} style={{ color: 'rgba(232,223,200,0.25)', fontSize: '0.72rem', textDecoration: 'none', fontFamily: '-apple-system, sans-serif', transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,223,200,0.6)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,223,200,0.25)')}
             >{label}</a>
           ))}
         </div>
