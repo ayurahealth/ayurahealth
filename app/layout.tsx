@@ -5,7 +5,7 @@ import './globals.css'
 const BASE_URL = 'https://ayurahealth.com'
 
 export const viewport: Viewport = {
-  themeColor: '#05100a',
+  themeColor: '#1a4d2e',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     alternateLocale: ['ja_JP', 'hi_IN', 'zh_CN', 'ko_KR', 'ar_SA'],
     images: [
       {
-        url: `${BASE_URL}/opengraph-image`,
+        url: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663443572913/nQYKCbsnkVANj8fjMcN4AQ/ayurahealth-og-image-nYXFGjSjXCSWu9Kkaoniqc.png',
         width: 1200,
         height: 630,
         alt: 'AyuraHealth — Ancient Wisdom, Modern AI · Natural Healing',

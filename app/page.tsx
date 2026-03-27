@@ -309,7 +309,10 @@ export default function LandingPage() {
       )}
 
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 2rem', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: scrolled ? 'rgba(5,16,10,0.92)' : 'transparent', backdropFilter: scrolled ? 'blur(20px)' : 'none', borderBottom: scrolled ? '1px solid rgba(106,191,138,0.12)' : 'none', transition: 'all 0.35s' }}>
-        <span style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.15rem', fontWeight: 600, color: '#c9a84c', letterSpacing: '0.02em' }}>🌿 AyuraHealth</span>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+          <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663443572913/nQYKCbsnkVANj8fjMcN4AQ/ayurahealth-favicon-32-W9FpdYEkk6bV4kRDmwm3C9.png" alt="AyuraHealth" style={{ height: 32, width: 32 }} />
+          <span style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.15rem', fontWeight: 600, color: '#c9a84c', letterSpacing: '0.02em' }}>AyuraHealth</span>
+        </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <button className="lang-btn" onClick={() => setShowPicker(!showPicker)}>
             <span style={{ fontSize: '0.8rem' }}>🌐</span>
