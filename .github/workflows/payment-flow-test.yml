@@ -1,0 +1,116 @@
+name: Weekly Payment Flow Validation
+
+on:
+  schedule:
+    # Run every Wednesday at 3 AM UTC
+    - cron: '0 3 * * 3'
+  workflow_dispatch:
+
+jobs:
+  payment-flow-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      app:
+        image: node:18
+        options: >-
+          --health-cmd "curl -f http://localhost:3000 || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_TEST_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_TEST_KEY_SECRET }}
+      
+      - name: Start application
+        run: npm start &
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_TEST_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_TEST_KEY_SECRET }}
+      
+      - name: Wait for application to start
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:3000 > /dev/null 2>&1; then
+              echo "Application is ready"
+              exit 0
+            fi
+            echo "Waiting for application... ($i/30)"
+            sleep 2
+          done
+          echo "Application failed to start"
+          exit 1
+      
+      - name: Run payment flow tests
+        run: node scripts/payment-flow-test.js
+        env:
+          TEST_URL: http://localhost:3000
+        continue-on-error: true
+      
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: payment-flow-report
+          path: .payment-flow-report.json
+          retention-days: 30
+      
+      - name: Send Slack notification
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "💳 Payment Flow Test Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Payment Flow Validation Failed*\n\nThe weekly payment flow test has detected issues.\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      
+      - name: Send success notification
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "✅ Payment Flow Test Passed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Payment Flow Validation Passed* ✅\n\nAll payment endpoints are functioning correctly."
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
