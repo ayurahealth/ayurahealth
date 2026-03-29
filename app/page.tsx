@@ -382,7 +382,7 @@ export default function LandingPage() {
           <div style={{ background: 'rgba(45,90,27,0.15)', border: '1px solid rgba(106,191,138,0.1)', borderRadius: 12, padding: '0.75rem 1rem', marginBottom: '1.25rem', fontSize: '0.88rem', color: 'rgba(232,223,200,0.6)' }}>
             💬 &quot;I feel anxious, sleep poorly, and my digestion is irregular. What should I do?&quot;
           </div>
-          <p style={{ color: '#c9a84c', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>✦ VAIDYA'S SYNTHESIS</p>
+          <p style={{ color: '#c9a84c', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>✦ VAIDYA&apos;S SYNTHESIS</p>
           <p style={{ fontSize: '0.85rem', color: 'rgba(232,223,200,0.7)', lineHeight: 1.8, marginBottom: '0.85rem' }}>These three symptoms together point to classic <strong style={{ color: '#6abf8a' }}>Vata imbalance</strong> — your air and space elements are in excess. Charaka Samhita describes this exact pattern in Nidanasthana Ch.1.</p>
           <p style={{ color: '#6abf8a', fontWeight: 600, marginBottom: '0.35rem', fontSize: '0.8rem' }}>🌿 Ayurvedic View</p>
           <p style={{ fontSize: '0.82rem', color: 'rgba(232,223,200,0.55)', lineHeight: 1.7, marginBottom: '0.85rem' }}>Ashwagandha 500mg with warm milk at night. Brahmi for the mind. Sesame oil self-massage before bed. Warm cooked foods only.</p>

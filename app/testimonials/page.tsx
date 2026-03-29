@@ -121,7 +121,7 @@ export default function TestimonialsPage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold mb-4">Ready to Transform Your Health?</h3>
           <p className="text-lg mb-8 opacity-90">
-            Join thousands of users discovering the power of holistic health. Start your journey today—it's free forever.
+            Join thousands of users discovering the power of holistic health. Start your journey today&mdash;it&apos;s free forever.
           </p>
           <Link href="/chat">
             <button className="bg-white text-emerald-600 px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">

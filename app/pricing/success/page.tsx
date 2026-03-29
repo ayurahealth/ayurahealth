@@ -105,7 +105,7 @@ export default function SuccessPage() {
               )}
 
               <div className="next-steps">
-                <h3>🎉 What's Next?</h3>
+                <h3>🎉 What&apos;s Next?</h3>
                 <ol>
                   <li>Check your email for a confirmation receipt and invoice</li>
                   <li>Your premium features are now available in the app</li>

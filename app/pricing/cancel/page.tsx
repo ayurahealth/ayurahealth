@@ -48,7 +48,7 @@ export default function CancelPage() {
               <h3>Why did you cancel?</h3>
               <div className="faq-item">
                 <strong>Not ready yet?</strong>
-                <p>No problem! You can try our free plan anytime. Upgrade whenever you're ready.</p>
+                <p>No problem! You can try our free plan anytime. Upgrade whenever you&apos;re ready.</p>
               </div>
               <div className="faq-item">
                 <strong>Have questions?</strong>

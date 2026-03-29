@@ -9,14 +9,19 @@ interface VoiceInputProps {
 export default function VoiceInput({ onTranscript, language }: VoiceInputProps) {
   const [isRecording, setIsRecording] = useState(false)
   const [transcript, setTranscript] = useState('')
-  const [isSupported, setIsSupported] = useState(false)
+  const [isSupported] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as unknown as { SpeechRecognition?: typeof window.SpeechRecognition; webkitSpeechRecognition?: typeof window.SpeechRecognition }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition
+      return !!SpeechRecognition
+    }
+    return false
+  })
   const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && isSupported) {
       const SpeechRecognition = (window as unknown as { SpeechRecognition?: typeof window.SpeechRecognition; webkitSpeechRecognition?: typeof window.SpeechRecognition }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition
       if (SpeechRecognition) {
-        setIsSupported(true)
         recognitionRef.current = new SpeechRecognition()
         recognitionRef.current.continuous = true
         recognitionRef.current.interimResults = true
@@ -39,7 +44,7 @@ export default function VoiceInput({ onTranscript, language }: VoiceInputProps) 
           }
           setTranscript(interim)
         }
-        recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+        recognitionRef.current.onerror = () => {
           // Error silently handled
         }
       }

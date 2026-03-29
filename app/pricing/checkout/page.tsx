@@ -75,7 +75,7 @@ export default function CheckoutPage() {
       } else {
         setError(data.error || 'Failed to create checkout session')
       }
-    } catch (err) {
+    } catch {
       setError('Payment processing failed. Please try again.')
       // Error logged server-side, not exposed to client
     } finally {
@@ -159,7 +159,7 @@ export default function CheckoutPage() {
 
         setLoading(false)
       }
-    } catch (err) {
+    } catch {
       setError('Payment processing failed. Please try again.')
       // Error logged server-side, not exposed to client
       setLoading(false)
@@ -205,7 +205,7 @@ export default function CheckoutPage() {
         <div className="checkout-container">
           <div className="checkout-card">
             <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontFamily: '"Cormorant Garamond", serif', fontWeight: 300 }}>Complete Your Purchase</h1>
-            <p style={{ color: 'rgba(232,223,200,0.6)', marginBottom: '2rem' }}>You're one step away from unlocking premium features</p>
+            <p style={{ color: 'rgba(232,223,200,0.6)', marginBottom: '2rem' }}>You&apos;re one step away from unlocking premium features</p>
 
             {error && <div className="error-message">{error}</div>}
 
