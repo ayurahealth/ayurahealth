@@ -1,4 +1,7 @@
 import Link from 'next/link'
+
+export const dynamic = 'force-dynamic'
+
 export default function NotFound() {
   return (
     <div style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', flexDirection: 'column', gap: '1.5rem', padding: '2rem' }}>
