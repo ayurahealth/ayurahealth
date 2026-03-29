@@ -1,12 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-11-20',
-})
+export const dynamic = 'force-dynamic'
+
+let stripe: Stripe | null = null
+
+function getStripe() {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2026-03-25.dahlia' as any,
+    })
+  }
+  return stripe
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const stripeInstance = getStripe()
+    if (!stripeInstance) {
+      return NextResponse.json(
+        { error: 'Stripe is not configured' },
+        { status: 500 }
+      )
+    }
+
     const body = await request.json()
     const { tier, email, successUrl, cancelUrl } = body
 
@@ -50,8 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+    const sessionParams: any = {
       mode: 'subscription',
       customer_email: email,
       line_items: [
@@ -61,13 +77,12 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: priceInfo.name,
               description: `AyuraHealth ${tier.replace('-', ' ').toUpperCase()} Subscription`,
-              images: ['https://d2xsxph8kpxj0f.cloudfront.net/310519663443572913/nQYKCbsnkVANj8fjMcN4AQ/ayurahealth-logo-modern-ai-ancient-Masdabix7xfaPSuHh7ULd8.webp'],
             },
             unit_amount: priceInfo.amount,
             recurring: {
               interval: priceInfo.interval as 'month' | 'year',
               interval_count: 1,
-              trial_period_days: 7, // 7-day free trial
+              trial_period_days: 7,
             },
           },
           quantity: 1,
@@ -79,7 +94,8 @@ export async function POST(request: NextRequest) {
         tier,
         email,
       },
-    })
+    }
+    const session = await stripeInstance.checkout.sessions.create(sessionParams)
 
     return NextResponse.json({ sessionId: session.id, url: session.url })
   } catch (error) {
