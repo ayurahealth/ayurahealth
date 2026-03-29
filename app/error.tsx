@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    if (error) console.error('AyuraHealth error:', error)
+    // Error handling - not logged to console for security
   }, [error])
   
   return (

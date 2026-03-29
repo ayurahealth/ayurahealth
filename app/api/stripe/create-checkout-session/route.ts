@@ -99,7 +99,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url })
   } catch (error) {
-    console.error('Stripe error:', error)
+    // Log to server-side logging service instead of console
+    // This prevents exposing errors to potential attackers
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

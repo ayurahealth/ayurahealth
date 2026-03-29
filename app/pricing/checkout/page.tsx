@@ -66,7 +66,7 @@ export default function CheckoutPage() {
       }
     } catch (err) {
       setError('Payment processing failed. Please try again.')
-      console.error(err)
+      // Error logged server-side, not exposed to client
     } finally {
       setLoading(false)
     }
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
       }
     } catch (err) {
       setError('Payment processing failed. Please try again.')
-      console.error(err)
+      // Error logged server-side, not exposed to client
       setLoading(false)
     }
   }

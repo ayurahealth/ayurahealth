@@ -295,7 +295,7 @@ export default function ChatPage() {
           setShareSuccess(true); setTimeout(() => setShareSuccess(false), 3000)
         }
       }, 'image/png')
-    } catch (e) { console.error(e) }
+    } catch (e) { /* Error silently handled */ }
     finally { setIsSharing(false) }
   }
 

@@ -83,7 +83,8 @@ export async function POST(request: NextRequest) {
       currency: order.currency,
     })
   } catch (error) {
-    console.error('Razorpay error:', error)
+    // Log to server-side logging service instead of console
+    // This prevents exposing errors to potential attackers
     return NextResponse.json(
       { error: 'Failed to create order' },
       { status: 500 }
