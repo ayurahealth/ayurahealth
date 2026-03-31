@@ -16,6 +16,13 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  // If Clerk keys are missing, don't crash. Just let the request pass.
+  // This helps you see the page even before auth is fully configured.
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    console.warn("Clerk Publishable Key is missing. Middleware is bypassing auth protection.");
+    return;
+  }
+
   if (!isPublicRoute(request)) {
     await auth.protect();
   }
