@@ -1,30 +1,50 @@
-// Simple in-memory rate limiter — 20 requests per IP per minute
-const requests = new Map<string, { count: number; resetAt: number }>()
+/**
+ * In-memory rate limiter.
+ *
+ * ⚠️  Limitation: This resets on every cold-start/deployment and does NOT
+ * share state across multiple Vercel serverless instances. For production
+ * scale, replace with an edge KV store (Vercel KV / Upstash Redis).
+ *
+ * For now this provides baseline protection per-instance.
+ */
 
-export function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
+interface RateLimitEntry { count: number; resetAt: number }
+const chatRequests = new Map<string, RateLimitEntry>()
+const paymentRequests = new Map<string, RateLimitEntry>()
+
+function check(
+  store: Map<string, RateLimitEntry>,
+  ip: string,
+  max: number,
+  windowMs: number,
+): { allowed: boolean; remaining: number } {
   const now = Date.now()
-  const windowMs = 60 * 1000 // 1 minute
-  const maxRequests = 20
+  const entry = store.get(ip)
 
-  const current = requests.get(ip)
-
-  if (!current || now > current.resetAt) {
-    requests.set(ip, { count: 1, resetAt: now + windowMs })
-    return { allowed: true, remaining: maxRequests - 1 }
+  if (!entry || now > entry.resetAt) {
+    store.set(ip, { count: 1, resetAt: now + windowMs })
+    return { allowed: true, remaining: max - 1 }
   }
 
-  if (current.count >= maxRequests) {
-    return { allowed: false, remaining: 0 }
-  }
+  if (entry.count >= max) return { allowed: false, remaining: 0 }
 
-  current.count++
-  return { allowed: true, remaining: maxRequests - current.count }
+  entry.count++
+  return { allowed: true, remaining: max - entry.count }
 }
 
-// Clean up old entries every 5 minutes to prevent memory leak
+/** Chat API: 20 requests per IP per minute */
+export function checkRateLimit(ip: string) {
+  return check(chatRequests, ip, 20, 60_000)
+}
+
+/** Payment APIs: 5 requests per IP per minute (stricter) */
+export function checkPaymentRateLimit(ip: string) {
+  return check(paymentRequests, ip, 5, 60_000)
+}
+
+// Clean up every 5 minutes to prevent memory leak
 setInterval(() => {
   const now = Date.now()
-  for (const [key, value] of requests.entries()) {
-    if (now > value.resetAt) requests.delete(key)
-  }
-}, 5 * 60 * 1000)
+  for (const [k, v] of chatRequests.entries()) if (now > v.resetAt) chatRequests.delete(k)
+  for (const [k, v] of paymentRequests.entries()) if (now > v.resetAt) paymentRequests.delete(k)
+}, 5 * 60_000)
