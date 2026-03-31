@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Razorpay from 'razorpay'
+import { auth } from '@clerk/nextjs/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +24,11 @@ export async function POST(request: NextRequest) {
         { error: 'Razorpay is not configured' },
         { status: 500 }
       )
+    }
+
+    const { userId } = await auth();
+    if (!userId) {
+       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json()
@@ -71,6 +77,7 @@ export async function POST(request: NextRequest) {
       notes: {
         tier,
         email,
+        userId
       },
     }
 

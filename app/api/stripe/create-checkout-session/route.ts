@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { auth } from '@clerk/nextjs/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +23,11 @@ export async function POST(request: NextRequest) {
         { error: 'Stripe is not configured' },
         { status: 500 }
       )
+    }
+
+    const { userId } = await auth();
+    if (!userId) {
+       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json()
@@ -93,6 +99,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         tier,
         email,
+        userId
       },
     }
     const session = await stripeInstance.checkout.sessions.create(sessionParams)

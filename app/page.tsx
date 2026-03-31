@@ -67,8 +67,8 @@ const T: Record<string, {
   finalCta: string, finalSub: string, footer: string, clinic: string
 }> = {
   en: {
-    tagline: 'Ancient Wisdom.\nModern AI.\nNatural Healing.',
-    sub: 'Your personal health companion — combining Ayurveda, Chinese Medicine, and 6 ancient healing traditions with AI.',
+    tagline: 'AYURAHEALTH\nAI Wellness Platform',
+    sub: 'Personalized Ayurvedic guidance powered by AI.',
     cta: 'Begin Your Journey', free: 'Free · No account required · Private',
     traditions: '8 Healing Traditions', tradSub: 'The first AI to unify all major healing systems',
     how: 'How VAIDYA Heals You',
@@ -254,12 +254,12 @@ export default function LandingPage() {
   const isRTL = ['ar', 'fa', 'ur', 'he'].includes(lang)
 
   return (
-    <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#05100a', minHeight: '100vh', color: '#e8dfc8', overflowX: 'hidden' }}>
+    <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#ffffff', minHeight: '100vh', color: '#2d5a1b', overflowX: 'hidden' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #05100a; }
-        .hero-tagline { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; white-space: pre-line; background: linear-gradient(160deg, #e8dfc8 0%, #c9a84c 50%, #6abf8a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        body { background: #ffffff; color: #3d4a3e; }
+        .hero-tagline { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; white-space: pre-line; background: linear-gradient(160deg, #1a4d2e 0%, #3d7a28 50%, #6abf8a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .fade { animation: fadeUp 0.9s ease forwards; }
         .fade-2 { animation: fadeUp 0.9s 0.1s ease forwards; opacity: 0; }
         .fade-3 { animation: fadeUp 0.9s 0.2s ease forwards; opacity: 0; }
@@ -316,10 +316,10 @@ export default function LandingPage() {
         </div>
       )}
 
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 2rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: scrolled ? 'rgba(5,16,10,0.95)' : 'transparent', backdropFilter: scrolled ? 'blur(20px)' : 'none', borderBottom: scrolled ? '1px solid rgba(106,191,138,0.15)' : 'none', transition: 'all 0.35s', boxShadow: scrolled ? '0 4px 20px rgba(0,0,0,0.3)' : 'none' }}>
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 2rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent', backdropFilter: scrolled ? 'blur(20px)' : 'none', borderBottom: scrolled ? '1px solid rgba(106,191,138,0.15)' : 'none', transition: 'all 0.35s', boxShadow: scrolled ? '0 4px 20px rgba(0,0,0,0.05)' : 'none' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', transition: 'transform 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'} >
-          <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663443572913/nQYKCbsnkVANj8fjMcN4AQ/ayurahealth-logo-modern-ai-ancient-Masdabix7xfaPSuHh7ULd8.webp" alt="AyuraHealth" style={{ height: 48, width: 48, borderRadius: '8px' }} />
-          <span style={{ fontFamily: '&quot;Cormorant Garamond&quot;, serif', fontSize: '1.35rem', fontWeight: 600, color: '#e8dfc8', letterSpacing: '0.02em' }}>AyuraHealth</span>
+          <img src="/favicon.svg" alt="AyuraHealth" style={{ height: 38, width: 38 }} />
+          <span style={{ fontFamily: '&quot;Cormorant Garamond&quot;, serif', fontSize: '1.35rem', fontWeight: 700, color: '#1a4d2e', letterSpacing: '0.02em' }}>AyuraHealth</span>
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <button className="lang-btn" onClick={() => setShowPicker(!showPicker)}>
