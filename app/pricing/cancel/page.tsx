@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Logo from '../../../components/Logo'
 
 export default function CancelPage() {
   return (
@@ -29,7 +30,7 @@ export default function CancelPage() {
       {/* Navigation */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 2rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(5,16,10,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(106,191,138,0.15)' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-          <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663443572913/nQYKCbsnkVANj8fjMcN4AQ/ayurahealth-logo-modern-ai-ancient-Masdabix7xfaPSuHh7ULd8.webp" alt="AyuraHealth" style={{ height: 48, width: 48, borderRadius: '8px' }} />
+          <Logo size={48} showText={false} />
           <span style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.35rem', fontWeight: 600, color: '#e8dfc8' }}>AyuraHealth</span>
         </Link>
       </nav>

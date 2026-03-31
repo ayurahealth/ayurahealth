@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     alternateLocale: ['ja_JP', 'hi_IN', 'zh_CN', 'ko_KR', 'ar_SA'],
     images: [
       {
-        url: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663443572913/nQYKCbsnkVANj8fjMcN4AQ/ayurahealth-og-image-nYXFGjSjXCSWu9Kkaoniqc.png',
+        url: `${BASE_URL}/opengraph-image`,
         width: 1200,
         height: 630,
         alt: 'AyuraHealth — Ancient Wisdom, Modern AI · Natural Healing',
