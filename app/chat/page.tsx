@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useUser } from '@clerk/nextjs'
 import { t, type Lang } from '../../lib/translations'
 
 interface Message { role: 'user' | 'assistant'; content: string }
@@ -81,6 +82,7 @@ function isValidUrl(str: string): boolean {
 }
 
 export default function ChatPage() {
+  const { user, isLoaded } = useUser()
   const [lang, setLang] = useState<Lang>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ayura_lang')
@@ -251,7 +253,25 @@ export default function ChatPage() {
     const newAnswers = [...answers, d]
     setAnswers(newAnswers)
     if (currentQ < QUESTIONS(lang).length - 1) setCurrentQ(currentQ + 1)
-    else { setDosha(calcDosha(newAnswers)); setScreen('result') }
+    else { 
+      const resultDosha = calcDosha(newAnswers)
+      setDosha(resultDosha)
+      setScreen('result')
+
+      // Save to Database if user is signed in
+      if (user) {
+        fetch('/api/user-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            primaryDosha: resultDosha,
+            vataScore: newAnswers.filter(a => a === 'Vata').length * 20,
+            pittaScore: newAnswers.filter(a => a === 'Pitta').length * 20,
+            kaphaScore: newAnswers.filter(a => a === 'Kapha').length * 20
+          })
+        }).catch(err => console.error('Failed to save profile:', err))
+      }
+    }
   }
 
   const startChat = useCallback((d?: Dosha | null) => {

@@ -104,9 +104,12 @@ export const metadata: Metadata = {
   category: 'health',
 }
 
+import { ClerkProvider } from '@clerk/nextjs'
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <ClerkProvider>
+      <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -162,5 +165,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Analytics />
       </body>
     </html>
+    </ClerkProvider>
   )
 }

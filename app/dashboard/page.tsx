@@ -16,11 +16,7 @@ export default async function DashboardPage() {
   
   // Provide mock local user if they aren't signed in so they can see the design
   if (!user) {
-    user = {
-      id: 'mock-local-123',
-      firstName: 'Guest',
-      emailAddresses: [{ emailAddress: 'guest@ayurahealth.com' }],
-    } as any
+    redirect('/')
   }
   
   const userEmail = user.emailAddresses?.[0]?.emailAddress || 'guest@ayurahealth.com'
