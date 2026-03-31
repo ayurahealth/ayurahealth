@@ -109,14 +109,18 @@ Use this EXACT format:
             if (line.startsWith('data: ')) {
               try {
                 const d = JSON.parse(line.slice(6))
-                if (d.content) { full += d.content; setDiet(full) }
+                if (d.content) { full += d.content }
               } catch {}
             }
           }
         }
       }
-    } catch { setDiet('Error generating diet chart. Please try again.') }
-    finally { setLoading(false) }
+      setDiet(full)
+    } catch {
+      setDiet('Error generating diet chart. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const formatDiet = (text: string) => {
