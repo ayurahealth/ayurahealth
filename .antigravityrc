@@ -1,0 +1,57 @@
+# Antigravity Build Configuration
+
+# Environment
+NODE_ENV=production
+NPM_REGISTRY=https://registry.npmjs.org/
+
+# Build Configuration
+ENABLE_CACHING=true
+CACHE_LAYERS=node_modules,build,.next
+CACHE_TTL=3600
+
+# Build Optimization
+OPTIMIZE_BUILD=true
+MINIFY_CODE=true
+TREE_SHAKE=true
+SOURCE_MAPS=false
+
+# Next.js Specific
+NEXT_TELEMETRY_DISABLED=1
+NEXT_SKIP_ENV_VALIDATION=false
+
+# Performance
+ENABLE_COMPRESSION=true
+ENABLE_BROTLI=true
+ENABLE_GZIP=true
+
+# Security
+ENABLE_SECURITY_HEADERS=true
+ENABLE_CSP=true
+ENABLE_HSTS=true
+
+# Logging
+LOG_LEVEL=info
+LOG_FORMAT=json
+
+# Deployment
+DEPLOYMENT_TIMEOUT=600
+HEALTH_CHECK_TIMEOUT=5
+HEALTH_CHECK_INTERVAL=30
+
+# Database
+DATABASE_POOL_SIZE=20
+DATABASE_POOL_TIMEOUT=30
+
+# API Configuration
+API_TIMEOUT=30000
+API_RETRY_ATTEMPTS=3
+API_RETRY_DELAY=1000
+
+# Payment Processing
+STRIPE_API_VERSION=2023-10-16
+RAZORPAY_API_VERSION=v1
+
+# Feature Flags
+ENABLE_ANALYTICS=true
+ENABLE_ERROR_TRACKING=true
+ENABLE_PERFORMANCE_MONITORING=true

@@ -1,0 +1,82 @@
+{
+  "projectId": "your-project-id-here",
+  "name": "ayurahealth",
+  "description": "AI-powered Ayurvedic wellness platform with Stripe and Razorpay integration",
+  "runtime": "node18",
+  "buildCommand": "npm run build",
+  "startCommand": "npm start",
+  "regions": ["us-east-1", "eu-west-1"],
+  "environment": "production",
+  "healthCheck": {
+    "path": "/api/health",
+    "interval": 30,
+    "timeout": 5,
+    "unhealthyThreshold": 3,
+    "healthyThreshold": 2
+  },
+  "scaling": {
+    "minInstances": 1,
+    "maxInstances": 10,
+    "cpuThreshold": 70,
+    "memoryThreshold": 80,
+    "scaleUpCooldown": 60,
+    "scaleDownCooldown": 300
+  },
+  "resources": {
+    "memory": "1024",
+    "cpu": "1",
+    "disk": "10GB"
+  },
+  "environment_variables": [
+    "NEXT_PUBLIC_RAZORPAY_KEY_ID",
+    "RAZORPAY_KEY_SECRET",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_PUBLISHABLE_KEY",
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "NEXT_PUBLIC_API_URL",
+    "NODE_ENV"
+  ],
+  "secrets": [
+    "RAZORPAY_KEY_SECRET",
+    "STRIPE_SECRET_KEY",
+    "JWT_SECRET"
+  ],
+  "buildCache": {
+    "enabled": true,
+    "paths": [
+      "node_modules",
+      ".next"
+    ]
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "retention": 30
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": [
+      "cpu",
+      "memory",
+      "requests",
+      "errors",
+      "latency"
+    ]
+  },
+  "security": {
+    "enableSSL": true,
+    "enableWAF": true,
+    "enableDDoSProtection": true,
+    "corsOrigins": [
+      "https://yourdomain.com",
+      "https://www.yourdomain.com"
+    ]
+  },
+  "deployment": {
+    "strategy": "blue-green",
+    "maxUnavailable": "0%",
+    "maxSurge": "25%",
+    "timeout": 600
+  }
+}
