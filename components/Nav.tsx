@@ -42,6 +42,7 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
   )
 
   const defaultLinks = links || [
+    { label: 'Vedic Pulse', href: '/dashboard' },
     { label: '💳 Pricing', href: '/pricing' },
     { label: 'For Clinics →', href: '/clinic' },
   ]

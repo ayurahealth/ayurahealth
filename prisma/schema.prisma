@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model UserProfile {
+  id             String   @id // Maps to Clerk User ID
+  email          String   @unique
+  primaryDosha   String?  // e.g. "Vata-Pitta"
+  vataScore      Int?     // e.g. 45
+  pittaScore     Int?
+  kaphaScore     Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  chatSessions   ChatSession[]
+}
+
+model ChatSession {
+  id             String   @id @default(uuid())
+  userId         String
+  topic          String
+  summary        String
+  createdAt      DateTime @default(now())
+  
+  user           UserProfile @relation(fields: [userId], references: [id])
+}
