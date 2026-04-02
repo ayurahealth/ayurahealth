@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
     process.env.NEXT_PUBLIC_APP_URL,
     'https://ayurahealth.com',
     'https://www.ayurahealth.com',
+    process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : null
   ].filter(Boolean)
 
   if (origin && !allowedOrigins.includes(origin)) {

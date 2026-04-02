@@ -1,5 +1,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { useClerk, useUser } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Nav from '../components/Nav'
@@ -134,10 +136,28 @@ export default function LandingPage() {
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
   const heroRef = useRef<HTMLElement>(null)
 
+  const [teaserPrompt, setTeaserPrompt] = useState('')
+  const router = useRouter()
+  const clerk = useClerk()
+  const { isSignedIn } = useUser()
+
   useEffect(() => {
     const saved = localStorage.getItem('ayura_lang')
     if (saved) setLang(saved)
   }, [])
+
+  const handleTeaserSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!teaserPrompt.trim()) return
+
+    const chatUrl = `/chat?q=${encodeURIComponent(teaserPrompt.trim())}`
+
+    if (!isSignedIn) {
+      clerk.openSignIn({ fallbackRedirectUrl: chatUrl })
+    } else {
+      router.push(chatUrl)
+    }
+  }
 
   return (
     <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#05100a', minHeight: '100vh', color: '#e8dfc8', overflowX: 'hidden' }}>
@@ -334,15 +354,79 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 80, damping: 22, delay: 0.28 }}
-          style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.2rem' }}
+          style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.2rem', width: '100%', maxWidth: 680 }}
         >
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Link href={`/chat?lang=${lang}`} className="btn-primary">
-              Start Free Assessment →
+          <form 
+            onSubmit={handleTeaserSubmit}
+            style={{ 
+              width: '100%', 
+              background: 'rgba(255,255,255,0.03)', 
+              border: '1px solid rgba(106,191,138,0.25)', 
+              borderRadius: 24, 
+              padding: '0.5rem', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem',
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.5), inset 0 2px 10px rgba(255,255,255,0.02)'
+            }}
+          >
+            <textarea
+              value={teaserPrompt}
+              onChange={(e) => setTeaserPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleTeaserSubmit()
+                }
+              }}
+              placeholder="What are you feeling today? e.g., 'I feel anxious and my digestion is off'..."
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                color: '#e8dfc8',
+                fontSize: '1.05rem',
+                fontFamily: 'inherit',
+                padding: '1rem',
+                resize: 'none',
+                height: 60,
+                outline: 'none',
+                lineHeight: 1.5
+              }}
+            />
+            <button 
+              type="submit"
+              disabled={!teaserPrompt.trim()}
+              style={{
+                background: teaserPrompt.trim() ? '#6abf8a' : 'rgba(106,191,138,0.15)',
+                color: teaserPrompt.trim() ? '#05100a' : 'rgba(232,223,200,0.3)',
+                border: 'none',
+                borderRadius: 20,
+                width: 50,
+                height: 50,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: teaserPrompt.trim() ? 'pointer' : 'default',
+                transition: 'all 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+                flexShrink: 0
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+            </button>
+          </form>
+          
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '0.5rem' }}>
+            <Link href="/diet" style={{ color: 'rgba(106,191,138,0.8)', fontSize: '0.85rem', textDecoration: 'none', border: '1px solid rgba(106,191,138,0.2)', padding: '0.35rem 0.8rem', borderRadius: 980 }}>
+              🌿 Get Diet Chart Instead
             </Link>
-            <Link href="/diet" className="btn-secondary">🌿 Get Diet Chart</Link>
           </div>
-          <span style={{ fontSize: '0.7rem', color: 'rgba(106,191,138,0.45)', letterSpacing: '0.07em', fontFamily: '-apple-system, sans-serif' }}>
+
+          <span style={{ fontSize: '0.75rem', color: 'rgba(232,223,200,0.35)', letterSpacing: '0.07em', fontFamily: '-apple-system, sans-serif', marginTop: '0.5rem' }}>
             3 free AI consultations · Upgrade from $4.99/mo · No credit card needed
           </span>
         </motion.div>

@@ -133,6 +133,22 @@ export default function ChatPage() {
   const doshaColor = dosha ? DOSHA_META[dosha].color : '#6abf8a'
   const tx = t[lang]
 
+  // Intercept the /chat?q=... parameter from the landing page growth hack
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const qs = new URLSearchParams(window.location.search)
+      const q = qs.get('q')
+      if (q && screen === 'landing' && messages.length === 0) {
+        setScreen('chat')
+        setInput(q)
+        // Optional: clear the URL so reloading doesn't reset it
+        const url = new URL(window.location.href)
+        url.searchParams.delete('q')
+        window.history.replaceState({}, '', url.toString())
+      }
+    }
+  }, [screen, messages.length])
+
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
