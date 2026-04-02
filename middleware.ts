@@ -1,11 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Define unauthenticated routes if needed. For now, /chat is open for guest previews.
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/admin(.*)"]);
+// Define public routes that do not require authentication
+const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)", "/api/webhooks(.*)", "/api/clinic-lead"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    // If the user isn't authenticated and tries to access protected routes, redirect to sign-in
+  if (!isPublicRoute(req)) {
+    // Force authentication on all other routes across the site
     await auth.protect();
   }
 });

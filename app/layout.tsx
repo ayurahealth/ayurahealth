@@ -18,6 +18,10 @@ export const metadata: Metadata = {
     default: 'AyuraHealth — Ancient Wisdom, Modern AI',
     template: '%s | AyuraHealth',
   },
+  icons: {
+    icon: '/favicon.png',
+    apple: '/favicon.png',
+  },
   description: 'Your personal holistic health companion — combining Ayurveda, Chinese Medicine, Tibetan, Unani, Siddha, Homeopathy, Naturopathy and Western Medicine. Powered by NVIDIA Nemotron. Free forever.',
   keywords: [
     'ayurveda', 'holistic health', 'dosha quiz', 'vata pitta kapha',
