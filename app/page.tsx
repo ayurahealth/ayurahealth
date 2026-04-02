@@ -14,13 +14,13 @@ const T: Record<string, {
   en: {
     tagline: 'Ancient Wisdom.\nModern AI.\nNatural Healing.',
     sub: 'Your personal health companion — unifying Ayurveda, Chinese Medicine, and 6 ancient healing traditions with the power of AI.',
-    cta: 'Begin Your Journey', free: 'Free · No account · Always private',
+    cta: 'Begin Your Journey', free: '3 free consultations · No credit card needed',
     traditions: '8 Healing Traditions', tradSub: 'The first AI to unify all major healing systems',
     how: 'How VAIDYA Heals You',
     s1t: 'Discover Your Constitution', s1d: 'A 5-question assessment reveals your Vata, Pitta, or Kapha type — drawn from 5,000 years of Ayurvedic wisdom.',
     s2t: 'VAIDYA Consults All Traditions', s2d: 'Cross-references Charaka Samhita, Huangdi Neijing, and 6 other classical texts simultaneously.',
     s3t: 'Deep Mind Mode', s3d: 'Advanced reasoning across all 8 traditions. Deeper cross-tradition analysis for complex health questions.',
-    finalCta: 'Healing has always been natural.', finalSub: 'Let VAIDYA guide you back to balance. Free, always.',
+    finalCta: 'Healing has always been natural.', finalSub: 'Start free with 3 consultations. Unlock unlimited access from $4.99/mo.',
     footer: 'For educational purposes only · Not a substitute for professional medical advice', clinic: 'For Clinics →',
   },
   hi: {
@@ -343,7 +343,7 @@ export default function LandingPage() {
             <Link href="/diet" className="btn-secondary">🌿 Get Diet Chart</Link>
           </div>
           <span style={{ fontSize: '0.7rem', color: 'rgba(106,191,138,0.45)', letterSpacing: '0.07em', fontFamily: '-apple-system, sans-serif' }}>
-            50+ languages · Sanskrit included · always free
+            3 free AI consultations · Upgrade from $4.99/mo · No credit card needed
           </span>
         </motion.div>
       </section>

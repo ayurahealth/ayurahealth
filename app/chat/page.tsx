@@ -114,6 +114,7 @@ export default function ChatPage() {
   const [attachLoading, setAttachLoading] = useState(false)
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
+  const [showPaywall, setShowPaywall] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -361,7 +362,14 @@ export default function ChatPage() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages, systems: selectedSystems, incognito, dosha, lang: (typeof window !== "undefined" ? localStorage.getItem("ayura_lang") || lang : lang), attachments: currentAttachments }),
       })
-      if (!res.ok) throw new Error('API error')
+      if (!res.ok) {
+        if (res.status === 402) {
+          setShowPaywall(true)
+          setLoading(false)
+          return
+        }
+        throw new Error('API error')
+      }
       const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''
       if (reader) {
         while (true) {
@@ -372,6 +380,17 @@ export default function ChatPage() {
         }
       }
       setMessages(prev => [...prev, { role: 'assistant', content: full }]); setStreaming('')
+      
+      if (newMessages.length <= 2 && user && !incognito) {
+        fetch('/api/chat-session', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ 
+             topic: content.slice(0, 50) + (content.length > 50 ? '...' : ''), 
+             summary: content 
+           })
+        }).catch(err => console.error('Failed to save chat session:', err));
+      }
     } catch { setMessages(prev => [...prev, { role: 'assistant', content: 'Connection interrupted. Please try again.' }]); setStreaming('') }
     finally { setLoading(false) }
   }
@@ -407,6 +426,42 @@ export default function ChatPage() {
         </svg>
         <div style={{ position: 'absolute', top: '-30%', left: '-20%', width: '80vw', height: '80vw', background: 'radial-gradient(circle, rgba(74,158,106,0.06) 0%, transparent 70%)', borderRadius: '50%' }} />
       </div>
+
+      {/* Paywall Modal */}
+      {showPaywall && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(12px)' }}>
+          <div style={{ background: 'linear-gradient(145deg, #0a1a0f, #081510)', border: '1px solid rgba(106,191,138,0.25)', borderRadius: 28, padding: '2.5rem 2rem', maxWidth: 440, width: '100%', textAlign: 'center', boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(106,191,138,0.1)' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem', filter: 'drop-shadow(0 0 24px rgba(201,168,76,0.5))' }}>🌿</div>
+            <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.9rem', fontWeight: 700, color: '#c9a84c', marginBottom: '0.5rem' }}>3 Free Consultations Used</div>
+            <p style={{ color: 'rgba(232,223,200,0.6)', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '2rem' }}>
+              You have experienced what VAIDYA can do. Thousands of years of healing wisdom — now unlock it fully.
+            </p>
+            <div style={{ background: 'rgba(106,191,138,0.06)', border: '1px solid rgba(106,191,138,0.15)', borderRadius: 16, padding: '1.25rem', marginBottom: '1.5rem', textAlign: 'left' }}>
+              {['Unlimited AI consultations', 'Advanced blood report analysis', 'Personalized weekly meal plans', 'Consultation history & export', '7-day free trial — cancel anytime'].map((f, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.35rem 0', fontSize: '0.85rem', color: 'rgba(232,223,200,0.75)' }}>
+                  <span style={{ color: '#6abf8a', fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                </div>
+              ))}
+            </div>
+            <div style={{ marginBottom: '0.75rem' }}>
+              <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.4rem', fontWeight: 300, color: '#e8dfc8', lineHeight: 1 }}>$4.99</div>
+              <div style={{ color: 'rgba(232,223,200,0.4)', fontSize: '0.8rem' }}>/month · 7-day free trial</div>
+            </div>
+            <a
+              href={`/pricing/checkout?tier=premium&billing=monthly&currency=usd`}
+              style={{ display: 'block', width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #1a4d2e, #2d7a45, #3a9455)', color: '#e8dfc8', border: '1px solid rgba(106,191,138,0.4)', borderRadius: 980, fontSize: '1rem', fontWeight: 700, textDecoration: 'none', marginBottom: '0.75rem', boxShadow: '0 8px 32px rgba(45,122,69,0.5)', cursor: 'pointer' }}
+            >
+              Start 7-Day Free Trial →
+            </a>
+            <button
+              onClick={() => setShowPaywall(false)}
+              style={{ background: 'none', border: 'none', color: 'rgba(200,200,200,0.35)', fontSize: '0.82rem', cursor: 'pointer', padding: '0.5rem' }}
+            >
+              Maybe later
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Welcome back */}
       {showWelcomeBack && savedState && (
@@ -457,9 +512,6 @@ export default function ChatPage() {
 
           {dosha && screen === 'chat' && <div style={{ padding: '0.3rem 0.7rem', borderRadius: 20, fontSize: '0.75rem', border: `1px solid ${DOSHA_META[dosha].color}40`, background: DOSHA_META[dosha].bg, color: DOSHA_META[dosha].color }}>{DOSHA_META[dosha].emoji} {dosha}</div>}
           {screen === 'chat' && !incognito && <button onClick={() => setShowClearConfirm(true)} style={{ padding: '0.3rem 0.5rem', borderRadius: 20, fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent', color: 'rgba(200,200,200,0.3)', cursor: 'pointer' }}>🗑️</button>}
-          <button onClick={() => setIncognito(!incognito)} style={{ padding: '0.3rem 0.65rem', borderRadius: 20, fontSize: '0.7rem', border: `1px solid ${incognito ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)'}`, background: incognito ? 'rgba(255,255,255,0.08)' : 'transparent', color: incognito ? '#fff' : 'rgba(200,200,200,0.5)', cursor: 'pointer' }}>
-            {incognito ? '🔒' : '👁️'}
-          </button>
         </div>
       </header>
 

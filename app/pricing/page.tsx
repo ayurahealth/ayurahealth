@@ -11,18 +11,18 @@ const PRICING_TIERS = [
     priceUSD: 0,
     priceINR: 0,
     period: 'Forever',
-    description: 'Perfect for exploring ancient wisdom',
+    description: '3 AI consultations to experience VAIDYA',
     features: [
+      '3 AI consultations with VAIDYA',
       'Dosha Quiz (5-minute assessment)',
       'Basic Health Guidance from 8 Traditions',
-      'Blood Report Analysis (basic)',
+      'Basic Blood Report Analysis',
       'Diet Chart Generation',
       '50+ Language Support',
-      'Private by Default — no server storage',
-      'No Account Required',
+      'No Credit Card Required',
       'Ad-Free Experience',
     ],
-    cta: 'Start Free',
+    cta: 'Try 3 Free Consultations',
     ctaHref: '/chat',
     highlighted: false,
     badge: null,
@@ -213,7 +213,7 @@ export default function PricingPage() {
 
         {/* Note */}
         <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.25)', fontSize: '0.75rem', marginTop: '2rem', fontFamily: '-apple-system, sans-serif' }}>
-          💳 USD: Stripe · ₹ INR: Razorpay (UPI, NetBanking, Cards) · 7-day free trial on paid plans · 30-day money-back guarantee
+          🏷️ 3 free consultations on Free plan · USD: Stripe · ₹ INR: Razorpay (UPI, NetBanking, Cards) · 7-day free trial on paid plans · 30-day money-back guarantee
         </p>
       </section>
 

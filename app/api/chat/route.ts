@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { currentUser } from '@clerk/nextjs/server'
 
 export const dynamic = 'force-dynamic'
 
 import { checkRateLimit } from '../../../lib/rateLimit'
+
+const FREE_MESSAGE_LIMIT = 3 // Number of AI responses a free user gets
 
 const VAIDYA_SYSTEM = `You are VAIDYA — the living mind of AyuraHealth. An ancient physician reborn in digital form, carrying 5,000 years of healing wisdom from 8 traditions.
 
@@ -71,6 +74,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Too many requests. Please wait a minute.' }, { status: 429 })
   }
 
+  // ── Paywall: read tier (count enforced after body parse) ────────────────
+  const clerkUser = await currentUser()
+  const tier = (clerkUser?.publicMetadata?.tier as string) || 'free'
+
   try {
     const body = await req.text()
     if (body.length > MAX_CONTENT_BYTES) {
@@ -106,6 +113,19 @@ export async function POST(req: NextRequest) {
       }
       if (!['user', 'assistant'].includes(m.role)) {
         return NextResponse.json({ error: 'Invalid message role.' }, { status: 400 })
+      }
+    }
+
+    // ── Paywall: count existing AI responses & enforce limit ─────────────────
+    if (tier === 'free') {
+      const assistantCount = Array.isArray(messages)
+        ? messages.filter(m => m.role === 'assistant').length
+        : 0
+      if (assistantCount >= FREE_MESSAGE_LIMIT) {
+        return NextResponse.json(
+          { error: 'PAYWALL_LIMIT', message: `Free plan includes ${FREE_MESSAGE_LIMIT} consultations. Upgrade to continue.` },
+          { status: 402 }
+        )
       }
     }
 
