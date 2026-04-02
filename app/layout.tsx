@@ -104,7 +104,7 @@ export const metadata: Metadata = {
   category: 'health',
 }
 
-import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -161,19 +161,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ClerkProvider>
-          <header style={{ padding: '0.75rem 1.5rem', display: 'flex', justifyContent: 'flex-end', position: 'absolute', top: 0, right: 0, zIndex: 1000, gap: '1rem' }}>
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button style={{ background: 'transparent', border: '1px solid #6abf8a', color: '#6abf8a', padding: '0.4rem 1rem', borderRadius: '980px', fontSize: '0.8rem', cursor: 'pointer' }}>Sign In</button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button style={{ background: '#6abf8a', border: 'none', color: '#05100a', padding: '0.4rem 1rem', borderRadius: '980px', fontSize: '0.8rem', cursor: 'pointer' }}>Sign Up</button>
-              </SignUpButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </header>
           {children}
           <Analytics />
         </ClerkProvider>

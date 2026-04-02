@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { SignInButton, UserButton, useUser } from '@clerk/nextjs'
 import Logo from './Logo'
 
 const LANGUAGES = [
@@ -34,6 +35,8 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
   const [search, setSearch] = useState('')
   const pickerRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
+  
+  const { isSignedIn, isLoaded } = useUser()
 
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0]
   const filtered = LANGUAGES.filter(l =>
@@ -108,6 +111,18 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
           {defaultLinks.map(link => (
             <Link key={link.href} href={link.href} className="nav-pill">{link.label}</Link>
           ))}
+          
+          <div style={{ marginLeft: '0.5rem', display: 'flex', alignItems: 'center', height: 32 }}>
+            {isLoaded ? (
+              isSignedIn ? (
+                <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
+              ) : (
+                <SignInButton mode="modal">
+                  <button className="nav-pill" style={{ background: '#6abf8a', color: '#05100a', border: 'none', fontWeight: 600, cursor: 'pointer' }}>Sign In</button>
+                </SignInButton>
+              )
+            ) : null}
+          </div>
         </div>
       </nav>
 
