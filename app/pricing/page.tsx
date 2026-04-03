@@ -213,7 +213,7 @@ export default function PricingPage() {
 
         {/* Note */}
         <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.25)', fontSize: '0.75rem', marginTop: '2rem', fontFamily: '-apple-system, sans-serif' }}>
-          🏷️ 3 free consultations on Free plan · USD: Stripe · ₹ INR: Razorpay (UPI, NetBanking, Cards) · 7-day free trial on paid plans · 30-day money-back guarantee
+          🏷️ 3 free consultations on Free plan · Razorpay (UPI, NetBanking, Cards, Wallets) · 7-day free trial on paid plans · 30-day money-back guarantee
         </p>
       </section>
 
@@ -221,11 +221,11 @@ export default function PricingPage() {
       <section style={{ padding: '5rem 2rem', maxWidth: 740, margin: '0 auto' }}>
         <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', fontWeight: 300, textAlign: 'center', color: '#e8dfc8', marginBottom: '3rem' }}>Frequently Asked Questions</h2>
         {[
-          { q: 'Can I switch plans anytime?', a: 'Yes! You can upgrade, downgrade, or cancel anytime. Changes take effect at the end of your billing cycle.' },
-          { q: 'Is there a free trial?', a: 'Yes! Premium and Premium Plus plans include a 7-day free trial. No credit card required to explore free features.' },
-          { q: 'What payment methods do you accept?', a: 'USD payments via Stripe (all major cards). INR payments via Razorpay (UPI, NetBanking, Debit/Credit cards, Wallets).' },
+          { q: 'Can I switch plans anytime?', a: 'Yes! You can upgrade, downgrade, or cancel anytime. Changes take effect immediately or at the end of your billing cycle.' },
+          { q: 'Is there a free trial?', a: 'Yes! Premium and Premium Plus plans include a 7-day free trial. No payment information required to start.' },
+          { q: 'What payment methods do you accept?', a: 'We accept payments via Razorpay: UPI, NetBanking, Debit/Credit cards, and Digital Wallets. All payments are secure and PCI-DSS compliant.' },
           { q: 'Is my health data private?', a: 'Absolutely. Free tier conversations are stored in your browser only — never on our servers. Premium features use end-to-end encrypted storage.' },
-          { q: 'Do you offer refunds?', a: 'Yes. We offer a 30-day money-back guarantee if you\'re not satisfied. Contact support@ayurahealth.com.' },
+          { q: 'Do you offer refunds?', a: 'Yes. We offer a 30-day money-back guarantee if you\'re not satisfied. Contact us at support@ayurahealth.com.' },
           { q: 'Are the prices really verified server-side?', a: 'Yes — pricing is enforced on our servers only. It\'s not possible to manipulate the charged amount from the browser. Your payment always matches the displayed price.' },
         ].map((faq, i) => (
           <div key={i} className="faq-item">

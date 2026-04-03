@@ -29,7 +29,17 @@ const sections = [
   },
   {
     title: '6. Subscription & Billing',
-    content: `Premium subscriptions:\n• Auto-renew at the end of each billing cycle unless cancelled\n• Prices are enforced server-side — the displayed price is the charged price\n• USD payments processed by Stripe; INR payments by Razorpay\n• 7-day free trial on Premium and Premium Plus plans\n• Cancel anytime — no cancellation fees\n• Downgrade to Free tier at end of billing cycle upon cancellation\n\nPricing (as of March 2026):\n• Premium: $4.99/month or $47.90/year | ₹399/month or ₹3,192/year\n• Premium Plus: $9.99/month or $95.90/year | ₹799/month or ₹6,392/year`,
+    content: `Premium subscriptions:
+• Auto-renew at the end of each billing cycle unless cancelled
+• Prices are enforced server-side — the displayed price is the charged price
+• All payments processed by Razorpay (UPI, NetBanking, Cards, Wallets)
+• 7-day free trial on Premium and Premium Plus plans
+• Cancel anytime — no cancellation fees
+• Downgrade to Free tier at end of billing cycle upon cancellation
+
+Pricing (as of March 2026):
+• Premium: ₹399/month or ₹3,192/year
+• Premium Plus: ₹799/month or ₹6,392/year`,
   },
   {
     title: '7. Refund Policy',

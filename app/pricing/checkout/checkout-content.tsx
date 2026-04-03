@@ -28,58 +28,25 @@ export function CheckoutContent() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay' | null>(null)
-  const [country, setCountry] = useState('')
+  const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
 
   useEffect(() => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     if (timezone.includes('Asia/Kolkata') || timezone.includes('Asia/Calcutta')) {
-      setCountry('IN')
-      setPaymentMethod('razorpay')
+      setCurrency('INR')
+    } else {
+      setCurrency('INR') // Default to INR for Razorpay
     }
   }, [])
 
-  const tierInfo: Record<string, { name: string; price: number; currency: string }> = {
-    premium: { name: 'Premium', price: 4.99, currency: 'USD' },
-    'premium-plus': { name: 'Premium Plus', price: 9.99, currency: 'USD' },
+  const tierInfo: Record<string, { name: string; priceINR: number; priceUSD: number }> = {
+    premium: { name: 'Premium', priceINR: 399, priceUSD: 4.99 },
+    'premium-plus': { name: 'Premium Plus', priceINR: 799, priceUSD: 9.99 },
   }
 
   const info = tierInfo[tier] || tierInfo.premium
-
-  const handleStripePayment = async () => {
-    if (!email) {
-      setError('Please enter your email address')
-      return
-    }
-
-    setLoading(true)
-    setError('')
-
-    try {
-      const response = await fetch('/api/stripe/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tier,
-          email,
-          successUrl: `${window.location.origin}/pricing/success`,
-          cancelUrl: `${window.location.origin}/pricing/cancel`,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (data.sessionId) {
-        window.location.href = data.url
-      } else {
-        setError(data.error || 'Failed to create checkout session')
-      }
-    } catch {
-      setError('Payment processing failed. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const displayPrice = currency === 'INR' ? info.priceINR : info.priceUSD
+  const displayCurrency = currency === 'INR' ? '₹' : '$'
 
   const handleRazorpayPayment = async () => {
     if (!email) {
@@ -97,64 +64,89 @@ export function CheckoutContent() {
       document.body.appendChild(script)
 
       script.onload = async () => {
-        const orderResponse = await fetch('/api/razorpay/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tier,
-            email,
-            amount: tier === 'premium-plus' ? 799 : 399,
-            currency: 'INR',
-          }),
-        })
-
-        const orderData = await orderResponse.json()
-
-        if (orderData.orderId) {
-          const options = {
-            key: orderData.keyId,
-            amount: orderData.amount,
-            currency: orderData.currency,
-            name: 'AyuraHealth',
-            description: `${info.name} Subscription`,
-            image: `${window.location.origin}/opengraph-image`,
-            order_id: orderData.orderId,
-            handler: async (response: RazorpayResponse) => {
-              const verifyResponse = await fetch('/api/razorpay/create-order', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                }),
-              })
-
-              const verifyData = await verifyResponse.json()
-
-              if (verifyData.success) {
-                window.location.href = `/pricing/success?payment_id=${response.razorpay_payment_id}`
-              } else {
-                setError('Payment verification failed')
-              }
-            },
-            prefill: {
+        try {
+          const orderResponse = await fetch('/api/razorpay/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tier,
               email,
-            },
-            theme: {
-              color: '#1a4d2e',
-            },
+              currency: 'INR',
+            }),
+          })
+
+          const orderData = await orderResponse.json()
+
+          if (!orderResponse.ok) {
+            setError(orderData.error || 'Failed to create order')
+            setLoading(false)
+            return
           }
 
-          const rzp = new window.Razorpay(options)
-          rzp.open()
-        } else {
-          setError(orderData.error || 'Failed to create order')
-        }
+          if (orderData.orderId) {
+            const options = {
+              key: orderData.keyId,
+              amount: orderData.amount,
+              currency: orderData.currency,
+              name: 'AyuraHealth',
+              description: `${info.name} Subscription`,
+              image: `${window.location.origin}/opengraph-image`,
+              order_id: orderData.orderId,
+              handler: async (response: RazorpayResponse) => {
+                try {
+                  const verifyResponse = await fetch('/api/razorpay/create-order', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      razorpay_order_id: response.razorpay_order_id,
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_signature: response.razorpay_signature,
+                    }),
+                  })
 
+                  const verifyData = await verifyResponse.json()
+
+                  if (verifyData.success) {
+                    window.location.href = `/pricing/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`
+                  } else {
+                    setError(verifyData.error || 'Payment verification failed')
+                    setLoading(false)
+                  }
+                } catch (err) {
+                  setError('Payment verification failed. Please try again.')
+                  setLoading(false)
+                }
+              },
+              prefill: {
+                email,
+              },
+              theme: {
+                color: '#1a4d2e',
+              },
+              modal: {
+                ondismiss: () => {
+                  setLoading(false)
+                },
+              },
+            }
+
+            const rzp = new window.Razorpay(options)
+            rzp.open()
+          } else {
+            setError(orderData.error || 'Failed to create order')
+            setLoading(false)
+          }
+        } catch (err) {
+          setError('Payment processing failed. Please try again.')
+          setLoading(false)
+        }
+      }
+
+      script.onerror = () => {
+        setError('Failed to load payment gateway. Please try again.')
         setLoading(false)
       }
-    } catch {
+    } catch (err) {
       setError('Payment processing failed. Please try again.')
       setLoading(false)
     }
@@ -172,10 +164,6 @@ export function CheckoutContent() {
         .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: #e8dfc8; font-weight: 500; }
         .form-input { width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(106,191,138,0.2); border-radius: 8px; color: #e8dfc8; font-size: 0.95rem; }
         .form-input:focus { outline: none; border-color: rgba(106,191,138,0.5); background: rgba(106,191,138,0.05); }
-        .payment-methods { display: grid; gap: 1rem; margin: 2rem 0; }
-        .payment-option { background: rgba(255,255,255,0.025); border: 2px solid rgba(106,191,138,0.1); border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.2s; }
-        .payment-option:hover { border-color: rgba(106,191,138,0.3); background: rgba(106,191,138,0.05); }
-        .payment-option.selected { border-color: rgba(106,191,138,0.5); background: rgba(106,191,138,0.1); }
         .btn-primary { display: block; width: 100%; background: linear-gradient(135deg, #2d5a1b, #3d7a28); color: #e8dfc8; padding: 1rem; border-radius: 8px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.25s; box-shadow: 0 4px 24px rgba(45,90,27,0.4); border: none; cursor: pointer; }
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(45,90,27,0.55); }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -204,15 +192,15 @@ export function CheckoutContent() {
             <div className="price-summary">
               <div className="price-row">
                 <span>{info.name} Subscription</span>
-                <span>${info.price.toFixed(2)}</span>
+                <span>{displayCurrency}{displayPrice}</span>
               </div>
               <div className="price-row">
                 <span>7-day free trial</span>
-                <span>$0.00</span>
+                <span>{displayCurrency}0</span>
               </div>
               <div className="price-row total">
                 <span>First charge after trial</span>
-                <span>${info.price.toFixed(2)}</span>
+                <span>{displayCurrency}{displayPrice}</span>
               </div>
             </div>
 
@@ -224,47 +212,22 @@ export function CheckoutContent() {
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Select Payment Method</label>
-              <div className="payment-methods">
-                <div
-                  className={`payment-option ${paymentMethod === 'stripe' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('stripe')}
-                >
-                  <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>💳 Credit/Debit Card (Stripe)</div>
-                  <div style={{ fontSize: '0.85rem', color: 'rgba(232,223,200,0.6)' }}>Visa, Mastercard, American Express</div>
-                </div>
-
-                <div
-                  className={`payment-option ${paymentMethod === 'razorpay' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('razorpay')}
-                >
-                  <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>🇮🇳 UPI & Local Methods (Razorpay)</div>
-                  <div style={{ fontSize: '0.85rem', color: 'rgba(232,223,200,0.6)' }}>UPI, NetBanking, Wallets (India)</div>
-                </div>
-              </div>
             </div>
 
             <button
               className="btn-primary"
-              onClick={() => {
-                if (paymentMethod === 'stripe') {
-                  handleStripePayment()
-                } else if (paymentMethod === 'razorpay') {
-                  handleRazorpayPayment()
-                }
-              }}
-              disabled={loading || !paymentMethod}
+              onClick={handleRazorpayPayment}
+              disabled={loading || !email}
             >
-              {loading ? 'Processing...' : `Pay with ${paymentMethod === 'stripe' ? 'Stripe' : 'Razorpay'}`}
+              {loading ? 'Processing...' : `Pay ${displayCurrency}${displayPrice} with Razorpay`}
             </button>
 
             <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(106,191,138,0.1)', textAlign: 'center', fontSize: '0.85rem', color: 'rgba(232,223,200,0.5)' }}>
               <p style={{ marginBottom: '0.5rem' }}>🔒 Secure payment processing</p>
               <p>Your payment information is encrypted and secure</p>
+              <p style={{ marginTop: '1rem', fontSize: '0.8rem' }}>Powered by Razorpay • UPI, NetBanking, Cards, Wallets</p>
             </div>
           </div>
         </div>

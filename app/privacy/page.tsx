@@ -13,7 +13,7 @@ const sections = [
   },
   {
     title: '2. What Data We Collect',
-    content: `We collect minimal data:\n\n• Conversations: Stored only in your browser's localStorage. Never sent to or stored on our servers beyond real-time AI processing.\n• Dosha quiz results: Stored locally in your browser only.\n• Uploaded files (images, PDFs): Processed in real-time for AI analysis. Not stored on our servers.\n• Language preference: Stored locally in your browser.\n• Anonymous analytics: Page views via Vercel Analytics. No personal identifiers collected.\n• Email (optional): Only if you voluntarily subscribe to updates or contact us.\n• Payment data: Processed by Stripe (USD) or Razorpay (INR). We never see or store your card numbers.\n• Cookies: We use only a language preference cookie (ayura_lang). No advertising or tracking cookies.`,
+    content: `We collect minimal data:\n\n• Conversations: Stored only in your browser's localStorage. Never sent to or stored on our servers beyond real-time AI processing.\n• Dosha quiz results: Stored locally in your browser only.\n• Uploaded files (images, PDFs): Processed in real-time for AI analysis. Not stored on our servers.\n• Language preference: Stored locally in your browser.\n• Anonymous analytics: Page views via Vercel Analytics. No personal identifiers collected.\n• Email (optional): Only if you voluntarily subscribe to updates or contact us.\n• Payment data: Processed by Razorpay. We never see or store your card numbers.\n• Cookies: We use only a language preference cookie (ayura_lang). No advertising or tracking cookies.`,
   },
   {
     title: '3. How We Use Your Data',
@@ -21,11 +21,13 @@ const sections = [
   },
   {
     title: '4. Third-Party Data Processors',
-    content: `• Groq API (groq.com): Processes your messages to generate AI responses. Subject to Groq's privacy policy.\n• OpenRouter / NVIDIA Nemotron: Used for Deep Mind mode. Subject to their privacy policies.\n• Stripe (stripe.com): USD payment processing. Subject to Stripe's privacy policy. We never store payment card data.\n• Razorpay (razorpay.com): INR payment processing (UPI, NetBanking, Cards). Subject to Razorpay's privacy policy.\n• Clerk (clerk.com): Authentication for premium subscribers. Subject to Clerk's privacy policy.\n• Vercel Analytics: Anonymous usage statistics only. No personal identifiers.\n• Google Fonts: Font loading. Subject to Google's privacy policy.\n\nWe do not use Facebook Pixel, invasive tracking cookies, or advertising networks.`,
+    content: `• Groq API (groq.com): Processes your messages to generate AI responses. Subject to Groq's privacy policy.\n• OpenRouter / NVIDIA Nemotron: Used for Deep Mind mode. Subject to their privacy policies.\n• Razorpay (razorpay.com): Payment processing (UPI, NetBanking, Cards, Wallets). Subject to Razorpay's privacy policy. We never store payment card data.\n• Clerk (clerk.com): Authentication for premium subscribers. Subject to Clerk's privacy policy.\n• Vercel Analytics: Anonymous usage statistics only. No personal identifiers.\n• Google Fonts: Font loading. Subject to Google's privacy policy.\n\nWe do not use Facebook Pixel, invasive tracking cookies, or advertising networks.`,
   },
   {
     title: '5. Payment Data & Security',
-    content: `• Payment card numbers are never stored on our servers. All payment data is handled by Stripe or Razorpay, which are PCI-DSS compliant.\n• We store only the subscription tier (free/premium) associated with your account.\n• Webhook events from Stripe and Razorpay are verified via HMAC signatures before processing.\n• All data in transit is encrypted via HTTPS/TLS 1.3.`,
+    content: `• Payment card numbers are never stored on our servers. All payment data is handled by Razorpay, which is PCI-DSS compliant.
+• We store only the subscription tier (free/premium) associated with your account.
+• Webhook events from Razorpay are verified via HMAC signatures before processing.\n• All data in transit is encrypted via HTTPS/TLS 1.3.`,
   },
   {
     title: '6. Data Storage & Retention',

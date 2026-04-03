@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
     }
 
+    // ── Create Razorpay order ────────────────────────────────────────────────
     const order = await razorpayInstance.orders.create({
       amount: priceInfo.amount, // Always from server, never from client
       currency,
@@ -94,8 +95,15 @@ export async function POST(request: NextRequest) {
       currency: order.currency,
       keyId: process.env.RAZORPAY_KEY_ID,
     })
-  } catch {
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+  } catch (err: any) {
+    // Improved error handling
+    const errorMessage = err?.message || 'Failed to create order'
+    const errorCode = err?.statusCode || 500
+    
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: errorCode >= 400 && errorCode < 600 ? errorCode : 500 }
+    )
   }
 }
 
@@ -114,6 +122,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Configuration missing' }, { status: 500 })
     }
 
+    // ── Verify signature ─────────────────────────────────────────────────────
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -124,7 +133,11 @@ export async function PUT(request: NextRequest) {
     } else {
       return NextResponse.json({ success: false, error: 'Invalid signature' }, { status: 400 })
     }
-  } catch {
-    return NextResponse.json({ success: false, error: 'Verification failed' }, { status: 500 })
+  } catch (err: any) {
+    // Improved error handling
+    return NextResponse.json(
+      { success: false, error: err?.message || 'Verification failed' },
+      { status: 500 }
+    )
   }
 }
