@@ -19,8 +19,14 @@ export const metadata: Metadata = {
     template: '%s | AyuraHealth',
   },
   icons: {
-    icon: '/favicon.png',
-    apple: '/favicon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
+    ],
+    apple: [
+      { url: '/favicon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
   description: 'Your personal holistic health companion — combining Ayurveda, Chinese Medicine, Tibetan, Unani, Siddha, Homeopathy, Naturopathy and Western Medicine. Powered by NVIDIA Nemotron. Free forever.',
   keywords: [
@@ -151,19 +157,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property="og:description" content="Discover your Ayurvedic dosha. Personalized health guidance from 8 ancient healing traditions. Free forever." />
 
         {/* Schema.org for Google rich results */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          "name": "AyuraHealth",
-          "url": BASE_URL,
-          "description": "AI-powered holistic health companion combining Ayurveda, TCM, and 6 other healing traditions",
-          "applicationCategory": "HealthApplication",
-          "operatingSystem": "Any",
-          "inLanguage": ["en", "ja", "hi", "zh", "ko", "ar", "sa"],
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-          "image": `${BASE_URL}/opengraph-image`,
-          "author": { "@type": "Organization", "name": "AyuraHealth", "url": BASE_URL },
-        })}} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "AyuraHealth",
+            "url": BASE_URL,
+            "logo": `${BASE_URL}/logo.png`,
+            "sameAs": [
+              "https://x.com/ayurahealth",
+              "https://reddit.com/r/AyuraHealth"
+            ]
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AyuraHealth",
+            "url": BASE_URL,
+            "description": "AI-powered holistic health companion combining Ayurveda, TCM, and 6 other healing traditions",
+            "applicationCategory": "HealthApplication",
+            "operatingSystem": "Any",
+            "inLanguage": ["en", "ja", "hi", "zh", "ko", "ar", "sa"],
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+            "image": `${BASE_URL}/opengraph-image`,
+            "author": { "@type": "Organization", "name": "AyuraHealth", "url": BASE_URL },
+          }
+        ])}} />
       </head>
       <body>
         <ClerkProvider>
