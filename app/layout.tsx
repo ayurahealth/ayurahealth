@@ -116,7 +116,6 @@ export const metadata: Metadata = {
 
 import { ClerkProvider } from "@clerk/nextjs";
 import ConsentBanner from '../components/ConsentBanner'
-import Image from 'next/image'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

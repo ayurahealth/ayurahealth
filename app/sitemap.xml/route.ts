@@ -2,7 +2,17 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   const baseUrl = 'https://ayurahealth.com'
-  const pages = ['', '/chat']
+  const pages = [
+    '', 
+    '/chat', 
+    '/pricing', 
+    '/clinic', 
+    '/diet', 
+    '/translator', 
+    '/testimonials', 
+    '/privacy', 
+    '/terms'
+  ]
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -14,6 +24,9 @@ ${pages.map(path => `  <url>
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}${path}"/>
     <xhtml:link rel="alternate" hreflang="ja" href="${baseUrl}${path}"/>
     <xhtml:link rel="alternate" hreflang="hi" href="${baseUrl}${path}"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="${baseUrl}${path}"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="${baseUrl}${path}"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="${baseUrl}${path}"/>
   </url>`).join('\n')}
 </urlset>`
   return new NextResponse(sitemap, {

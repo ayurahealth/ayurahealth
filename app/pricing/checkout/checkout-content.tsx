@@ -33,16 +33,13 @@ export function CheckoutContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay' | null>(null)
 
   useEffect(() => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     if (timezone.includes('Asia/Kolkata') || timezone.includes('Asia/Calcutta')) {
       setCurrency('INR')
-      setPaymentMethod('razorpay')
     } else {
       setCurrency('INR') // Default to INR for Razorpay for now
-      setPaymentMethod('razorpay')
     }
   }, [])
 
@@ -120,6 +117,7 @@ export function CheckoutContent() {
                     setLoading(false)
                   }
                 } catch (err) {
+                  console.error('Razorpay verify error:', err)
                   setError('Payment verification failed. Please try again.')
                   setLoading(false)
                 }
@@ -144,6 +142,7 @@ export function CheckoutContent() {
             setLoading(false)
           }
         } catch (err) {
+          console.error('Razorpay script onload error:', err)
           setError('Payment processing failed. Please try again.')
           setLoading(false)
         }
@@ -154,6 +153,7 @@ export function CheckoutContent() {
         setLoading(false)
       }
     } catch (err) {
+      console.error('Razorpay overall error:', err)
       setError('Payment processing failed. Please try again.')
       setLoading(false)
     }

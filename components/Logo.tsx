@@ -1,6 +1,8 @@
 'use client'
 import Link from 'next/link'
 
+import Image from 'next/image'
+
 interface LogoProps {
   size?: number
   showText?: boolean
@@ -23,7 +25,7 @@ export default function Logo({ size = 36, showText = true, href = '/' }: LogoPro
       onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.04)' }}
       onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
     >
-      <img
+      <Image
         src="/favicon.svg"
         alt="AyuraHealth"
         width={size}

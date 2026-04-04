@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { ArrowRight, MessageCircle, BookOpen, Shield, Users, Zap, ChevronDown } from 'lucide-react'
+import { ArrowRight, MessageCircle, BookOpen, Shield, Zap } from 'lucide-react'
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('ayurveda')
@@ -80,7 +78,7 @@ export default function HomePage() {
               <a href="#safety" className="text-sm text-slate-600 hover:text-slate-900">Safety</a>
               <a href="#faq" className="text-sm text-slate-600 hover:text-slate-900">FAQ</a>
               <Link href="/chat">
-                <Button className="bg-emerald-600 hover:bg-emerald-700">Start Chat</Button>
+                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Start Chat</button>
               </Link>
             </div>
           </div>
@@ -106,15 +104,15 @@ export default function HomePage() {
               {/* Primary CTA */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link href="/chat" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-lg h-12">
+                  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-lg h-12 px-6 rounded-lg flex items-center justify-center transition-colors">
                     <MessageCircle className="mr-2 h-5 w-5" />
                     Start a Health Session
-                  </Button>
+                  </button>
                 </Link>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg h-12">
+                <button className="w-full sm:w-auto text-lg h-12 px-6 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center transition-colors">
                   <BookOpen className="mr-2 h-5 w-5" />
                   View Example Reports
-                </Button>
+                </button>
               </div>
 
               {/* Trust Signals */}
@@ -148,7 +146,7 @@ export default function HomePage() {
                       <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
                       <span className="text-sm font-semibold text-slate-900">AyuraHealth AI</span>
                     </div>
-                    <p className="text-sm text-slate-600 italic">"What's an Ayurvedic approach to managing insomnia?"</p>
+                    <p className="text-sm text-slate-600 italic">&quot;What&apos;s an Ayurvedic approach to managing insomnia?&quot;</p>
                     <div className="border-t border-slate-200 pt-4 space-y-3">
                       <p className="text-sm font-semibold text-slate-900">Insomnia in Ayurveda is often linked to Vata imbalance...</p>
                       <div className="flex flex-wrap gap-2">
@@ -224,10 +222,10 @@ export default function HomePage() {
           {/* CTA */}
           <div className="text-center mt-12">
             <Link href="/chat">
-              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+              <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg text-lg font-semibold inline-flex items-center transition-colors">
                 Try Your Own Question
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
@@ -242,6 +240,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card Replacement */}
             {[
               {
                 icon: <BookOpen className="h-8 w-8" />,
@@ -259,11 +258,11 @@ export default function HomePage() {
                 description: "Every response includes red-flag symptoms, emergency guidance, and when to see a professional"
               }
             ].map((item, idx) => (
-              <Card key={idx} className="p-8 border border-slate-200 hover:shadow-lg transition-shadow">
+              <div key={idx} className="p-8 bg-white border border-slate-200 rounded-xl hover:shadow-lg transition-shadow">
                 <div className="text-emerald-600 mb-4">{item.icon}</div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-600">{item.description}</p>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
@@ -294,10 +293,10 @@ export default function HomePage() {
                 </div>
               </div>
               <Link href="/safety">
-                <Button variant="outline" className="mt-8">
+                <button className="mt-8 px-4 py-2 border border-slate-200 rounded-md hover:bg-slate-50 inline-flex items-center text-sm font-medium transition-colors">
                   Read Full Safety Guidelines
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                </button>
               </Link>
             </div>
             <div className="bg-emerald-50 rounded-xl p-8 border border-emerald-200">
@@ -336,6 +335,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card Replacement */}
             {[
               {
                 name: "Priya M.",
@@ -356,7 +356,7 @@ export default function HomePage() {
                 avatar: "👨‍🔬"
               }
             ].map((testimonial, idx) => (
-              <Card key={idx} className="p-8 border border-slate-200">
+              <div key={idx} className="p-8 bg-white border border-slate-200 rounded-xl">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="text-4xl">{testimonial.avatar}</div>
                   <div>
@@ -364,8 +364,8 @@ export default function HomePage() {
                     <p className="text-sm text-slate-600">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-slate-700 italic">"{testimonial.text}"</p>
-              </Card>
+                <p className="text-slate-700 italic">&quot;{testimonial.text}&quot;</p>
+              </div>
             ))}
           </div>
         </div>
@@ -379,6 +379,7 @@ export default function HomePage() {
           </div>
 
           <div className="space-y-6">
+            {/* Card Replacement */}
             {[
               {
                 q: "Is AyuraHealth a replacement for my doctor?",
@@ -401,19 +402,19 @@ export default function HomePage() {
                 a: "AyuraHealth is completely free. We're powered by NVIDIA Nemotron and committed to keeping wellness accessible."
               }
             ].map((item, idx) => (
-              <Card key={idx} className="p-6 border border-slate-200 hover:shadow-md transition-shadow">
+              <div key={idx} className="p-6 bg-white border border-slate-200 rounded-xl hover:shadow-md transition-shadow">
                 <h3 className="font-bold text-slate-900 mb-2">{item.q}</h3>
                 <p className="text-slate-600">{item.a}</p>
-              </Card>
+              </div>
             ))}
           </div>
 
           <div className="mt-12 p-8 bg-emerald-50 rounded-xl border border-emerald-200 text-center">
             <p className="text-slate-700 mb-4">Still have questions?</p>
             <Link href="/contact">
-              <Button className="bg-emerald-600 hover:bg-emerald-700">
+              <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
                 Contact Our Team
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
@@ -432,9 +433,9 @@ export default function HomePage() {
               className="flex-1 px-4 py-3 rounded-lg border-0 focus:outline-none"
               required
             />
-            <Button className="bg-white text-emerald-600 hover:bg-emerald-50 font-semibold">
+            <button className="bg-white text-emerald-600 hover:bg-emerald-50 px-6 py-3 rounded-lg font-semibold transition-colors">
               Subscribe
-            </Button>
+            </button>
           </form>
           <p className="text-sm text-emerald-100 mt-4">We respect your privacy. Unsubscribe anytime.</p>
         </div>

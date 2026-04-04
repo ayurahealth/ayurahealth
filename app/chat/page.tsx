@@ -83,7 +83,7 @@ function isValidUrl(str: string): boolean {
 }
 
 export default function ChatPage() {
-  const { user, isLoaded, isSignedIn } = useUser()
+  const { user, isSignedIn } = useUser()
   const clerk = useClerk()
   const [lang, setLang] = useState<Lang>(() => {
     if (typeof window !== 'undefined') {

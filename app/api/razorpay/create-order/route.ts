@@ -95,10 +95,10 @@ export async function POST(request: NextRequest) {
       currency: order.currency,
       keyId: process.env.RAZORPAY_KEY_ID,
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Improved error handling
-    const errorMessage = err?.message || 'Failed to create order'
-    const errorCode = err?.statusCode || 500
+    const errorMessage = err instanceof Error ? err.message : 'Failed to create order'
+    const errorCode = (err as { statusCode?: number })?.statusCode || 500
     
     return NextResponse.json(
       { error: errorMessage },
@@ -106,6 +106,8 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+import { prisma } from '../../../../lib/prisma'
 
 export async function PUT(request: NextRequest) {
   try {
@@ -116,9 +118,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Missing parameters' }, { status: 400 })
     }
 
+    const razorpayInstance = getRazorpay()
     const secret = process.env.RAZORPAY_KEY_SECRET
 
-    if (!secret) {
+    if (!razorpayInstance || !secret) {
       return NextResponse.json({ success: false, error: 'Configuration missing' }, { status: 500 })
     }
 
@@ -129,14 +132,33 @@ export async function PUT(request: NextRequest) {
       .digest('hex')
 
     if (expectedSignature === razorpay_signature) {
+      // ── Signature is valid. Now persist the payment state ────────────────
+      // Fetch the order to get the tier and user email stored in notes
+      const order = await razorpayInstance.orders.fetch(razorpay_order_id)
+      const { tier, email, userId } = (order.notes as { tier: string; email: string; userId?: string })
+
+      if (email) {
+        // Record the subscription in the database
+        await prisma.userProfile.update({
+          where: { email }, // Or use ID if userId is provided
+          data: {
+            subscriptionTier: tier,
+            subscriptionStatus: 'active',
+            subscriptionId: razorpay_payment_id,
+            // Simple logic for 30 days from now for monthly
+            subscriptionExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          }
+        })
+      }
+
       return NextResponse.json({ success: true })
     } else {
       return NextResponse.json({ success: false, error: 'Invalid signature' }, { status: 400 })
     }
-  } catch (err: any) {
-    // Improved error handling
+  } catch (err: unknown) {
+    console.error('Razorpay verification error:', err)
     return NextResponse.json(
-      { success: false, error: err?.message || 'Verification failed' },
+      { success: false, error: err instanceof Error ? err.message : 'Verification failed' },
       { status: 500 }
     )
   }

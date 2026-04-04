@@ -13,8 +13,12 @@ model UserProfile {
   vataScore      Int?     // e.g. 45
   pittaScore     Int?
   kaphaScore     Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  subscriptionTier   String?  // e.g. "premium", "premium-plus"
+  subscriptionStatus String   @default("free") // "free", "active", "cancelled", "expired"
+  subscriptionId     String?  @unique // Razorpay ID
+  subscriptionExpiry DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
   
   chatSessions   ChatSession[]
 }

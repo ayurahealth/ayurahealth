@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Logo from '../../components/Logo'
 import Nav from '../../components/Nav'
 import { motion } from 'framer-motion'
 

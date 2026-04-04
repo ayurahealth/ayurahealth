@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useClerk, useUser } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Nav from '../components/Nav'
@@ -138,7 +138,6 @@ export default function LandingPage() {
 
   const [teaserPrompt, setTeaserPrompt] = useState('')
   const router = useRouter()
-  const { isSignedIn } = useUser()
 
   useEffect(() => {
     const saved = localStorage.getItem('ayura_lang')
