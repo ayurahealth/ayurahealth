@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '../../../components/Logo'
@@ -32,16 +32,7 @@ export function CheckoutContent() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
-
-  useEffect(() => {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    if (timezone.includes('Asia/Kolkata') || timezone.includes('Asia/Calcutta')) {
-      setCurrency('INR')
-    } else {
-      setCurrency('INR') // Default to INR for Razorpay for now
-    }
-  }, [])
+  const [currency] = useState<'INR' | 'USD'>('INR') // Always INR for Razorpay
 
   const tierInfo: Record<string, { name: string; priceINR: number; priceUSD: number }> = {
     premium: { name: 'Premium', priceINR: 399, priceUSD: 4.99 },

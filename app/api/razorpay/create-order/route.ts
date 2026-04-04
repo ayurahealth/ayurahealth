@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // ── Input validation ─────────────────────────────────────────────────────
-    const { tier, email, currency = 'INR', userId } = body
+    const { tier, email, currency = 'INR' } = body
 
     if (!tier || typeof tier !== 'string' || tier.length > 50) {
       return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
@@ -84,10 +84,9 @@ export async function POST(request: NextRequest) {
       notes: {
         tier,
         email,
-        userId: userId || '',
         productName: priceInfo.name,
       },
-    } as Parameters<typeof razorpayInstance.orders.create>[0])
+    })
 
     return NextResponse.json({
       orderId: order.id,
