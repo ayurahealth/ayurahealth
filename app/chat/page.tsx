@@ -5,8 +5,9 @@ import { useUser, useClerk } from '@clerk/nextjs'
 import { t, type Lang } from '../../lib/translations'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { traditionIcons } from '../../components/TraditionIcons'
 
-interface Message { role: 'user' | 'assistant'; content: string }
+interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[] }
 interface Attachment {
   id: string; type: 'image' | 'pdf' | 'link'
   name: string; content: string
@@ -16,6 +17,12 @@ type Dosha = 'Vata' | 'Pitta' | 'Kapha'
 type Screen = 'landing' | 'welcome' | 'quiz' | 'result' | 'chat'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SR = any
+interface ChatSource {
+  title: string
+  content: string
+  tradition: string
+  source: string
+}
 
 const STORAGE_KEY = 'ayurahealth_v1'
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
@@ -38,10 +45,14 @@ const DOSHA_META = {
 }
 
 const MEDICINE_SYSTEMS = [
-  { id: 'ayurveda', label: '🌿 Ayurveda' }, { id: 'tcm', label: '☯️ TCM' },
-  { id: 'western', label: '💊 Western' }, { id: 'homeopathy', label: '💧 Homeopathy' },
-  { id: 'naturopathy', label: '🌱 Naturo' }, { id: 'unani', label: '🌙 Unani' },
-  { id: 'siddha', label: '✨ Siddha' }, { id: 'tibetan', label: '🏔️ Tibetan' },
+  { id: 'ayurveda', label: 'Ayurveda', icon: 'ayurveda' }, 
+  { id: 'tcm', label: 'TCM', icon: 'tcm' },
+  { id: 'western', label: 'Western', icon: 'western' }, 
+  { id: 'homeopathy', label: 'Homeopathy', icon: 'homeopathy' },
+  { id: 'naturopathy', label: 'Naturo', icon: 'naturopathy' }, 
+  { id: 'unani', label: 'Unani', icon: 'unani' },
+  { id: 'siddha', label: 'Siddha', icon: 'siddha' }, 
+  { id: 'tibetan', label: 'Tibetan', icon: 'tibetan' },
 ]
 
 const QUESTIONS = (lang: Lang) => [
@@ -115,6 +126,7 @@ export default function ChatPage() {
   const [savedState, setSavedState] = useState<SavedState | null>(null)
   const [showWelcomeBack, setShowWelcomeBack] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [selectedSource, setSelectedSource] = useState<ChatSource | null>(null)
   const [isSharing, setIsSharing] = useState(false)
   const [shareSuccess, setShareSuccess] = useState(false)
   const [attachments, setAttachments] = useState<Attachment[]>([])
@@ -393,16 +405,25 @@ export default function ChatPage() {
         }
         throw new Error('API error')
       }
-      const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''
+      const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''; let currentSources: ChatSource[] = []
       if (reader) {
         while (true) {
           const { done, value } = await reader.read(); if (done) break
           for (const line of decoder.decode(value).split('\n')) {
-            if (line.startsWith('data: ')) { try { const d = JSON.parse(line.slice(6)); if (d.content) { full += d.content; setStreaming(full) } } catch {} }
+            if (line.startsWith('data: ')) { 
+              try { 
+                const d = JSON.parse(line.slice(6))
+                if (d.sources) { 
+                  currentSources = d.sources 
+                } else if (d.content) { 
+                  full += d.content; setStreaming(full) 
+                } 
+              } catch {} 
+            }
           }
         }
       }
-      setMessages(prev => [...prev, { role: 'assistant', content: full }]); setStreaming('')
+      setMessages(prev => [...prev, { role: 'assistant', content: full, sources: currentSources }]); setStreaming('')
       
       if (newMessages.length <= 2 && user && !incognito) {
         fetch('/api/chat-session', {
@@ -430,6 +451,42 @@ export default function ChatPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#05100a', fontFamily: '"DM Sans", system-ui, sans-serif', color: '#e8dfc8', position: 'relative', overflow: 'hidden' }}>
+
+      {/* Source Detail Modal */}
+      {selectedSource && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(12px)' }}>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="glass-card" 
+            style={{ padding: '2.5rem 2rem', maxWidth: 500, width: '100%', border: '1px solid rgba(201,168,76,0.3)', boxShadow: '0 32px 80px rgba(0,0,0,0.8)' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+              <div>
+                <div style={{ color: '#6abf8a', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{selectedSource.tradition} Clinical Snippet</div>
+                <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#c9a84c', fontSize: '1.6rem', fontWeight: 700 }}>{selectedSource.source}</h3>
+              </div>
+              <button 
+                onClick={() => setSelectedSource(null)}
+                style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem' }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="native-scroll" style={{ maxHeight: '40vh', overflowY: 'auto', background: 'rgba(0,0,0,0.2)', padding: '1.25rem', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(232,223,200,0.8)', fontSize: '0.95rem', lineHeight: 1.8, fontStyle: 'italic', marginBottom: '2rem' }}>
+              &quot;{selectedSource.content}&quot;
+            </div>
+
+            <button 
+              onClick={() => setSelectedSource(null)}
+              style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #2d7a45, #1a4d2e)', color: '#fff', border: 'none', borderRadius: 980, fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Continue Consultation
+            </button>
+          </motion.div>
+        </div>
+      )}
 
       {/* Sacred geometry bg */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -693,7 +750,8 @@ export default function ChatPage() {
           <div className="liquid-glass" style={{ padding: '0.6rem 1rem', display: 'flex', gap: '0.35rem', flexWrap: 'wrap', borderTop: 'none', borderBottom: '1px solid rgba(106,191,138,0.08)' }}>
             {MEDICINE_SYSTEMS.map(sys => (
               <button key={sys.id} onClick={() => setSelectedSystems(prev => prev.includes(sys.id) ? prev.filter(s => s !== sys.id) : [...prev, sys.id])}
-                style={{ padding: '0.22rem 0.65rem', borderRadius: 20, border: `1px solid ${selectedSystems.includes(sys.id) ? 'rgba(106,191,138,0.4)' : 'rgba(255,255,255,0.07)'}`, background: selectedSystems.includes(sys.id) ? 'rgba(106,191,138,0.1)' : 'transparent', color: selectedSystems.includes(sys.id) ? '#6abf8a' : 'rgba(200,200,200,0.35)', fontSize: '0.7rem', cursor: 'pointer' }}>
+                style={{ padding: '0.35rem 0.8rem', borderRadius: 12, border: `1px solid ${selectedSystems.includes(sys.id) ? 'rgba(106,191,138,0.4)' : 'rgba(255,255,255,0.07)'}`, background: selectedSystems.includes(sys.id) ? 'rgba(106,191,138,0.1)' : 'transparent', color: selectedSystems.includes(sys.id) ? '#6abf8a' : 'rgba(232,223,200,0.4)', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'all 0.2s' }}>
+                <span style={{ width: 14, height: 14 }}>{traditionIcons[sys.icon]}</span>
                 {sys.label}
               </button>
             ))}
@@ -727,6 +785,39 @@ export default function ChatPage() {
                     boxShadow: msg.role === 'user' ? '0 8px 24px rgba(0,0,0,0.2)' : undefined
                   }}>
                     {msg.role === 'assistant' ? <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content, doshaColor) }} /> : msg.content}
+                    
+                    {/* Source Cards */}
+                    {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                      <div style={{ marginTop: '1.25rem', borderTop: '1px solid rgba(106,191,138,0.12)', paddingTop: '0.9rem' }}>
+                        <div style={{ fontSize: '0.68rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.65rem', opacity: 0.8 }}>Consulted Classical Texts:</div>
+                        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                          {msg.sources.map((src, idx) => (
+                            <button 
+                              key={idx} 
+                              onClick={() => setSelectedSource(src)}
+                              className="glass-card" 
+                              style={{ 
+                                padding: '0.45rem 0.85rem', 
+                                border: '1px solid rgba(201, 168, 76, 0.25)', 
+                                borderRadius: 12, 
+                                fontSize: '0.78rem', 
+                                color: '#e8dfc8', 
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.45rem',
+                                transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03) translateY(-1px)'}
+                              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                              <span style={{ width: 14, height: 14, color: '#6abf8a' }}>{traditionIcons[src.tradition?.toLowerCase() || 'ayurveda']}</span>
+                              <span style={{ fontWeight: 500 }}>{src.source}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   {msg.role === 'assistant' && voiceSupported && (
                     <button onClick={() => speakText(msg.content)} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: isSpeaking ? '#6abf8a' : 'rgba(200,200,200,0.3)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>

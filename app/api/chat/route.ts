@@ -8,6 +8,14 @@ import { prisma } from '../../../lib/prisma'
 import { getEmbedding } from '../../../lib/ai/embeddings'
 import { COUNCIL_OF_AGENTS, SYNTHESIS_PROMPT } from '../../../lib/ai/agents'
 
+interface KnowledgeChunkResult {
+  title: string;
+  content: string;
+  tradition: string;
+  source: string;
+  similarity: number;
+}
+
 const FREE_MESSAGE_LIMIT = 10 // Number of AI responses a free user gets
 
 const VAIDYA_SYSTEM = `You are VAIDYA — the living mind of AyuraHealth. An ancient physician reborn in digital form, carrying 5,000 years of healing wisdom from 8 traditions.
@@ -244,23 +252,17 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
     const lastMsg = messages[messages.length - 1]
     const userQuery = lastMsg.role === 'user' ? lastMsg.content : ''
 
-    interface KnowledgeChunkResult {
-      title: string;
-      content: string;
-      tradition: string;
-      source: string;
-      similarity: number;
-    }
-
     // ── AI Brain: Vector Search (RAG) ────────────────────────────────────────
     let knowledgeCtx = ''
+    let chunks: KnowledgeChunkResult[] = []
+
     if (userQuery && userQuery.length > 3) {
       try {
         const queryEmbedding = await getEmbedding(userQuery)
         const vectorString = `[${queryEmbedding.join(',')}]`
 
         // Search for relevant classical wisdom
-        const chunks = await prisma.$queryRawUnsafe<KnowledgeChunkResult[]>(
+        chunks = await prisma.$queryRawUnsafe<KnowledgeChunkResult[]>(
           `SELECT title, content, tradition, source, 1 - (embedding <=> $1::vector) as similarity 
            FROM "KnowledgeChunk" 
            WHERE 1 - (embedding <=> $1::vector) > 0.6
@@ -378,7 +380,7 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
       return NextResponse.json({ error: 'AI service temporarily unavailable. Please try again.' }, { status: 500 })
     }
 
-    return new NextResponse(createStream(response), { headers: streamHeaders })
+    return new NextResponse(createStream(response, { sources: chunks }), { headers: streamHeaders })
 
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -391,12 +393,19 @@ const streamHeaders = {
   'Connection': 'keep-alive',
 }
 
-function createStream(response: Response): ReadableStream {
+function createStream(response: Response, metadata?: { sources?: KnowledgeChunkResult[] }): ReadableStream {
   return new ReadableStream({
     async start(controller) {
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
       if (!reader) { controller.close(); return }
+
+      // ── Send Metadata First ───────────────────────────────────────────────
+      if (metadata && metadata.sources && metadata.sources.length > 0) {
+        const metaStr = JSON.stringify({ sources: metadata.sources })
+        controller.enqueue(new TextEncoder().encode(`data: ${metaStr}\n\n`))
+      }
+
       while (true) {
         const { done, value } = await reader.read()
         if (done) { controller.close(); break }
