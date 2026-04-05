@@ -2,10 +2,6 @@ import { pipeline } from '@xenova/transformers';
 
 let extractor: Awaited<ReturnType<typeof pipeline>> | null = null;
 
-/**
- * Initializes the embedding extractor (all-MiniLM-L6-v2, 384 dimensions)
- * This runs locally and does not require an API key.
- */
 async function getExtractor() {
   if (!extractor) {
     extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
@@ -15,20 +11,41 @@ async function getExtractor() {
 
 /**
  * Generates a vector embedding for a given text.
- * @param text The string to embed.
- * @returns An array of 384 floats representing the embedding.
+ * Prioritizes HuggingFace Inference API in production for high speed and stability.
  */
 export async function getEmbedding(text: string): Promise<number[]> {
+  // ── High Speed Mode: HuggingFace Inference (Recommended for Production) ───
+  const hfKey = process.env.HUGGINGFACE_API_KEY
+  if (hfKey || process.env.NODE_ENV === 'production') {
+    try {
+      const response = await fetch(
+        'https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2',
+        {
+          method: 'POST',
+          headers: { 
+            'Authorization': `Bearer ${hfKey || ''}`,
+            'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify({ inputs: text })
+        }
+      )
+      if (response.ok) {
+        const result = await response.json()
+        if (Array.isArray(result)) return result
+      }
+    } catch (err) {
+      console.warn('HF_INFERENCE_FAILED, falling back to local:', err)
+    }
+  }
+
+  // ── Legacy Mode: Local Transformers.js ─────────────────────────────────────
   try {
     const extract = await getExtractor();
-    // Use 'any' cast for options to bypass a known TS type-clash with the 'normalize' property in some environments.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const output = await extract(text, { pooling: 'mean', normalize: true } as any);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return Array.from((output as any).data);
   } catch (error) {
-    console.error('Error generating embedding:', error);
-    throw new Error('Failed to generate embedding');
+    console.error('EMBEDDING_ENGINE_CRASH:', error);
+    throw new Error('Consultation engine (RAG) is currently unavailable. Please check your API keys.');
   }
 }
 

@@ -104,7 +104,6 @@ export default function ChatPage() {
   
   // ── CEO Bypass: Check for frictionless owner access ────────────────────────
   const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
-  const userLoaded = clerkLoaded || isCeo
   const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
 
   const [lang, setLang] = useState<Lang>(() => {
@@ -451,7 +450,11 @@ export default function ChatPage() {
       }
     } catch (err) { 
       console.error('CHAT_FETCH_FAILURE:', err)
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection interrupted. Please try again.' }]); 
+      let displayError = 'Connection interrupted. Please try again.'
+      if (err instanceof Error && err.message.includes('API error')) {
+        displayError = 'VAIDYA is slightly overwhelmed (API error). Please refresh and try one more time.'
+      }
+      setMessages(prev => [...prev, { role: 'assistant', content: displayError }]); 
       setStreaming('') 
     }
     finally { setLoading(false) }

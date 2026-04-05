@@ -370,15 +370,18 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
     })
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      const details = errorData.error?.message || response.statusText
+      
       if (useNemotron) {
         const fallback = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages], max_tokens: 3000, temperature: 0.6, stream: true }),
         })
-        if (fallback.ok) return new NextResponse(createStream(fallback), { headers: streamHeaders })
+        if (fallback.ok) return new NextResponse(createStream(fallback, { sources: chunks }), { headers: streamHeaders })
       }
-      return NextResponse.json({ error: 'AI service temporarily unavailable. Please try again.' }, { status: 500 })
+      return NextResponse.json({ error: 'AI service temporarily unavailable.', details }, { status: 500 })
     }
 
     return new NextResponse(createStream(response, { sources: chunks }), { headers: streamHeaders })
