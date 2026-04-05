@@ -155,8 +155,8 @@ export default function LandingPage() {
 
   return (
     <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#05100a', minHeight: '100vh', color: '#e8dfc8', overflowX: 'hidden' }}>
+      <div className="premium-bg-glow" />
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #05100a !important; color: #e8dfc8; -webkit-font-smoothing: antialiased; }
 
@@ -166,15 +166,26 @@ export default function LandingPage() {
         /* ── Hero ── */
         .hero-tagline {
           font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: clamp(2.4rem, 6.5vw, 5.8rem);
+          font-size: clamp(2.6rem, 7vw, 6.2rem);
           font-weight: 700;
-          line-height: 1.06;
-          letter-spacing: -0.025em;
+          line-height: 1.02;
+          letter-spacing: -0.035em;
           white-space: pre-line;
-          background: linear-gradient(150deg, #e8dfc8 0%, #c9a84c 35%, #6abf8a 65%, #2d7a45 100%);
+          background: linear-gradient(135deg, #e8dfc8 0%, #c9a84c 30%, #6abf8a 70%, #2d7a45 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+        }
+
+        .premium-bg-glow {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          z-index: 0; pointer-events: none;
+          background: 
+            radial-gradient(circle at 10% 10%, rgba(26, 77, 46, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 90% 90%, rgba(201, 168, 76, 0.08) 0%, transparent 50%);
+          filter: blur(80px);
         }
 
         /* ── Buttons ── */
@@ -450,26 +461,33 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           FEATURES
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '6rem 2rem', maxWidth: 1060, margin: '0 auto' }}>
+      <section style={{ padding: '6rem 2rem', maxWidth: 1060, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <motion.p
-          initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-          style={{ textAlign: 'center', color: 'rgba(106,191,138,0.4)', fontSize: '0.72rem', marginBottom: '3rem', letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}
+          initial={{ opacity: 0, y: 10 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          viewport={{ once: true, margin: "-100px" }}
+          style={{ textAlign: 'center', color: 'rgba(106,191,138,0.4)', fontSize: '0.72rem', marginBottom: '3.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}
         >
           What AyuraHealth does for you
         </motion.p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
           {FEATURES.map((f, i) => (
             <motion.div
               key={i}
               className="feat-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.07, type: 'spring', stiffness: 80, damping: 20 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ 
+                delay: i % 3 * 0.1, 
+                type: 'spring', 
+                stiffness: 70, 
+                damping: 18 
+              }}
             >
               <span className="feat-icon">{f.icon}</span>
-              <div style={{ fontSize: '0.97rem', fontWeight: 600, color: '#e8dfc8', marginBottom: '0.6rem', fontFamily: '-apple-system, sans-serif' }}>{f.title}</div>
-              <div style={{ fontSize: '0.83rem', color: 'rgba(232,223,200,0.42)', lineHeight: 1.75, fontFamily: '-apple-system, sans-serif' }}>{f.desc}</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 600, color: '#e8dfc8', marginBottom: '0.75rem', fontFamily: 'var(--font-dm-sans), sans-serif' }}>{f.title}</div>
+              <div style={{ fontSize: '0.88rem', color: 'rgba(232,223,200,0.5)', lineHeight: 1.8, fontFamily: 'var(--font-dm-sans), sans-serif' }}>{f.desc}</div>
             </motion.div>
           ))}
         </div>

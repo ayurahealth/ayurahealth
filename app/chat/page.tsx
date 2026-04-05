@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { t, type Lang } from '../../lib/translations'
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 
 interface Message { role: 'user' | 'assistant'; content: string }
 interface Attachment {
@@ -700,42 +701,77 @@ export default function ChatPage() {
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1rem 0.5rem' }}>
+          <div className="native-scroll" style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem 0.5rem' }}>
             {messages.map((msg, i) => (
-              <div key={i} style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '0.5rem' }}>
-                {msg.role === 'assistant' && <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #2d5a1b, #4a9e6a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>🌿</div>}
-                <div style={{ maxWidth: '82%' }}>
-                  <div style={{ padding: msg.role === 'user' ? '0.75rem 1rem' : '1rem 1.25rem', borderRadius: msg.role === 'user' ? '20px 20px 6px 20px' : '6px 20px 20px 20px', background: msg.role === 'user' ? 'linear-gradient(135deg, rgba(45,90,27,0.7), rgba(60,110,35,0.6))' : 'rgba(255,255,255,0.04)', border: msg.role === 'user' ? '1px solid rgba(106,191,138,0.25)' : '1px solid rgba(106,191,138,0.1)', fontSize: '0.9rem', lineHeight: 1.7, color: msg.role === 'user' ? '#f0e6c8' : 'rgba(232,223,200,0.85)', backdropFilter: 'blur(10px)' }}>
-                    {msg.role === 'assistant' ? <div dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content, doshaColor) }} /> : msg.content}
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+                style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '0.75rem' }}
+              >
+                {msg.role === 'assistant' && (
+                  <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', border: '1px solid rgba(106,191,138,0.2)' }}>
+                    🌿
                   </div>
-                  {msg.role === 'assistant' && voiceSupported && <button onClick={() => speakText(msg.content)} style={{ marginTop: '0.4rem', background: 'none', border: 'none', color: isSpeaking ? '#6abf8a' : 'rgba(200,200,200,0.25)', fontSize: '0.75rem', cursor: 'pointer', padding: '0 0.25rem' }}>{isSpeaking ? '🔊 speaking...' : '🔈 listen'}</button>}
+                )}
+                <div style={{ maxWidth: '85%' }}>
+                  <div className={msg.role === 'user' ? "" : "glass-card"} style={{ 
+                    padding: msg.role === 'user' ? '0.85rem 1.25rem' : '1.25rem 1.5rem', 
+                    borderRadius: msg.role === 'user' ? '24px 24px 4px 24px' : '4px 24px 24px 24px', 
+                    background: msg.role === 'user' ? 'linear-gradient(135deg, #1a4d2e, #2d7a45)' : undefined, 
+                    border: msg.role === 'user' ? '1px solid rgba(106,191,138,0.3)' : undefined, 
+                    fontSize: '0.95rem', 
+                    lineHeight: 1.8, 
+                    color: msg.role === 'user' ? '#f0e6c8' : 'rgba(232,223,200,0.9)',
+                    boxShadow: msg.role === 'user' ? '0 8px 24px rgba(0,0,0,0.2)' : undefined
+                  }}>
+                    {msg.role === 'assistant' ? <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content, doshaColor) }} /> : msg.content}
+                  </div>
+                  {msg.role === 'assistant' && voiceSupported && (
+                    <button onClick={() => speakText(msg.content)} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: isSpeaking ? '#6abf8a' : 'rgba(200,200,200,0.3)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      {isSpeaking ? '🔊 Speaking...' : '🔈 Listen'}
+                    </button>
+                  )}
                 </div>
-              </div>
+              </motion.div>
             ))}
             {streaming && (
-              <div style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #2d5a1b, #4a9e6a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>🌿</div>
-                <div style={{ maxWidth: '82%', padding: '1rem 1.25rem', borderRadius: '6px 20px 20px 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(106,191,138,0.1)', fontSize: '0.9rem', lineHeight: 1.7, color: 'rgba(232,223,200,0.85)' }}>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}
+              >
+                <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🌿</div>
+                <div className="glass-card" style={{ maxWidth: '85%', padding: '1.25rem 1.5rem', borderRadius: '4px 24px 24px 24px', fontSize: '0.95rem', lineHeight: 1.8, color: 'rgba(232,223,200,0.9)' }}>
                   <div dangerouslySetInnerHTML={{ __html: renderMarkdown(streaming, doshaColor) }} />
-                  <span style={{ opacity: 0.4 }}>▋</span>
+                  <span style={{ color: '#6abf8a', animation: 'blink 1s infinite' }}>▋</span>
                 </div>
-              </div>
+              </motion.div>
             )}
             {loading && !streaming && (
-              <div style={{ marginBottom: '1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.6rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg, #2d5a1b, #4a9e6a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>🌿</div>
-                  <div style={{ padding: '0.6rem 1rem', borderRadius: '6px 16px 16px 16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(106,191,138,0.1)', color: 'rgba(200,200,200,0.4)', fontSize: '0.85rem' }}>Vaidya is consulting the Council{thinkingDots}</div>
-                </div>
-                {/* Knowledge Pulse Visualizer */}
-                <div style={{ marginLeft: 36, display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.4rem 0.75rem', background: 'rgba(106,191,138,0.05)', border: '1px solid rgba(106,191,138,0.15)', borderRadius: 12, animation: 'pulse 2s infinite ease-in-out' }}>
-                  <div style={{ display: 'flex', gap: '3px' }}>
-                    {[0, 1, 2].map(i => (
-                      <div key={i} style={{ width: 3, height: 12, background: '#6abf8a', borderRadius: 2, animation: `bounce 1s infinite ${i * 0.2}s` }} />
-                    ))}
+              <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.85rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div className="glass-card" style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🌿</div>
+                  <div className="glass-card" style={{ padding: '0.75rem 1.25rem', borderRadius: '4px 20px 20px 20px', color: 'rgba(232,223,200,0.5)', fontSize: '0.9rem' }}>
+                    Vaidya is consulting the Council{thinkingDots}
                   </div>
-                  <span style={{ fontSize: '0.65rem', color: '#6abf8a', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Accessing AI Brain Wisdom...</span>
                 </div>
+                
+                {/* Knowledge Pulse 2.0 */}
+                <motion.div 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  style={{ marginLeft: 44, display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.6rem 1.25rem', background: 'rgba(74,222,128,0.03)', border: '1px solid rgba(74,222,128,0.1)', borderRadius: 16 }}
+                >
+                  <div className="knowledge-pulse-core">
+                    <div className="knowledge-pulse-ring" />
+                    <div className="knowledge-pulse-ring" style={{ animationDelay: '0.5s' }} />
+                  </div>
+                  <span style={{ fontSize: '0.7rem', color: '#4ade80', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    Accessing AI Brain Wisdom...
+                  </span>
+                </motion.div>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -823,13 +859,15 @@ export default function ChatPage() {
       )}
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { margin: 0; background: #05100a; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(106,191,138,0.2); border-radius: 2px; }
-        .synthesis-header { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 700; color: #c9a84c; margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+        .synthesis-header { font-family: var(--font-cormorant), serif; font-size: 1.25rem; font-weight: 700; color: #c9a84c; margin-bottom: 0.75rem; letter-spacing: 0.05em; border-bottom: 1px solid rgba(201, 168, 76, 0.2); padding-bottom: 0.3rem;}
         @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .markdown-content strong { font-weight: 600; color: #6abf8a; }
+        .markdown-content br + br { display: block; margin-top: 0.5rem; content: ""; }
       `}</style>
     </main>
   )
