@@ -15,6 +15,9 @@ model UserProfile {
   vataScore      Int?     // e.g. 45
   pittaScore     Int?
   kaphaScore     Int?
+  age            Int?
+  gender         String?
+  healthGoal     String?
   subscriptionTier   String?  // e.g. "premium", "premium-plus"
   subscriptionStatus String   @default("free") // "free", "active", "cancelled", "expired"
   subscriptionId     String?  @unique // Razorpay ID
@@ -29,11 +32,22 @@ model UserProfile {
 model ChatSession {
   id             String   @id @default(uuid())
   userId         String
-  topic          String
-  summary        String
+  topic          String?  @default("New Consultation")
+  summary        String?  @default("")
   createdAt      DateTime @default(now())
   
   user           UserProfile @relation(fields: [userId], references: [id])
+  messages       Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  sessionId String
+  role      String   // 'user' or 'assistant'
+  content   String
+  createdAt DateTime @default(now())
+  
+  session   ChatSession @relation(fields: [sessionId], references: [id])
 }
 
 model UserMemory {

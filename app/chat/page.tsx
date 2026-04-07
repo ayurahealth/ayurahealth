@@ -6,6 +6,10 @@ import { t, type Lang } from '../../lib/translations'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { traditionIcons } from '../../components/TraditionIcons'
+import AyurvedicClock from '../../components/AyurvedicClock'
+import VaidyaOracle from '../../components/VaidyaOracle'
+import { ChatSkeleton } from '../../components/BoneyardLoaders'
+import EngagementStory from '../../components/EngagementStory'
 
 interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[] }
 interface Attachment {
@@ -65,11 +69,12 @@ const QUESTIONS = (lang: Lang) => [
 
 function renderMarkdown(text: string, doshaColor = '#6abf8a'): string {
   return text
-    .replace(/\*\*✦ VAIDYA'S SYNTHESIS\*\*/g, `<div class="synthesis-header">✦ VAIDYA'S SYNTHESIS</div>`)
-    .replace(/\*\*🌿 The Path of Balance\*\*/g, `<div class="section-header" style="color:${doshaColor}">🌿 The Path of Balance</div>`)
-    .replace(/\*\*📊 Clinical Correlation\*\*/g, `<div class="section-header" style="color:${doshaColor}">📊 Clinical Correlation</div>`)
-    .replace(/\*\*⚡ Your Integrated Regimens?\*\*/g, `<div class="section-header" style="color:${doshaColor}">⚡ Your Integrated Regimen</div>`)
-    .replace(/\*\*📚 Lineage & Proof\*\*/g, `<div class="section-header" style="color:${doshaColor}">📚 Lineage & Proof</div>`)
+    .replace(/\*\*✦ VAIDYA'S NEURAL SYNTHESIS\*\*/g, `<div class="synthesis-header">✦ VAIDYA'S NEURAL SYNTHESIS</div>`)
+    .replace(/\*\*🧪 Mathematical Precision Log\*\*/g, `<div class="section-header" style="color:${doshaColor}">🧪 Mathematical Precision Log</div>`)
+    .replace(/\*\*🌿 The Path of Multi-Tradition Balance\*\*/g, `<div class="section-header" style="color:${doshaColor}">🌿 The Path of Multi-Tradition Balance</div>`)
+    .replace(/\*\*📊 Clinical & Biomarker Correlation\*\*/g, `<div class="section-header" style="color:${doshaColor}">📊 Clinical Correlation</div>`)
+    .replace(/\*\*⚡ Integrated Regimen \(Priority Actions\)\*\*/g, `<div class="section-header" style="color:${doshaColor}">⚡ Your Integrated Regimen</div>`)
+    .replace(/\*\*📚 Verified Lineage\*\*/g, `<div class="section-header" style="color:${doshaColor}">📚 Lineage & Proof</div>`)
     .replace(/\*\*([^*]+)\*\*/g, `<strong style="color:${doshaColor}">$1</strong>`)
     .replace(/\*([^*]+)\*/g, '<em style="opacity:0.85">$1</em>')
     .replace(/^### (.+)$/gm, `<h3 style="color:${doshaColor};font-size:1rem;font-weight:600;margin:1rem 0 0.4rem">$1</h3>`)
@@ -139,6 +144,7 @@ export default function ChatPage() {
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
+  const [showClock, setShowClock] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -633,15 +639,43 @@ export default function ChatPage() {
         </div>
       </header>
 
-      {/* LANDING */}
+      {/* ── LANDING SCREEN ─────────────────────────────────────────────────── */}
       {screen === 'landing' && (
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <div style={{ fontSize: '5rem', marginBottom: '1rem', filter: 'drop-shadow(0 0 30px rgba(106,191,138,0.4))' }}>🌿</div>
-            <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(2.2rem, 6vw, 3.5rem)', fontWeight: 700, color: '#c9a84c', lineHeight: 1.15, marginBottom: '0.75rem', textShadow: '0 0 40px rgba(201,168,76,0.3)' }}>{tx.hero_title}</h1>
-            <p style={{ color: 'rgba(232,223,200,0.65)', fontSize: '1.05rem', lineHeight: 1.7, maxWidth: 480, margin: '0 auto 2rem' }}>{tx.hero_sub}</p>
-          </div>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', textAlign: 'center', padding: '2rem 1rem' }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <VaidyaOracle />
+          </motion.div>
+
+          <header style={{ marginBottom: '3.5rem', marginTop: '-1rem' }}>
+            <h1 style={{ 
+              fontFamily: '"Cormorant Garamond", serif', 
+              fontSize: '3.8rem', 
+              color: '#c9a84c', 
+              marginBottom: '0.5rem',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1
+            }}>
+              {t[lang].title}
+            </h1>
+            <p style={{ 
+              fontSize: '1.2rem', 
+              opacity: 0.6, 
+              color: '#e8dfc8', 
+              maxWidth: 500, 
+              margin: '0 auto',
+              lineHeight: 1.5,
+              fontWeight: 400
+            }}>
+              {t[lang].subtitle}
+            </p>
+          </header>
+
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(106,191,138,0.2)', borderRadius: 20, padding: '2rem', backdropFilter: 'blur(10px)', marginBottom: '1rem' }}>
+            <EngagementStory />
             <div style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '0.75rem' }}>🧬</div>
             <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#c9a84c', fontSize: '1.4rem', textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>{tx.quiz_cta_title}</h3>
             <p style={{ color: 'rgba(232,223,200,0.55)', fontSize: '0.875rem', textAlign: 'center', lineHeight: 1.6, marginBottom: '1.5rem' }}>{tx.quiz_cta_sub}</p>
@@ -760,6 +794,12 @@ export default function ChatPage() {
           <div className="liquid-glass" style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h1 style={{ color: '#f0e6c8', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>🌿 AyuraHealth Chat</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <button 
+                onClick={() => setShowClock(!showClock)}
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '0.3rem 0.6rem', color: '#6abf8a', fontSize: '0.7rem', cursor: 'pointer' }}
+              >
+                {showClock ? '🕒 Hide Clock' : '🕒 Show Clock'}
+              </button>
               <div style={{ padding: '0.25rem 0.6rem', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
                 <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
@@ -779,8 +819,20 @@ export default function ChatPage() {
             {!incognito && messages.length > 1 && <span style={{ marginLeft: 'auto', fontSize: '0.65rem', color: 'rgba(200,200,200,0.25)', alignSelf: 'center' }}>💾 auto-saved</span>}
           </div>
 
+          {showClock && (
+            <div style={{ padding: '1rem', display: 'flex', justifyContent: 'center' }}>
+              <AyurvedicClock />
+            </div>
+          )}
+
           {/* Messages */}
           <div className="native-scroll" style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem 0.5rem' }}>
+            {messages.length === 0 && !loading && (
+              <div style={{ textAlign: 'center', marginTop: '4rem', opacity: 0.5 }}>
+                <p>Start a conversation with VAIDYA...</p>
+              </div>
+            )}
+            
             {messages.map((msg, i) => (
               <motion.div 
                 key={i} 
@@ -848,6 +900,10 @@ export default function ChatPage() {
                 </div>
               </motion.div>
             ))}
+            {loading && !streaming && (
+              <ChatSkeleton />
+            )}
+            
             {streaming && (
               <motion.div 
                 initial={{ opacity: 0 }}

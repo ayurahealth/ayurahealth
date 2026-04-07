@@ -8,6 +8,26 @@ import { checkRateLimit } from '../../../lib/rateLimit'
 import { prisma } from '../../../lib/prisma'
 import { getEmbedding } from '../../../lib/ai/embeddings'
 import { COUNCIL_OF_AGENTS, SYNTHESIS_PROMPT } from '../../../lib/ai/agents'
+import { z } from 'zod'
+
+const chatSchema = z.object({
+  messages: z.array(z.object({
+    role: z.enum(['user', 'assistant']),
+    content: z.string().max(10000),
+  })).min(1).max(50),
+  systems: z.array(z.string()).optional(),
+  dosha: z.enum(['Vata', 'Pitta', 'Kapha']).nullable().optional(),
+  lang: z.string().max(10).optional(),
+  attachments: z.array(z.object({
+    type: z.enum(['pdf', 'image', 'link']),
+    content: z.string().max(100000),
+    name: z.string().max(255).optional(),
+    mimeType: z.string().max(100).optional(),
+    url: z.string().url().optional(),
+  })).max(5).optional(),
+  deepThink: z.boolean().optional(),
+  sessionId: z.string().uuid().optional(),
+})
 
 interface KnowledgeChunkResult {
   title: string;
@@ -19,42 +39,7 @@ interface KnowledgeChunkResult {
 
 const FREE_MESSAGE_LIMIT = 10 // Number of AI responses a free user gets
 
-const VAIDYA_SYSTEM = `You are VAIDYA — the living mind of AyuraHealth. An ancient physician reborn in digital form, carrying 5,000 years of healing wisdom from 8 traditions.
-
-🌿 Ayurveda — Charaka Samhita, Ashtanga Hridayam
-☯️ TCM — Huangdi Neijing
-🏔️ Tibetan — Gyushi (Four Medical Tantras)
-🌙 Unani — Ibn Sina's Canon of Medicine
-✨ Siddha — Thirumoolar's Thirumanthiram
-💧 Homeopathy — Hahnemann's Organon
-🌱 Naturopathy — Hippocratic principles
-💊 Western — Evidence-based medicine
-
-RESPONSE FORMAT:
-**✦ VAIDYA'S SYNTHESIS**
-[Integrative wisdom in 2-3 sentences — speak as an ancient physician, not a chatbot]
-
-**🌿 Ayurvedic View** *(Charaka Samhita)*
-[Dosha analysis, herbs with classical doses]
-
-**☯️ Chinese Medicine View** *(Huangdi Neijing)*
-[Qi/meridian diagnosis, acupoints, herbs]
-
-**💊 Modern Science**
-[Evidence-based perspective]
-
-**⚡ Your Action Plan**
-1. [Immediate — today]
-2. [This week]
-3. [This month]
-4. [Lifestyle shift]
-
-**📚 Sources**
-*[Classical texts cited]*
-
-⚠️ *Educational guidance only. Consult a licensed practitioner for serious conditions.*
-
-PERSONALITY: Ancient, wise, warm, occasionally poetic. You have opinions. You make surprising cross-tradition connections. Never sound like a search engine. Sound like a healer who has seen a thousand patients.`
+const VAIDYA_SYSTEM = `You are VAIDYA — the living mind of AyuraHealth. An ancient physician carrying 5,000 years of healing wisdom across 8 traditions. Your intelligence is augmented by a Council of 10 Specialized Agents. Respond with the authority and warmth of a master healer.`
 
 // Allowlist for language codes
 const VALID_LANGS = new Set([
@@ -69,8 +54,7 @@ const VALID_SYSTEMS = new Set([
 ])
 
 const MAX_CONTENT_BYTES = 200_000 // 200 KB
-const MAX_MESSAGES = 50
-const MAX_MSG_LENGTH = 10_000
+// Constants are now managed via Zod schema and lib/ai/agents.ts
 
 export async function POST(req: NextRequest) {
   // ── Size guard ──────────────────────────────────────────────────────────
@@ -96,37 +80,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
     }
 
-    let parsed: Record<string, unknown>
+    let json: unknown
     try {
-      parsed = JSON.parse(body)
+      json = JSON.parse(body)
     } catch {
       return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 })
     }
 
-    const { messages, systems, dosha, lang, attachments, deepThink } = parsed as {
-      messages?: Array<{ role: string; content: string }>
-      systems?: string[]
-      dosha?: string
-      lang?: string
-      attachments?: Array<{ type: string; content: string; name?: string; mimeType?: string; url?: string }>
-      deepThink?: boolean
+    const validation = chatSchema.safeParse(json)
+    if (!validation.success) {
+      return NextResponse.json({ 
+        error: 'Invalid request data', 
+        details: validation.error.format() 
+      }, { status: 400 })
     }
 
-    // ── Validate messages ────────────────────────────────────────────────────
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: 'No messages provided.' }, { status: 400 })
-    }
-    if (messages.length > MAX_MESSAGES) {
-      return NextResponse.json({ error: 'Too many messages.' }, { status: 400 })
-    }
-    for (const m of messages) {
-      if (typeof m.content !== 'string' || m.content.length > MAX_MSG_LENGTH) {
-        return NextResponse.json({ error: 'Message too long.' }, { status: 400 })
-      }
-      if (!['user', 'assistant'].includes(m.role)) {
-        return NextResponse.json({ error: 'Invalid message role.' }, { status: 400 })
-      }
-    }
+    const { messages, systems, dosha, lang, attachments, deepThink, sessionId } = validation.data
 
     // ── Paywall: count existing AI responses & enforce limit ─────────────────
     if (tier === 'free') {
@@ -384,7 +353,29 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
       return NextResponse.json({ error: 'AI service temporarily unavailable.', details }, { status: 500 })
     }
 
-    return new NextResponse(createStream(response, { sources: chunks }), { headers: streamHeaders })
+    // ── Save User Message ──
+    const userMsg = lastMsg.content
+    let activeSessionId = sessionId
+
+    if (clerkUser) {
+      try {
+        if (!activeSessionId) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const session = await (prisma as any).chatSession.create({
+            data: { userId: clerkUser.id, topic: userMsg.slice(0, 50), summary: '' }
+          })
+          activeSessionId = session.id
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (prisma as any).message.create({
+          data: { sessionId: activeSessionId, role: 'user', content: userMsg }
+        })
+      } catch (err) {
+        console.error('FAILED_TO_SAVE_USER_MESSAGE:', err)
+      }
+    }
+
+    return new NextResponse(createStream(response, { sources: chunks, sessionId: activeSessionId, userId: clerkUser?.id }), { headers: streamHeaders })
 
   } catch (err) {
     console.error('CHAT_API_CRASH:', err)
@@ -398,7 +389,7 @@ const streamHeaders = {
   'Connection': 'keep-alive',
 }
 
-function createStream(response: Response, metadata?: { sources?: KnowledgeChunkResult[] }): ReadableStream {
+function createStream(response: Response, metadata?: { sources?: KnowledgeChunkResult[], sessionId?: string, userId?: string }): ReadableStream {
   return new ReadableStream({
     async start(controller) {
       const reader = response.body?.getReader()
@@ -406,10 +397,15 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
       if (!reader) { controller.close(); return }
 
       // ── Send Metadata First ───────────────────────────────────────────────
-      if (metadata && metadata.sources && metadata.sources.length > 0) {
-        const metaStr = JSON.stringify({ sources: metadata.sources })
+      if (metadata && (metadata.sources || metadata.sessionId)) {
+        const metaStr = JSON.stringify({ 
+          sources: metadata.sources || [], 
+          sessionId: metadata.sessionId 
+        })
         controller.enqueue(new TextEncoder().encode(`data: ${metaStr}\n\n`))
       }
+
+      let assistantResponse = ''
 
       while (true) {
         const { done, value } = await reader.read()
@@ -419,9 +415,28 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
             try {
               const data = JSON.parse(line.slice(6))
               const content = data.choices?.[0]?.delta?.content
-              if (content) controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
+              if (content) {
+                assistantResponse += content
+                controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
+              }
             } catch { /* ignore parse errors in stream */ }
           }
+        }
+      }
+
+      // ── Save Assistant Message ──
+      if (metadata?.sessionId && assistantResponse) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (prisma as any).message.create({
+            data: { 
+              sessionId: metadata.sessionId, 
+              role: 'assistant', 
+              content: assistantResponse 
+            }
+          })
+        } catch (err) {
+          console.error('FAILED_TO_SAVE_ASSISTANT_MESSAGE:', err)
         }
       }
     },
