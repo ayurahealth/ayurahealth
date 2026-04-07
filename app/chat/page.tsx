@@ -6,10 +6,11 @@ import { t, type Lang } from '../../lib/translations'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { traditionIcons } from '../../components/TraditionIcons'
-// AyurvedicClock import removed
+import AyurvedicClock from '../../components/AyurvedicClock'
 import VaidyaOracle from '../../components/VaidyaOracle'
 import { ChatSkeleton } from '../../components/BoneyardLoaders'
 import EngagementStory from '../../components/EngagementStory'
+import Logo from '../../components/Logo'
 
 interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[] }
 interface Attachment {
@@ -58,6 +59,17 @@ const MEDICINE_SYSTEMS = [
   { id: 'siddha', label: 'Siddha', icon: 'siddha' }, 
   { id: 'tibetan', label: 'Tibetan', icon: 'tibetan' },
 ]
+
+const SYSTEM_DETAIL: Record<string, string> = {
+  ayurveda: 'Dosha, agni, dinacharya and herbs only.',
+  tcm: 'Qi, meridians, yin-yang and organ clocks only.',
+  western: 'Evidence-based biomedical guidance only.',
+  homeopathy: 'Homeopathic remedy framework only.',
+  naturopathy: 'Lifestyle and natural therapeutics only.',
+  unani: 'Mizaj and humoral balancing only.',
+  siddha: 'Siddha principles and elemental balance only.',
+  tibetan: 'Sowa Rigpa principles only.',
+}
 
 const QUESTIONS = (lang: Lang) => [
   { emoji: '🧍', q: t[lang].q1, opts: [{ l: t[lang].q1a, d: 'Vata' }, { l: t[lang].q1b, d: 'Pitta' }, { l: t[lang].q1c, d: 'Kapha' }] },
@@ -126,7 +138,7 @@ export default function ChatPage() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [streaming, setStreaming] = useState('')
-  const [selectedSystems, setSelectedSystems] = useState(['ayurveda', 'tcm', 'western'])
+  const [selectedSystems, setSelectedSystems] = useState(['ayurveda'])
   const [incognito] = useState(false)
   const [revealed, setRevealed] = useState(false)
   const [isListening, setIsListening] = useState(false)
@@ -803,7 +815,7 @@ export default function ChatPage() {
       {screen === 'chat' && (
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
           <div className="liquid-glass" style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h1 style={{ color: '#f0e6c8', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>🌿 AyuraHealth Chat</h1>
+            <Logo size={26} showText={true} href="/" />
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <button 
                 onClick={() => setShowClock(!showClock)}
@@ -818,21 +830,51 @@ export default function ChatPage() {
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.5)', fontSize: '0.8rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
-          {/* System pills */}
-          <div className="liquid-glass" style={{ padding: '0.6rem 1rem', display: 'flex', gap: '0.35rem', flexWrap: 'wrap', borderTop: 'none', borderBottom: '1px solid rgba(106,191,138,0.08)' }}>
-            {MEDICINE_SYSTEMS.map(sys => (
-              <button key={sys.id} onClick={() => setSelectedSystems(prev => prev.includes(sys.id) ? prev.filter(s => s !== sys.id) : [...prev, sys.id])}
-                style={{ padding: '0.35rem 0.8rem', borderRadius: 12, border: `1px solid ${selectedSystems.includes(sys.id) ? 'rgba(106,191,138,0.4)' : 'rgba(255,255,255,0.07)'}`, background: selectedSystems.includes(sys.id) ? 'rgba(106,191,138,0.1)' : 'transparent', color: selectedSystems.includes(sys.id) ? '#6abf8a' : 'rgba(232,223,200,0.4)', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'all 0.2s' }}>
-                <span style={{ width: 14, height: 14 }}>{traditionIcons[sys.icon]}</span>
-                {sys.label}
-              </button>
-            ))}
-            {!incognito && messages.length > 1 && <span style={{ marginLeft: 'auto', fontSize: '0.65rem', color: 'rgba(200,200,200,0.25)', alignSelf: 'center' }}>💾 auto-saved</span>}
+          {/* System cards */}
+          <div className="liquid-glass" style={{ padding: '0.7rem 1rem', borderTop: 'none', borderBottom: '1px solid rgba(106,191,138,0.08)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.45rem' }}>
+              {MEDICINE_SYSTEMS.map(sys => {
+                const active = selectedSystems.includes(sys.id)
+                return (
+                  <button
+                    key={sys.id}
+                    onClick={() => setSelectedSystems([sys.id])}
+                    style={{
+                      padding: '0.55rem 0.45rem',
+                      borderRadius: 12,
+                      border: `1px solid ${active ? 'rgba(201,168,76,0.5)' : 'rgba(255,255,255,0.08)'}`,
+                      background: active ? 'linear-gradient(135deg, rgba(201,168,76,0.18), rgba(106,191,138,0.12))' : 'rgba(255,255,255,0.02)',
+                      color: active ? '#e8dfc8' : 'rgba(232,223,200,0.55)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '0.28rem',
+                      transition: 'all 0.2s',
+                      minHeight: 62,
+                    }}
+                  >
+                    <span style={{ width: 16, height: 16, color: active ? '#6abf8a' : 'rgba(232,223,200,0.5)' }}>{traditionIcons[sys.icon]}</span>
+                    <span style={{ fontSize: '0.66rem', fontWeight: active ? 700 : 500, lineHeight: 1.1 }}>{sys.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {!incognito && messages.length > 1 && (
+              <div style={{ marginTop: 6, textAlign: 'right', fontSize: '0.63rem', color: 'rgba(200,200,200,0.3)' }}>💾 auto-saved</div>
+            )}
           </div>
+
+          {selectedSystems[0] && (
+            <div className="liquid-glass" style={{ padding: '0.55rem 1rem', borderTop: 'none', marginTop: '-1px', color: 'rgba(232,223,200,0.8)', fontSize: '0.78rem' }}>
+              <span style={{ color: '#6abf8a', fontWeight: 700, marginRight: 8 }}>Active:</span>
+              {MEDICINE_SYSTEMS.find(s => s.id === selectedSystems[0])?.label} - {SYSTEM_DETAIL[selectedSystems[0]]}
+            </div>
+          )}
 
           {showClock && (
             <div style={{ padding: '1rem', display: 'flex', justifyContent: 'center' }}>
-              {/* AyurvedicClock moved to /cycle */}
+              <AyurvedicClock />
             </div>
           )}
 

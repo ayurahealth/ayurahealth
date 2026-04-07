@@ -95,6 +95,16 @@ const Particles = ({ count = 500, state = 'idle' }: { count?: number; state?: st
 export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
   return (
     <div style={{ width: '100%', height: '350px', position: 'relative', cursor: 'pointer' }}>
+      <div style={{
+        position: 'absolute',
+        inset: '20% 15%',
+        background: state === 'thinking'
+          ? 'radial-gradient(circle, rgba(201,168,76,0.28) 0%, rgba(201,168,76,0.03) 65%, transparent 85%)'
+          : 'radial-gradient(circle, rgba(106,191,138,0.22) 0%, rgba(106,191,138,0.03) 65%, transparent 85%)',
+        filter: 'blur(20px)',
+        zIndex: 0,
+        pointerEvents: 'none',
+      }} />
       <Canvas 
         camera={{ position: [0, 0, 4.5], fov: 45 }}
         gl={{ antialias: true, alpha: true }}

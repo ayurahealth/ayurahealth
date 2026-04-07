@@ -32,6 +32,9 @@ jobs:
     - name: Lint
       run: npm run lint
 
+    - name: SEO Guard
+      run: npm run seo:guard
+
     - name: Type Check
       run: npx tsc --noEmit
 

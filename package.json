@@ -7,10 +7,17 @@
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "launch:check": "node scripts/launch-check.mjs"
+    "seo:guard": "node scripts/seo-guard.mjs",
+    "launch:check": "node scripts/launch-check.mjs",
+    "cap:sync": "npx cap sync ios",
+    "cap:open": "npx cap open ios",
+    "ios:setup": "npm run build && npm run cap:sync"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/ios": "^8.3.0",
     "@clerk/nextjs": "^7.0.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@prisma/client": "^7.6.0",

@@ -1,7 +1,15 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  const dbUrl =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL
+
+  // Support Vercel Postgres/Supabase env naming when DATABASE_URL isn't set.
+  return dbUrl
+    ? new PrismaClient({ datasources: { db: { url: dbUrl } } })
+    : new PrismaClient()
 }
 
 declare const globalThis: {

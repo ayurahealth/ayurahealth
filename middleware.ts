@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
 // Define protected routes that REQUIRE authentication
 const isProtectedRoute = createRouteMatcher([
@@ -8,6 +9,14 @@ const isProtectedRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req) => {
+  // Keep homepage canonical stable for SEO.
+  // Query variants like "/?lang=ceb" can cause duplicate URL indexing noise.
+  if (req.nextUrl.pathname === '/' && req.nextUrl.searchParams.has('lang')) {
+    const cleanUrl = req.nextUrl.clone()
+    cleanUrl.searchParams.delete('lang')
+    return NextResponse.redirect(cleanUrl, 308)
+  }
+
   // ── CEO Bypass: Frictionless access for the owner ──────────────────────────
   const ceoToken = req.cookies.get('ayura_ceo_token')?.value
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY

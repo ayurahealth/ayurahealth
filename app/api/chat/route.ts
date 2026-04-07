@@ -6,8 +6,6 @@ export const maxDuration = 60
 export const runtime = 'nodejs'
 
 import { checkRateLimit } from '../../../lib/rateLimit'
-import { prisma } from '../../../lib/prisma'
-import { getEmbedding } from '../../../lib/ai/embeddings'
 import { COUNCIL_OF_AGENTS, SYNTHESIS_PROMPT } from '../../../lib/ai/agents'
 import { z } from 'zod'
 
@@ -97,6 +95,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { messages, systems, dosha, lang, attachments, deepThink, sessionId } = validation.data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let prismaClient: any = null
 
     // ── Paywall: count existing AI responses & enforce limit ─────────────────
     if (tier === 'free') {
@@ -155,9 +155,10 @@ export async function POST(req: NextRequest) {
       unani: 'Unani', siddha: 'Siddha', tibetan: 'Tibetan Medicine',
     }
 
-    const selectedSystems = safeSystems.length > 0
-      ? `Focus on: ${safeSystems.map(s => systemsMap[s] || s).join(', ')}.`
-      : 'Draw from all 8 traditions.'
+    const primarySystem = safeSystems.length > 0 ? safeSystems[0] : null
+    const selectedSystems = primarySystem
+      ? `STRICT MODE: Use ONLY ${systemsMap[primarySystem] || primarySystem}. Do NOT mix traditions unless user explicitly asks to compare.`
+      : 'Default mode: Ayurveda-only guidance unless user explicitly requests another system.'
 
     const doshaCtx = safeDosha
       ? `Patient is ${safeDosha} dominant. Tailor ALL recommendations to ${safeDosha}. ${safeDosha === 'Vata' ? 'Grounding, warming, nourishing.' : safeDosha === 'Pitta' ? 'Cooling, calming, anti-inflammatory.' : 'Stimulating, lightening, activating.'}`
@@ -229,11 +230,16 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
 
     if (userQuery && userQuery.length > 3) {
       try {
+        if (!prismaClient) {
+          const prismaMod = await import('../../../lib/prisma')
+          prismaClient = prismaMod.prisma
+        }
+        const { getEmbedding } = await import('../../../lib/ai/embeddings')
         const queryEmbedding = await getEmbedding(userQuery)
         const vectorString = `[${queryEmbedding.join(',')}]`
 
         // Search for relevant classical wisdom
-        chunks = await prisma.$queryRawUnsafe<KnowledgeChunkResult[]>(
+        chunks = await prismaClient.$queryRawUnsafe<KnowledgeChunkResult[]>(
           `SELECT title, content, tradition, source, 1 - (embedding <=> $1::vector) as similarity 
            FROM "KnowledgeChunk" 
            WHERE 1 - (embedding <=> $1::vector) > 0.6
@@ -263,8 +269,13 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
     ${knowledgeCtx ? `\nFOUNDATIONAL DATA RETRIEVED FROM AI BRAIN (NotebookLM Curated):\n${knowledgeCtx}` : ''}
     `
 
+    const strictStyle = `STRUCTURE:
+- Give concise answer in 5-8 bullet points.
+- Include: likely cause, what to do today, what to avoid, and when to seek doctor care.
+- Use ONLY the selected medical system.`
+
     const systemPrompt = `${VAIDYA_SYSTEM}
-${SYNTHESIS_PROMPT}
+${primarySystem ? strictStyle : SYNTHESIS_PROMPT}
 ${selectedSystems}
 ${doshaCtx}
 ${councilBrief}
@@ -272,7 +283,8 @@ LANGUAGE: ${safeLang === 'sa'
       ? 'Respond ONLY in classical Sanskrit (देवनागरी script). Use Sanskrit grammar. Every word must be Sanskrit. Example greeting: नमस्ते। अहं वैद्यः।'
       : `Respond entirely in ${langName}. Every single word must be in ${langName}. Do not use English.`}
 ${isBloodReport ? bloodReportPrompt : ''}
-${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 traditions thoroughly. Show nuanced multi-tradition connections. Be comprehensive and cite specific classical chapters.' : ''}`
+${deepThink ? 'DEEP MIND MODE: Be more thorough within the selected system only. Keep final answer concise and practical.' : ''}
+RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.`
 
     const hasImages = safeAttachments.some(a => a.type === 'image')
 
@@ -378,13 +390,17 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
 
     if (clerkUser) {
       try {
+        if (!prismaClient) {
+          const prismaMod = await import('../../../lib/prisma')
+          prismaClient = prismaMod.prisma
+        }
         if (!activeSessionId) {
-          const session = await (prisma as any).chatSession.create({
+          const session = await (prismaClient as any).chatSession.create({
             data: { userId: clerkUser.id, topic: userMsg.slice(0, 50), summary: '' }
           })
           activeSessionId = session.id
         }
-        await (prisma as any).message.create({
+        await (prismaClient as any).message.create({
           data: { sessionId: activeSessionId!, role: 'user', content: userMsg }
         })
       } catch (err) {
@@ -458,7 +474,8 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
         // Enforce save on close
         if (metadata?.sessionId && assistantResponse) {
           try {
-            await (prisma as any).message.create({
+            const prismaMod = await import('../../../lib/prisma')
+            await (prismaMod.prisma as any).message.create({
               data: { 
                 sessionId: metadata.sessionId, 
                 role: 'assistant', 
