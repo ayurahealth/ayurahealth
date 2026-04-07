@@ -6,7 +6,7 @@ import { t, type Lang } from '../../lib/translations'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { traditionIcons } from '../../components/TraditionIcons'
-import AyurvedicClock from '../../components/AyurvedicClock'
+// AyurvedicClock import removed
 import VaidyaOracle from '../../components/VaidyaOracle'
 import { ChatSkeleton } from '../../components/BoneyardLoaders'
 import EngagementStory from '../../components/EngagementStory'
@@ -821,7 +821,7 @@ export default function ChatPage() {
 
           {showClock && (
             <div style={{ padding: '1rem', display: 'flex', justifyContent: 'center' }}>
-              <AyurvedicClock />
+              {/* AyurvedicClock moved to /cycle */}
             </div>
           )}
 

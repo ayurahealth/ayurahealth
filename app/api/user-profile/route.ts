@@ -16,6 +16,25 @@ const userProfileSchema = z.object({
   healthGoal: z.string().optional(),
 })
 
+// Fetch the user's Health Profile
+export async function GET() {
+  try {
+    const user = await currentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const profile = await prisma.userProfile.findUnique({
+      where: { id: user.id }
+    })
+
+    return NextResponse.json({ success: true, profile })
+  } catch (error) {
+    console.error('Error fetching user profile:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}
+
 // Update the user's Health Profile (e.g. after a Quiz or AI Chat)
 export async function POST(req: Request) {
   try {
@@ -33,7 +52,8 @@ export async function POST(req: Request) {
 
     const { primaryDosha, vataScore, pittaScore, kaphaScore, age, gender, healthGoal } = validation.data
 
-    const updatedProfile = await prisma.userProfile.upsert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updatedProfile = await (prisma as any).userProfile.upsert({
       where: { id: user.id },
       update: {
         primaryDosha,
