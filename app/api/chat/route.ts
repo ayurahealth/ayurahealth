@@ -360,12 +360,14 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
     if (clerkUser) {
       try {
         if (!activeSessionId) {
-          const session = await prisma.chatSession.create({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const session = await (prisma as any).chatSession.create({
             data: { userId: clerkUser.id, topic: userMsg.slice(0, 50), summary: '' }
           })
           activeSessionId = session.id
         }
-        await prisma.message.create({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (prisma as any).message.create({
           data: { sessionId: activeSessionId, role: 'user', content: userMsg }
         })
       } catch (err) {
@@ -404,37 +406,54 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
       }
 
       let assistantResponse = ''
+      let lineBuffer = ''
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) { controller.close(); break }
-        for (const line of decoder.decode(value).split('\n')) {
-          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-            try {
-              const data = JSON.parse(line.slice(6))
-              const content = data.choices?.[0]?.delta?.content
-              if (content) {
-                assistantResponse += content
-                controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          lineBuffer += decoder.decode(value, { stream: true })
+          const lines = lineBuffer.split('\n')
+          lineBuffer = lines.pop() || '' // Keep the last partial line in the buffer
+
+          for (const line of lines) {
+            const trimmed = line.trim()
+            if (!trimmed || trimmed === 'data: [DONE]') continue
+            
+            if (trimmed.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(trimmed.slice(6))
+                const content = data.choices?.[0]?.delta?.content
+                if (content) {
+                  assistantResponse += content
+                  controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
+                }
+              } catch (e) {
+                console.error('SSE_PARSE_ERROR:', e, 'Line:', trimmed)
               }
-            } catch { /* ignore parse errors in stream */ }
+            }
           }
         }
-      }
-
-      // ── Save Assistant Message ──
-      if (metadata?.sessionId && assistantResponse) {
-        try {
-          await prisma.message.create({
-            data: { 
-              sessionId: metadata.sessionId, 
-              role: 'assistant', 
-              content: assistantResponse 
-            }
-          })
-        } catch (err) {
-          console.error('FAILED_TO_SAVE_ASSISTANT_MESSAGE:', err)
+      } catch (err) {
+        console.error('STREAM_READ_ERROR:', err)
+      } finally {
+        // Enforce save on close
+        if (metadata?.sessionId && assistantResponse) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (prisma as any).message.create({
+              data: { 
+                sessionId: metadata.sessionId, 
+                role: 'assistant', 
+                content: assistantResponse 
+              }
+            })
+          } catch (err) {
+            console.error('FAILED_TO_SAVE_ASSISTANT_MESSAGE:', err)
+          }
         }
+        controller.close()
       }
     },
   })

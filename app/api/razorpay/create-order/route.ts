@@ -33,11 +33,17 @@ export async function POST(request: NextRequest) {
     process.env.NEXT_PUBLIC_APP_URL,
     'https://ayurahealth.com',
     'https://www.ayurahealth.com',
-    process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : null
   ].filter(Boolean)
 
-  if (origin && !allowedOrigins.includes(origin)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const isAllowed = origin && (
+    allowedOrigins.includes(origin) || 
+    origin.endsWith('.vercel.app') || 
+    (process.env.NODE_ENV === 'development' && origin.startsWith('http://localhost:'))
+  )
+
+  if (origin && !isAllowed) {
+    console.error('CORS blocked origin:', origin)
+    return NextResponse.json({ error: 'Origin not allowed' }, { status: 403 })
   }
 
   // ── Rate limiting (payment-specific: 5/min) ──────────────────────────────
