@@ -162,8 +162,7 @@
 - ✅ No sensitive data in URLs
 
 ### Rate Limiting
-- ⚠️ TODO: Implement rate limiting on payment endpoints
-- ⚠️ TODO: Implement CAPTCHA for checkout form
+- [x] Rate limiting implemented on Chat and Payment endpoints.
 
 ---
 
