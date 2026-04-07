@@ -18,6 +18,7 @@ model UserProfile {
   age            Int?
   gender         String?
   healthGoal     String?
+  conditions     String[] @default([])
   subscriptionTier   String?  // e.g. "premium", "premium-plus"
   subscriptionStatus String   @default("free") // "free", "active", "cancelled", "expired"
   subscriptionId     String?  @unique // Razorpay ID

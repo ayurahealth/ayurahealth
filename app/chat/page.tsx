@@ -409,12 +409,17 @@ export default function ChatPage() {
         body: JSON.stringify({ messages: newMessages, systems: selectedSystems, incognito, dosha, lang: (typeof window !== "undefined" ? localStorage.getItem("ayura_lang") || lang : lang), attachments: currentAttachments }),
       })
       if (!res.ok) {
+        let apiError = 'API error'
+        try {
+          const errBody = await res.json()
+          apiError = errBody?.error || errBody?.message || apiError
+        } catch {}
         if (res.status === 402) {
           setShowPaywall(true)
           setLoading(false)
           return
         }
-        throw new Error('API error')
+        throw new Error(apiError)
       }
       const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''; let currentSources: ChatSource[] = []; let buffer = ''
       if (reader) {
@@ -457,8 +462,12 @@ export default function ChatPage() {
     } catch (err) { 
       console.error('CHAT_FETCH_FAILURE:', err)
       let displayError = 'Connection interrupted. Please try again.'
-      if (err instanceof Error && err.message.includes('API error')) {
-        displayError = 'VAIDYA is slightly overwhelmed (API error). Please refresh and try one more time.'
+      if (err instanceof Error) {
+        if (err.message.includes('VAIDYA is not configured') || err.message.includes('provider key missing')) {
+          displayError = 'VAIDYA setup issue on server. Please contact support while we update deployment keys.'
+        } else if (err.message.includes('API error')) {
+          displayError = 'VAIDYA is slightly overwhelmed (API error). Please refresh and try one more time.'
+        }
       }
       setMessages(prev => [...prev, { role: 'assistant', content: displayError }]); 
       setStreaming('') 
@@ -475,6 +484,8 @@ export default function ChatPage() {
 
   const attachmentIconMap = { image: '🖼️', pdf: '📄', link: '🔗' }
   const attachmentColorMap = { image: '#7aafd4', pdf: '#e8835a', link: '#c9a84c' }
+
+  const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
 
   return (
     <main style={{ minHeight: '100vh', background: '#05100a', fontFamily: '"DM Sans", system-ui, sans-serif', color: '#e8dfc8', position: 'relative', overflow: 'hidden' }}>
@@ -828,9 +839,28 @@ export default function ChatPage() {
           {/* Messages */}
           <div className="native-scroll" style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem 0.5rem' }}>
             {messages.length === 0 && !loading && (
-              <div style={{ textAlign: 'center', marginTop: '4rem', opacity: 0.5 }}>
-                <p>Start a conversation with VAIDYA...</p>
+              <div style={{ textAlign: 'center', marginTop: '2rem', padding: '0 2rem' }}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1.5 }}
+                  style={{ width: '100%', maxWidth: 200, margin: '0 auto' }}
+                >
+                  <VaidyaOracle state="idle" />
+                </motion.div>
+                <div style={{ marginTop: '-2rem', opacity: 0.5 }}>
+                  <p style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.2rem', color: '#c9a84c' }}>VAIDYA is ready.</p>
+                  <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Ask your first health question below...</p>
+                </div>
               </div>
+            )}
+            
+            {loading && !streaming && (
+               <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(5,16,10,0.8)', backdropFilter: 'blur(8px)', margin: '0 -1rem 1.5rem', padding: '1rem' }}>
+                 <div style={{ width: 120, height: 120, margin: '0 auto' }}>
+                   <VaidyaOracle state={oracleState} />
+                 </div>
+               </div>
             )}
             
             {messages.map((msg, i) => (

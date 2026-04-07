@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Nav from '../../components/Nav'
 import { motion } from 'framer-motion'
 
-export function DashboardContent({ user, dbProfile }: { user: { firstName?: string } | null; dbProfile: { vataScore?: number; pittaScore?: number; kaphaScore?: number; primaryDosha?: string } | null }) {
+export function DashboardContent({ user, dbProfile }: { user: { firstName?: string } | null; dbProfile: { vataScore?: number; pittaScore?: number; kaphaScore?: number; primaryDosha?: string; healthGoal?: string; conditions?: string[]; chatSessions?: { id: string; topic: string; createdAt: string; summary?: string }[] } | null }) {
   const [mounted, setMounted] = useState(false)
   
   // Real-Time Database Profile Dosha Balance
@@ -61,6 +61,12 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
         .bio-card { background: linear-gradient(145deg, rgba(6,78,59,0.2), rgba(2,6,23,0.4)); border: 1px solid rgba(52,211,153,0.15); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; cursor: pointer; position: relative; overflow: hidden; }
         .bio-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shine 6s infinite; }
         @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        
+        /* Timeline */
+        .timeline-container { margin-top: 3rem; border-top: 1px solid rgba(106,191,138,0.1); paddingTop: 2rem; }
+        .timeline-card { background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+        .timeline-card:hover { background: rgba(106,191,138,0.03); border-color: rgba(106,191,138,0.15); transform: translateX(5px); }
+        .timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: #6abf8a; margin-right: 15px; flex-shrink: 0; box-shadow: 0 0 10px rgba(106,191,138,0.4); }
       `}</style>
 
       {/* Navigation */}
@@ -184,6 +190,58 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
               </Link>
             </motion.div>
 
+            {/* Consultation History Timeline (PRD 5.2.3) */}
+            <div className="timeline-container" style={{ gridColumn: '1 / -1' }}>
+              <h2 className="section-title">Consultation History</h2>
+              {dbProfile?.chatSessions && dbProfile.chatSessions.length > 0 ? (
+                dbProfile.chatSessions.map((session) => (
+                  <Link href={`/chat?sessionId=${session.id}`} key={session.id} style={{ textDecoration: 'none' }}>
+                    <motion.div initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }} className="timeline-card">
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className="timeline-dot" />
+                        <div>
+                          <h3 style={{ fontSize: '1.05rem', color: '#e8dfc8', fontWeight: 500 }}>{session.topic || 'General Health Consultation'}</h3>
+                          <p style={{ fontSize: '0.8rem', color: 'rgba(232,223,200,0.4)', marginTop: '0.2rem' }}>
+                            {new Date(session.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </div>
+                      <div style={{ color: '#6abf8a', fontSize: '0.85rem' }}>View Transcript →</div>
+                    </motion.div>
+                  </Link>
+                ))
+              ) : (
+                <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(255,255,255,0.01)', borderRadius: 20, border: '1px dashed rgba(255,255,255,0.1)' }}>
+                  <p style={{ color: 'rgba(232,223,200,0.3)' }}>No consultations found yet. Start your journey with VAIDYA.</p>
+                  <Link href="/chat" style={{ color: '#6abf8a', textDecoration: 'none', fontSize: '0.9rem', marginTop: '1rem', display: 'inline-block' }}>Open Chat Portal →</Link>
+                </div>
+              )}
+            </div>
+            {/* Bio-Profile Summary (PRD 5.1.2) */}
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bio-card" style={{ cursor: 'default', flexDirection: 'column', alignItems: 'flex-start', padding: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '1rem' }}>
+                <div style={{ color: '#6abf8a', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>✦ Health Profile</div>
+                <Link href="/chat" style={{ color: 'rgba(232,223,200,0.3)', fontSize: '0.7rem', textDecoration: 'none' }}>Update Profile →</Link>
+              </div>
+              
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ fontSize: '0.65rem', color: 'rgba(232,223,200,0.4)', textTransform: 'uppercase', marginBottom: '0.2rem' }}>Primary Goal</div>
+                <div style={{ fontSize: '1.1rem', color: '#c9a84c', fontFamily: '"Cormorant Garamond", serif' }}>{dbProfile?.healthGoal || 'Discovery & Pathfinding'}</div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.65rem', color: 'rgba(232,223,200,0.4)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Active Conditions</div>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  {dbProfile?.conditions && dbProfile.conditions.length > 0 ? (
+                    dbProfile.conditions.map((c, i) => (
+                      <span key={i} style={{ padding: '0.2rem 0.6rem', borderRadius: 8, background: 'rgba(255,255,255,0.05)', fontSize: '0.7rem', border: '1px solid rgba(255,255,255,0.1)' }}>{c}</span>
+                    ))
+                  ) : (
+                    <span style={{ fontSize: '0.75rem', opacity: 0.3 }}>No chronic conditions reported.</span>
+                  )}
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
 
         </div>

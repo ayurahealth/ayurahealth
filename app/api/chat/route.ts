@@ -303,19 +303,36 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
 
     const indicLangs = ['sa', 'ta', 'te', 'kn', 'ml', 'pa', 'gu', 'mr', 'bn', 'ur', 'fa', 'ar', 'he']
     const autoDeepMind = indicLangs.includes(safeLang) || isBloodReport
-    const useNemotron = (deepThink || autoDeepMind) && !hasImages && !!process.env.OPENROUTER_API_KEY
+    const prefersNemotron = (deepThink || autoDeepMind) && !hasImages
+    const hasOpenRouter = Boolean(process.env.OPENROUTER_API_KEY)
+    const hasGroq = Boolean(process.env.GROQ_API_KEY)
+
+    if (!hasOpenRouter && !hasGroq) {
+      return NextResponse.json(
+        { error: 'VAIDYA is not configured. Missing GROQ_API_KEY/OPENROUTER_API_KEY in deployment environment.' },
+        { status: 503 }
+      )
+    }
+
+    const useNemotron = prefersNemotron && hasOpenRouter
 
     const apiUrl = useNemotron
       ? 'https://openrouter.ai/api/v1/chat/completions'
       : 'https://api.groq.com/openai/v1/chat/completions'
 
     const model = useNemotron
-      ? 'nvidia/nemotron-3-super-120b-a12b:free'
+      ? (process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3-super-120b-a12b:free')
       : hasImages
         ? 'meta-llama/llama-4-scout-17b-16e-instruct'
         : 'llama-3.3-70b-versatile'
 
     const authKey = useNemotron ? process.env.OPENROUTER_API_KEY : process.env.GROQ_API_KEY
+    if (!authKey) {
+      return NextResponse.json(
+        { error: 'VAIDYA provider key missing for selected model route.' },
+        { status: 503 }
+      )
+    }
 
     const fetchHeaders: Record<string, string> = {
       'Authorization': `Bearer ${authKey}`,
@@ -342,7 +359,7 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
       const errorData = await response.json().catch(() => ({}))
       const details = errorData.error?.message || response.statusText
       
-      if (useNemotron) {
+      if (useNemotron && hasGroq) {
         const fallback = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },

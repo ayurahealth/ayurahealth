@@ -14,6 +14,7 @@ const userProfileSchema = z.object({
   age: z.union([z.string(), z.number()]).optional(),
   gender: z.string().optional(),
   healthGoal: z.string().optional(),
+  conditions: z.array(z.string()).optional(),
 })
 
 // Fetch the user's Health Profile
@@ -25,7 +26,13 @@ export async function GET() {
     }
 
     const profile = await prisma.userProfile.findUnique({
-      where: { id: user.id }
+      where: { id: user.id },
+      include: {
+        chatSessions: {
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+        }
+      }
     })
 
     return NextResponse.json({ success: true, profile })
@@ -50,7 +57,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid data', details: validation.error.format() }, { status: 400 })
     }
 
-    const { primaryDosha, vataScore, pittaScore, kaphaScore, age, gender, healthGoal } = validation.data
+    const { primaryDosha, vataScore, pittaScore, kaphaScore, age, gender, healthGoal, conditions } = validation.data
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updatedProfile = await (prisma as any).userProfile.upsert({
@@ -63,6 +70,7 @@ export async function POST(req: Request) {
         age: age ? parseInt(age.toString()) : undefined,
         gender,
         healthGoal,
+        conditions,
       },
       create: {
         id: user.id,
@@ -74,6 +82,7 @@ export async function POST(req: Request) {
         age: age ? parseInt(age.toString()) : undefined,
         gender,
         healthGoal,
+        conditions: conditions || [],
       }
     })
 

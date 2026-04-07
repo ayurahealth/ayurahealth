@@ -5,11 +5,24 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
-const OrbCore = () => {
+interface OracleProps {
+  state?: 'idle' | 'listening' | 'thinking' | 'responding';
+}
+
+const OrbCore = ({ state = 'idle' }: OracleProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  const config = useMemo(() => {
+    switch (state) {
+      case 'listening': return { color: '#6abf8a', distort: 0.5, speed: 4, emissive: '#2d7a45' };
+      case 'thinking':  return { color: '#c9a84c', distort: 0.8, speed: 8, emissive: '#c9a84c' };
+      case 'responding': return { color: '#34d399', distort: 0.6, speed: 3, emissive: '#1a4d2e' };
+      default:           return { color: '#c9a84c', distort: 0.4, speed: 2, emissive: '#1a4d2e' };
+    }
+  }, [state]);
+
+  useFrame((s) => {
+    const time = s.clock.getElapsedTime();
     if (mesh.current) {
       mesh.current.rotation.x = Math.cos(time / 4) * 0.2;
       mesh.current.rotation.y = Math.sin(time / 2) * 0.2;
@@ -19,20 +32,20 @@ const OrbCore = () => {
   return (
     <Sphere ref={mesh} args={[1, 64, 64]} scale={1.2}>
       <MeshDistortMaterial
-        color="#c9a84c"
+        color={config.color}
         attach="material"
-        distort={0.4}
-        speed={2}
+        distort={config.distort}
+        speed={config.speed}
         roughness={0}
         metalness={1}
-        emissive="#1a4d2e"
-        emissiveIntensity={0.5}
+        emissive={config.emissive}
+        emissiveIntensity={state === 'thinking' ? 1.2 : 0.5}
       />
     </Sphere>
   );
 };
 
-const Particles = ({ count = 500 }) => {
+const Particles = ({ count = 500, state = 'idle' }: { count?: number; state?: string }) => {
   const points = useMemo(() => {
     const p = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
@@ -48,11 +61,12 @@ const Particles = ({ count = 500 }) => {
 
   const pointsRef = useRef<THREE.Points>(null!);
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  useFrame((s) => {
+    const time = s.clock.getElapsedTime();
+    const speed = state === 'listening' ? 0.4 : state === 'responding' ? 0.2 : 0.1;
     if (pointsRef.current) {
-      pointsRef.current.rotation.y = time * 0.1;
-      pointsRef.current.rotation.z = time * 0.05;
+      pointsRef.current.rotation.y = time * speed;
+      pointsRef.current.rotation.z = time * (speed / 2);
     }
   });
 
@@ -68,8 +82,8 @@ const Particles = ({ count = 500 }) => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.015}
-        color="#6abf8a"
+        size={state === 'listening' ? 0.025 : 0.015}
+        color={state === 'listening' ? '#6abf8a' : '#c9a84c'}
         transparent
         opacity={0.6}
         sizeAttenuation
@@ -78,7 +92,7 @@ const Particles = ({ count = 500 }) => {
   );
 };
 
-export default function VaidyaOracle() {
+export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
   return (
     <div style={{ width: '100%', height: '350px', position: 'relative', cursor: 'pointer' }}>
       <Canvas 
@@ -87,9 +101,9 @@ export default function VaidyaOracle() {
       >
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
-        <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-          <OrbCore />
-          <Particles />
+        <Float speed={state === 'thinking' ? 5 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
+          <OrbCore state={state} />
+          <Particles state={state} />
         </Float>
       </Canvas>
       <div style={{ 
@@ -102,12 +116,13 @@ export default function VaidyaOracle() {
         width: '100%'
       }}>
         <h3 style={{ 
-          color: '#c9a84c', 
+          color: state === 'listening' ? '#6abf8a' : '#c9a84c', 
           fontFamily: '"Cormorant Garamond", serif', 
           fontSize: '1.8rem', 
           margin: 0,
           letterSpacing: '0.05em',
-          textShadow: '0 0 15px rgba(201,168,76,0.4)' 
+          textShadow: `0 0 15px ${state === 'listening' ? 'rgba(106,191,138,0.4)' : 'rgba(201,168,76,0.4)'}`,
+          transition: 'all 0.5s'
         }}>VAIDYA</h3>
         <p style={{ 
           color: 'rgba(232, 223, 200, 0.4)', 
@@ -115,7 +130,7 @@ export default function VaidyaOracle() {
           textTransform: 'uppercase', 
           letterSpacing: '0.3em',
           marginTop: '0.2rem'
-        }}>Neural Oracle Mode</p>
+        }}>{state === 'idle' ? 'Neural Oracle Mode' : state.toUpperCase() + '...'}</p>
       </div>
     </div>
   );

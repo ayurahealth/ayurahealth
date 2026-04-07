@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Nav from '../components/Nav'
+import VaidyaOracle from '../components/VaidyaOracle'
 
 /* ─── Translations ─────────────────────────────────────────────────────── */
 const T: Record<string, {
@@ -354,6 +355,15 @@ export default function LandingPage() {
         >
           {t.sub}
         </motion.p>
+
+        <motion.div
+           initial={{ opacity: 0, scale: 0.8 }}
+           animate={{ opacity: 1, scale: 1 }}
+           transition={{ duration: 1, delay: 0.2 }}
+           style={{ width: '100%', maxWidth: 400, margin: '0 auto', marginBottom: '2rem', zIndex: 1, position: 'relative' }}
+        >
+           <VaidyaOracle />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 18 }}
