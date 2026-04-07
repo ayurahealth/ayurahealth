@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Razorpay from 'razorpay'
 import crypto from 'crypto'
 import { checkRateLimit, checkPaymentRateLimit } from '../../../../lib/rateLimit'
-import { prisma } from '../../../../lib/prisma'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 // Server-side pricing — NEVER trust client-sent amounts
 const PRICES: Record<string, { amount: number; name: string }> = {
@@ -14,16 +13,50 @@ const PRICES: Record<string, { amount: number; name: string }> = {
   'premium-plus-annual': { amount: 639200, name: 'Premium Plus Annual' }, // ₹6,392 in paise
 }
 
-let razorpay: Razorpay | null = null
-
-function getRazorpay() {
-  if (!razorpay && process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-    razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
+function getRazorpayConfig() {
+  // Support both canonical keys and existing custom legacy names in Vercel.
+  const keyId = process.env.RAZORPAY_KEY_ID || process.env.razorpay_Live_API_Key
+  const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.razorpay_Live_Key_Secret
+  
+  if (!keyId || !keySecret) {
+    console.error('RAZORPAY_CONFIG_ERROR: Missing keys.', {
+      hasKeyId: !!keyId,
+      hasKeySecret: !!keySecret,
+      envKeyId: process.env.RAZORPAY_KEY_ID ? 'set' : 'missing',
+      legacyKeyId: process.env.razorpay_Live_API_Key ? 'set' : 'missing'
     })
   }
-  return razorpay
+  
+  return { keyId, keySecret }
+}
+
+async function razorpayApi<T>(path: string, init?: RequestInit): Promise<T> {
+  const { keyId, keySecret } = getRazorpayConfig()
+  if (!keyId || !keySecret) throw new Error('Payment service not configured')
+
+  const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64')
+  const response = await fetch(`https://api.razorpay.com/v1${path}`, {
+    ...init,
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/json',
+      ...(init?.headers || {}),
+    },
+  })
+
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    const errorMessage =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (data as any)?.error?.description ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (data as any)?.error?.reason ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (data as any)?.error ||
+      `Razorpay API failed (${response.status})`
+    throw new Error(errorMessage)
+  }
+  return data as T
 }
 
 export async function POST(request: NextRequest) {
@@ -60,8 +93,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const razorpayInstance = getRazorpay()
-    if (!razorpayInstance) {
+    const { keyId, keySecret } = getRazorpayConfig()
+    if (!keyId || !keySecret) {
       return NextResponse.json({ error: 'Payment service not configured' }, { status: 503 })
     }
 
@@ -84,22 +117,28 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Create Razorpay order ────────────────────────────────────────────────
-    const order = await razorpayInstance.orders.create({
-      amount: priceInfo.amount, // Always from server, never from client
-      currency,
-      receipt: `order_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      notes: {
-        tier,
-        email,
-        productName: priceInfo.name,
-      },
-    })
+    const order = await razorpayApi<{ id: string; amount: number; currency: string }>(
+      '/orders',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          amount: priceInfo.amount, // Always from server, never from client
+          currency,
+          receipt: `order_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          notes: {
+            tier,
+            email,
+            productName: priceInfo.name,
+          },
+        }),
+      }
+    )
 
     return NextResponse.json({
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId,
     })
   } catch (err: unknown) {
     // Improved error handling with logging
@@ -123,10 +162,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Missing parameters' }, { status: 400 })
     }
 
-    const razorpayInstance = getRazorpay()
-    const secret = process.env.RAZORPAY_KEY_SECRET
+    const { keySecret: secret } = getRazorpayConfig()
 
-    if (!razorpayInstance || !secret) {
+    if (!secret) {
       return NextResponse.json({ success: false, error: 'Configuration missing' }, { status: 500 })
     }
 
@@ -139,13 +177,14 @@ export async function PUT(request: NextRequest) {
     if (expectedSignature === razorpay_signature) {
       // ── Signature is valid. Now persist the payment state ────────────────
       // Fetch the order to get the tier and user email stored in notes
-      const order = await razorpayInstance.orders.fetch(razorpay_order_id)
-      const { tier, email } = (order.notes as { tier: string; email: string; userId?: string })
+      const order = await razorpayApi<{ notes?: { tier?: string; email?: string } }>(`/orders/${razorpay_order_id}`)
+      const { tier, email } = (order.notes || {}) as { tier?: string; email?: string }
 
       if (email) {
-        // Record the subscription in the database
-        await prisma.userProfile.update({
-          where: { email }, // Or use ID if userId is provided
+        const { prisma } = await import('../../../../lib/prisma')
+        // Record subscription if profile exists; do not fail payment on missing profile.
+        await prisma.userProfile.updateMany({
+          where: { email },
           data: {
             subscriptionTier: tier,
             subscriptionStatus: 'active',

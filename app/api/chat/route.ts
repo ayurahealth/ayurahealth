@@ -3,6 +3,7 @@ import { currentUser } from '@clerk/nextjs/server'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
+export const runtime = 'nodejs'
 
 import { checkRateLimit } from '../../../lib/rateLimit'
 import { prisma } from '../../../lib/prisma'
@@ -321,7 +322,7 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
       : 'https://api.groq.com/openai/v1/chat/completions'
 
     const model = useNemotron
-      ? (process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3-super-120b-a12b:free')
+      ? (process.env.OPENROUTER_MODEL || 'anthropic/claude-3-haiku')
       : hasImages
         ? 'meta-llama/llama-4-scout-17b-16e-instruct'
         : 'llama-3.3-70b-versatile'
@@ -358,6 +359,7 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       const details = errorData.error?.message || response.statusText
+      console.error('VAIDYA_AI_ERROR:', { status: response.status, details, model, provider: useNemotron ? 'OpenRouter' : 'Groq' })
       
       if (useNemotron && hasGroq) {
         const fallback = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -377,15 +379,13 @@ ${deepThink ? 'DEEP MIND MODE: Maximum reasoning depth. Cross-reference all 8 tr
     if (clerkUser) {
       try {
         if (!activeSessionId) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const session = await (prisma as any).chatSession.create({
             data: { userId: clerkUser.id, topic: userMsg.slice(0, 50), summary: '' }
           })
           activeSessionId = session.id
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (prisma as any).message.create({
-          data: { sessionId: activeSessionId, role: 'user', content: userMsg }
+          data: { sessionId: activeSessionId!, role: 'user', content: userMsg }
         })
       } catch (err) {
         console.error('FAILED_TO_SAVE_USER_MESSAGE:', err)
@@ -458,7 +458,6 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
         // Enforce save on close
         if (metadata?.sessionId && assistantResponse) {
           try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (prisma as any).message.create({
               data: { 
                 sessionId: metadata.sessionId, 
@@ -467,7 +466,7 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
               }
             })
           } catch (err) {
-            console.error('FAILED_TO_SAVE_ASSISTANT_MESSAGE:', err)
+            console.error('FAILED_TO_SAVE_ASSISTANT_MESSAGE:', { error: err, sessionId: metadata.sessionId })
           }
         }
         controller.close()

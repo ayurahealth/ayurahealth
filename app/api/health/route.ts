@@ -1,25 +1,81 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { getDeepChecks, getVaidyaCheck } from '../../../lib/healthChecks'
 
-export async function GET() {
+export const dynamic = 'force-dynamic'
+
+/**
+ * GET /api/health
+ * - Default: liveness + non-sensitive VAIDYA env presence (booleans only).
+ * - ?deep=1 + Authorization: Bearer <HEALTH_CHECK_SECRET>: full integration checklist (still no secret values).
+ */
+export async function GET(req: NextRequest) {
   try {
-    // A simple health check response
+    const { searchParams } = new URL(req.url)
+    const wantsDeep = searchParams.get('deep') === '1'
+    const auth = req.headers.get('authorization')
+    const token = auth?.startsWith('Bearer ') ? auth.slice(7).trim() : ''
+    const secret = process.env.HEALTH_CHECK_SECRET
+
+    const base = {
+      status: 'healthy' as const,
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      service: 'ayurahealth-api',
+    }
+
+    const vaidya = getVaidyaCheck()
+    const summary = vaidya.ready ? ('ok' as const) : ('degraded' as const)
+
+    if (!wantsDeep) {
+      return NextResponse.json(
+        {
+          ...base,
+          checks: {
+            vaidya,
+            summary,
+          },
+        },
+        { status: 200 }
+      )
+    }
+
+    if (!secret || token !== secret) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          hint: 'Set HEALTH_CHECK_SECRET in the deployment environment and send Authorization: Bearer <secret> with ?deep=1',
+        },
+        { status: 401 }
+      )
+    }
+
+    const deep = await getDeepChecks()
+    const deepSummary =
+      deep.vaidya.ready &&
+      deep.database !== 'error' &&
+      deep.clerk.secretConfigured &&
+      deep.clerk.publishableConfigured
+        ? ('ok' as const)
+        : ('degraded' as const)
+
     return NextResponse.json(
-      { 
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV,
-        service: 'ayurahealth-api'
+      {
+        ...base,
+        checks: {
+          ...deep,
+          summary: deepSummary,
+        },
       },
       { status: 200 }
-    );
+    )
   } catch (error) {
     return NextResponse.json(
-      { 
+      {
         status: 'unhealthy',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
-    );
+    )
   }
 }

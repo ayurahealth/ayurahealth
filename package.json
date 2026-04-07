@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "npx prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "launch:check": "node scripts/launch-check.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
