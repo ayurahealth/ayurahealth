@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+.envrc
+.env.local
+.env.production
+.env.development
+.env.test
 
 # vercel
 .vercel
@@ -49,6 +54,16 @@ next-env.d.ts
 .payment-flow-report.json
 .security-audit-report.json
 .antigravityrc
+
+# secrets and credentials
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+credentials*.json
+service-account*.json
+secrets*.json
 
 # IDEs
 .vscode/
