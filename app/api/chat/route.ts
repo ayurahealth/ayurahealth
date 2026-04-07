@@ -36,6 +36,26 @@ interface KnowledgeChunkResult {
   similarity: number;
 }
 
+interface ChatSessionRecord {
+  id: string
+}
+
+interface MessageCreateInput {
+  sessionId: string
+  role: 'user' | 'assistant'
+  content: string
+}
+
+interface PrismaChatClient {
+  chatSession: {
+    create(args: { data: { userId: string; topic: string; summary: string } }): Promise<ChatSessionRecord>
+  }
+  message: {
+    create(args: { data: MessageCreateInput }): Promise<unknown>
+  }
+  $queryRawUnsafe<T>(query: string, ...params: unknown[]): Promise<T>
+}
+
 const FREE_MESSAGE_LIMIT = 10 // Number of AI responses a free user gets
 
 const VAIDYA_SYSTEM = `You are VAIDYA — the living mind of AyuraHealth. An ancient physician carrying 5,000 years of healing wisdom across 8 traditions. Your intelligence is augmented by a Council of 10 Specialized Agents. Respond with the authority and warmth of a master healer.`
@@ -95,8 +115,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { messages, systems, dosha, lang, attachments, deepThink, sessionId } = validation.data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let prismaClient: any = null
+    let prismaClient: PrismaChatClient | null = null
 
     // ── Paywall: count existing AI responses & enforce limit ─────────────────
     if (tier === 'free') {
@@ -395,12 +414,12 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
           prismaClient = prismaMod.prisma
         }
         if (!activeSessionId) {
-          const session = await (prismaClient as any).chatSession.create({
+          const session = await prismaClient.chatSession.create({
             data: { userId: clerkUser.id, topic: userMsg.slice(0, 50), summary: '' }
           })
           activeSessionId = session.id
         }
-        await (prismaClient as any).message.create({
+        await prismaClient.message.create({
           data: { sessionId: activeSessionId!, role: 'user', content: userMsg }
         })
       } catch (err) {
@@ -475,7 +494,8 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
         if (metadata?.sessionId && assistantResponse) {
           try {
             const prismaMod = await import('../../../lib/prisma')
-            await (prismaMod.prisma as any).message.create({
+            const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
+            await prismaClient.message.create({
               data: { 
                 sessionId: metadata.sessionId, 
                 role: 'assistant', 

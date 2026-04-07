@@ -7,9 +7,11 @@ const prismaClientSingleton = () => {
     process.env.POSTGRES_URL
 
   // Support Vercel Postgres/Supabase env naming when DATABASE_URL isn't set.
-  return dbUrl
-    ? new PrismaClient({ datasources: { db: { url: dbUrl } } })
-    : new PrismaClient()
+  if (!process.env.DATABASE_URL && dbUrl) {
+    process.env.DATABASE_URL = dbUrl
+  }
+
+  return new PrismaClient()
 }
 
 declare const globalThis: {
