@@ -493,6 +493,17 @@ export default function ChatPage() {
     e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px'
   }
   const questions = QUESTIONS(lang)
+  const toggleSystem = (id: string) => {
+    setSelectedSystems((prev) => {
+      if (prev.includes(id)) {
+        // Always keep at least one active system.
+        return prev.length === 1 ? prev : prev.filter((s) => s !== id)
+      }
+      // Allow up to 3 concurrent systems.
+      if (prev.length >= 3) return prev
+      return [...prev, id]
+    })
+  }
 
   const attachmentIconMap = { image: '🖼️', pdf: '📄', link: '🔗' }
   const attachmentColorMap = { image: '#7aafd4', pdf: '#e8835a', link: '#c9a84c' }
@@ -838,7 +849,7 @@ export default function ChatPage() {
                 return (
                   <button
                     key={sys.id}
-                    onClick={() => setSelectedSystems([sys.id])}
+                    onClick={() => toggleSystem(sys.id)}
                     style={{
                       padding: '0.55rem 0.45rem',
                       borderRadius: 12,
@@ -860,15 +871,23 @@ export default function ChatPage() {
                 )
               })}
             </div>
+            <div style={{ marginTop: 6, fontSize: '0.63rem', color: 'rgba(200,200,200,0.38)' }}>
+              Selected: {selectedSystems.length}/3
+            </div>
             {!incognito && messages.length > 1 && (
               <div style={{ marginTop: 6, textAlign: 'right', fontSize: '0.63rem', color: 'rgba(200,200,200,0.3)' }}>💾 auto-saved</div>
             )}
           </div>
 
-          {selectedSystems[0] && (
+          {selectedSystems.length > 0 && (
             <div className="liquid-glass" style={{ padding: '0.55rem 1rem', borderTop: 'none', marginTop: '-1px', color: 'rgba(232,223,200,0.8)', fontSize: '0.78rem' }}>
               <span style={{ color: '#6abf8a', fontWeight: 700, marginRight: 8 }}>Active:</span>
-              {MEDICINE_SYSTEMS.find(s => s.id === selectedSystems[0])?.label} - {SYSTEM_DETAIL[selectedSystems[0]]}
+              {selectedSystems
+                .map((id) => MEDICINE_SYSTEMS.find((s) => s.id === id)?.label || id)
+                .join(', ')}
+              <span style={{ color: 'rgba(232,223,200,0.5)' }}>
+                {' '}· {selectedSystems.length === 1 ? SYSTEM_DETAIL[selectedSystems[0]] : 'Combined synthesis from selected systems only.'}
+              </span>
             </div>
           )}
 

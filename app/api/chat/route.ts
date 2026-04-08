@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
 
     // ── Validate systems ─────────────────────────────────────────────────────
     const safeSystems = Array.isArray(systems)
-      ? systems.filter(s => typeof s === 'string' && VALID_SYSTEMS.has(s)).slice(0, 8)
+      ? systems.filter(s => typeof s === 'string' && VALID_SYSTEMS.has(s)).slice(0, 3)
       : []
 
     // ── Validate dosha ───────────────────────────────────────────────────────
@@ -174,10 +174,13 @@ export async function POST(req: NextRequest) {
       unani: 'Unani', siddha: 'Siddha', tibetan: 'Tibetan Medicine',
     }
 
-    const primarySystem = safeSystems.length > 0 ? safeSystems[0] : null
-    const selectedSystems = primarySystem
-      ? `STRICT MODE: Use ONLY ${systemsMap[primarySystem] || primarySystem}. Do NOT mix traditions unless user explicitly asks to compare.`
-      : 'Default mode: Ayurveda-only guidance unless user explicitly requests another system.'
+    const selectedSystems = safeSystems.length === 1
+      ? `STRICT MODE: Use ONLY ${systemsMap[safeSystems[0]] || safeSystems[0]}. Do NOT mix traditions.`
+      : safeSystems.length > 1
+        ? `MULTI-SYSTEM MODE: User selected ${safeSystems.map(s => systemsMap[s] || s).join(', ')}.
+Use ONLY these selected systems. Do NOT use any unselected tradition.
+Structure answer with clear sub-sections per selected system, then a concise combined action plan.`
+        : 'Default mode: Ayurveda-only guidance unless user explicitly requests another system.'
 
     const doshaCtx = safeDosha
       ? `Patient is ${safeDosha} dominant. Tailor ALL recommendations to ${safeDosha}. ${safeDosha === 'Vata' ? 'Grounding, warming, nourishing.' : safeDosha === 'Pitta' ? 'Cooling, calming, anti-inflammatory.' : 'Stimulating, lightening, activating.'}`
@@ -293,14 +296,25 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
 - Include: likely cause, what to do today, what to avoid, and when to seek doctor care.
 - Use ONLY the selected medical system.`
 
+    const multiStyle = `STRUCTURE:
+- Keep response concise and practical.
+- For each selected system, provide 2-3 bullets.
+- Then provide one combined "Action Plan" section (3-5 bullets).
+- Do NOT include non-selected systems.`
+
+    const languageInstruction =
+      safeLang === 'sa'
+        ? 'Respond ONLY in classical Sanskrit (देवनागरी script). Use Sanskrit grammar. Every word must be Sanskrit.'
+        : safeLang === 'ja'
+          ? 'Respond in natural Japanese using proper Japanese script (日本語: ひらがな・カタカナ・漢字). Do not use romaji. Use full sentences and bullet points, not one word per line.'
+          : `Respond entirely in ${langName}. Every single word must be in ${langName}. Do not use English. Use complete sentences and avoid splitting words across separate lines.`
+
     const systemPrompt = `${VAIDYA_SYSTEM}
-${primarySystem ? strictStyle : SYNTHESIS_PROMPT}
+${safeSystems.length === 1 ? strictStyle : safeSystems.length > 1 ? multiStyle : SYNTHESIS_PROMPT}
 ${selectedSystems}
 ${doshaCtx}
 ${councilBrief}
-LANGUAGE: ${safeLang === 'sa'
-      ? 'Respond ONLY in classical Sanskrit (देवनागरी script). Use Sanskrit grammar. Every word must be Sanskrit. Example greeting: नमस्ते। अहं वैद्यः।'
-      : `Respond entirely in ${langName}. Every single word must be in ${langName}. Do not use English.`}
+LANGUAGE: ${languageInstruction}
 ${isBloodReport ? bloodReportPrompt : ''}
 ${deepThink ? 'DEEP MIND MODE: Be more thorough within the selected system only. Keep final answer concise and practical.' : ''}
 RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.`
