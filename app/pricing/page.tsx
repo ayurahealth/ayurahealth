@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Logo from '../../components/Logo'
 import Surface from '../../components/ui/Surface'
 import IOSButton from '../../components/ui/IOSButton'
+import IOSSegmentedControl from '../../components/ui/IOSSegmentedControl'
 
 // Server-verified pricing (must match server-side PRICES in API routes)
 const PRICING_TIERS = [
@@ -110,11 +111,6 @@ export default function PricingPage() {
 
         .pricing-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; background: linear-gradient(160deg, #e8dfc8 0%, #c9a84c 50%, #6abf8a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-        .toggle-group { display: flex; gap: 0.5rem; align-items: center; }
-        .toggle-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(106,191,138,0.15); color: rgba(232,223,200,0.6); padding: 0.45rem 1.1rem; border-radius: 980px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; font-family: inherit; }
-        .toggle-btn:hover { border-color: rgba(106,191,138,0.35); color: rgba(232,223,200,0.85); }
-        .toggle-btn.active { background: rgba(106,191,138,0.12); border-color: rgba(106,191,138,0.4); color: #e8dfc8; }
-
         .pricing-card { background: linear-gradient(145deg, rgba(255,255,255,0.025), rgba(106,191,138,0.02)); border: 1px solid rgba(106,191,138,0.1); border-radius: 22px; padding: 2.2rem; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden; }
         .pricing-card.highlighted { background: linear-gradient(145deg, rgba(106,191,138,0.07), rgba(45,90,27,0.05)); border-color: rgba(106,191,138,0.28); transform: scale(1.03); box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(106,191,138,0.15); }
         .pricing-card:not(.highlighted):hover { border-color: rgba(106,191,138,0.2); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.35); }
@@ -160,17 +156,23 @@ export default function PricingPage() {
 
         {/* Billing + Currency toggles */}
         <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div className="toggle-group">
-            <button className={`toggle-btn${billing === 'monthly' ? ' active' : ''}`} onClick={() => setBilling('monthly')}>Monthly</button>
-            <button className={`toggle-btn${billing === 'annual' ? ' active' : ''}`} onClick={() => setBilling('annual')}>
-              Annual <span style={{ color: '#6abf8a', marginLeft: '0.3rem' }}>-20%</span>
-            </button>
-          </div>
+          <IOSSegmentedControl
+            value={billing}
+            onChange={(id) => setBilling(id as 'monthly' | 'annual')}
+            options={[
+              { id: 'monthly', label: 'Monthly' },
+              { id: 'annual', label: 'Annual -20%' },
+            ]}
+          />
           <div style={{ width: 1, height: 24, background: 'rgba(106,191,138,0.12)' }} />
-          <div className="toggle-group">
-            <button className={`toggle-btn${currency === 'usd' ? ' active' : ''}`} onClick={() => setCurrency('usd')}>$ USD</button>
-            <button className={`toggle-btn${currency === 'inr' ? ' active' : ''}`} onClick={() => setCurrency('inr')}>₹ INR</button>
-          </div>
+          <IOSSegmentedControl
+            value={currency}
+            onChange={(id) => setCurrency(id as Currency)}
+            options={[
+              { id: 'usd', label: '$ USD' },
+              { id: 'inr', label: '₹ INR' },
+            ]}
+          />
         </div>
       </section>
 
