@@ -1,3 +1,5 @@
+'use client'
+
 import Logo from '../../components/Logo'
 import Surface from '../../components/ui/Surface'
 import IOSButton from '../../components/ui/IOSButton'
