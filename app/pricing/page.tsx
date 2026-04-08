@@ -215,6 +215,9 @@ export default function PricingPage() {
         <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.25)', fontSize: '0.75rem', marginTop: '2rem', fontFamily: '-apple-system, sans-serif' }}>
           🏷️ 3 free consultations on Free plan · Razorpay (UPI, NetBanking, Cards, Wallets) · 7-day free trial on paid plans · 30-day money-back guarantee
         </p>
+        <p style={{ textAlign: 'center', color: 'rgba(232,223,200,0.33)', fontSize: '0.78rem', marginTop: '0.55rem', fontFamily: '-apple-system, sans-serif' }}>
+          Educational wellness platform only. Not medical diagnosis or treatment. <Link href="/safety" style={{ color: '#6abf8a', textDecoration: 'none' }}>Read Safety & Scope</Link>
+        </p>
       </section>
 
       {/* FAQ */}
@@ -248,7 +251,7 @@ export default function PricingPage() {
       <footer style={{ padding: '2.5rem 2rem', borderTop: '1px solid rgba(106,191,138,0.07)', textAlign: 'center' }}>
         <p style={{ color: 'rgba(232,223,200,0.2)', fontSize: '0.72rem', marginBottom: '1rem', fontFamily: '-apple-system, sans-serif' }}>© 2026 AyuraHealth · Tokyo, Japan · All rights reserved.</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-          {[['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['Contact', '/contact']].map(([label, href]) => (
+          {[['Safety & Scope', '/safety'], ['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['Contact', '/contact']].map(([label, href]) => (
             <Link key={href} href={href} style={{ color: 'rgba(232,223,200,0.3)', textDecoration: 'none', fontSize: '0.72rem', fontFamily: '-apple-system, sans-serif', transition: 'color 0.2s' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'rgba(232,223,200,0.65)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(232,223,200,0.3)')}>

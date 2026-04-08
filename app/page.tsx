@@ -671,7 +671,7 @@ export default function LandingPage() {
       <footer style={{ borderTop: '1px solid rgba(106,191,138,0.07)', padding: '2.5rem 2rem', textAlign: 'center' }}>
         <p style={{ color: 'rgba(232,223,200,0.18)', fontSize: '0.7rem', marginBottom: '1.2rem', fontFamily: '-apple-system, sans-serif' }}>{t.footer}</p>
         <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
-          {[['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['Testimonials', '/testimonials'], ['Press Kit', '/press-kit'], ['Pricing', '/pricing'], ['For Clinics', '/clinic'], ['Diet Chart', '/diet'], ['Contact', '/contact']].map(([label, href]) => (
+          {[['Safety & Scope', '/safety'], ['Privacy Policy', '/privacy'], ['Terms of Service', '/terms'], ['Testimonials', '/testimonials'], ['Press Kit', '/press-kit'], ['Pricing', '/pricing'], ['For Clinics', '/clinic'], ['Diet Chart', '/diet'], ['Contact', '/contact']].map(([label, href]) => (
             <a key={href} href={href} className="footer-link">{label}</a>
           ))}
         </div>
