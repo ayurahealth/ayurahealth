@@ -38,6 +38,14 @@ jobs:
     - name: Type Check
       run: npx tsc --noEmit
 
+    - name: Auth Guard (production safety)
+      run: node scripts/auth-guard.mjs
+      env:
+        VERCEL_ENV: production
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_dummy
+        CLERK_SECRET_KEY: sk_live_dummy
+        NEXT_PUBLIC_CLERK_FRONTEND_API: clerk.ayurahealth.com
+
     - name: Build
       run: npm run build
       env:

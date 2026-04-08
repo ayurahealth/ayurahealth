@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     const csp = [
       "default-src 'self'",
       // scripts: self + inline/eval (Next.js needs these) + payment SDKs + analytics + Clerk
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.razorpay.com https://easy-gator-64.clerk.accounts.dev https://www.googletagmanager.com https://fonts.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.razorpay.com https://*.clerk.accounts.dev https://*.clerk.accounts.com https://www.googletagmanager.com https://fonts.googleapis.com",
       // styles: self + inline + Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // fonts
@@ -31,7 +31,8 @@ const nextConfig: NextConfig = {
         "https://api.razorpay.com",             // Razorpay API
         "https://cdn.razorpay.com",             // Razorpay CDN
         "https://lumberjack.razorpay.com",      // Razorpay analytics
-        "https://easy-gator-64.clerk.accounts.dev", // Clerk auth
+        "https://*.clerk.accounts.dev",           // Clerk auth (dev)
+        "https://*.clerk.accounts.com",           // Clerk auth (prod)
         "https://formspree.io",                // Contact form
         "https://www.google-analytics.com",    // GA
         "https://vitals.vercel-insights.com",  // Vercel analytics
