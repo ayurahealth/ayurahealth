@@ -3,15 +3,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { t, type Lang } from '../../lib/translations'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { traditionIcons } from '../../components/TraditionIcons'
-import AyurvedicClock from '../../components/AyurvedicClock'
 import VaidyaOracle from '../../components/VaidyaOracle'
-import { ChatSkeleton } from '../../components/BoneyardLoaders'
 import EngagementStory from '../../components/EngagementStory'
 import Logo from '../../components/Logo'
-import SystemCard from '../../components/ui/SystemCard'
+import ChatSidebar from '../../components/chat/ChatSidebar'
+import ChatComposer from '../../components/chat/ChatComposer'
+import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
 
 interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[] }
 interface Attachment {
@@ -157,7 +155,6 @@ export default function ChatPage() {
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
-  const [showClock, setShowClock] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -506,9 +503,6 @@ export default function ChatPage() {
     })
   }
 
-  const attachmentIconMap = { image: '🖼️', pdf: '📄', link: '🔗' }
-  const attachmentColorMap = { image: '#7aafd4', pdf: '#e8835a', link: '#c9a84c' }
-
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
 
   return (
@@ -825,16 +819,10 @@ export default function ChatPage() {
       )}
 
       {screen === 'chat' && (
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
+        <div className="chat-shell" style={{ position: 'relative', zIndex: 1, maxWidth: 1180, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
           <div className="liquid-glass ios-surface" style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Logo size={26} showText={true} href="/" />
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <button 
-                onClick={() => setShowClock(!showClock)}
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '0.3rem 0.6rem', color: '#6abf8a', fontSize: '0.7rem', cursor: 'pointer' }}
-              >
-                {showClock ? '🕒 Hide Clock' : '🕒 Show Clock'}
-              </button>
               <div className="ios-chip active" style={{ padding: '0.25rem 0.6rem', borderRadius: 12, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
                 <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
@@ -842,277 +830,65 @@ export default function ChatPage() {
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.5)', fontSize: '0.8rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
-          {/* System cards */}
-          <div className="liquid-glass ios-surface" style={{ padding: '0.7rem 1rem', borderTop: 'none', borderBottom: '1px solid rgba(106,191,138,0.08)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.45rem' }}>
-              {MEDICINE_SYSTEMS.map(sys => {
-                const active = selectedSystems.includes(sys.id)
-                return (
-                  <SystemCard
-                    key={sys.id}
-                    label={sys.label}
-                    icon={traditionIcons[sys.icon]}
-                    active={active}
-                    onClick={() => toggleSystem(sys.id)}
-                  />
-                )
-              })}
-            </div>
-            <div style={{ marginTop: 6, fontSize: '0.63rem', color: 'rgba(200,200,200,0.38)' }}>
-              Selected: {selectedSystems.length}/3
-            </div>
-            {!incognito && messages.length > 1 && (
-              <div style={{ marginTop: 6, textAlign: 'right', fontSize: '0.63rem', color: 'rgba(200,200,200,0.3)' }}>💾 auto-saved</div>
-            )}
-          </div>
+          <div className="chat-desktop-layout">
+            {/* Left rail */}
+            <ChatSidebar
+              systems={MEDICINE_SYSTEMS}
+              selectedSystems={selectedSystems}
+              onToggleSystem={toggleSystem}
+              systemDetail={SYSTEM_DETAIL}
+              messagesCount={messages.length}
+              incognito={incognito}
+            />
 
-          {selectedSystems.length > 0 && (
-            <div className="liquid-glass ios-surface" style={{ padding: '0.55rem 1rem', borderTop: 'none', marginTop: '-1px', color: 'rgba(232,223,200,0.8)', fontSize: '0.78rem' }}>
-              <span style={{ color: '#6abf8a', fontWeight: 700, marginRight: 8 }}>Active:</span>
-              {selectedSystems
-                .map((id) => MEDICINE_SYSTEMS.find((s) => s.id === id)?.label || id)
-                .join(', ')}
-              <span style={{ color: 'rgba(232,223,200,0.5)' }}>
-                {' '}· {selectedSystems.length === 1 ? SYSTEM_DETAIL[selectedSystems[0]] : 'Combined synthesis from selected systems only.'}
-              </span>
-            </div>
-          )}
-
-          {showClock && (
-            <div style={{ padding: '1rem', display: 'flex', justifyContent: 'center' }}>
-              <AyurvedicClock />
-            </div>
-          )}
-
-          {/* Messages */}
-          <div className="native-scroll" style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem 0.5rem' }}>
-            {messages.length === 0 && !loading && (
-              <div style={{ textAlign: 'center', marginTop: '2rem', padding: '0 2rem' }}>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 1.5 }}
-                  style={{ width: '100%', maxWidth: 200, margin: '0 auto' }}
-                >
-                  <VaidyaOracle state="idle" />
-                </motion.div>
-                <div style={{ marginTop: '-2rem', opacity: 0.5 }}>
-                  <p style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.2rem', color: '#c9a84c' }}>VAIDYA is ready.</p>
-                  <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Ask your first health question below...</p>
-                </div>
-              </div>
-            )}
-            
-            {loading && !streaming && (
-               <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(5,16,10,0.8)', backdropFilter: 'blur(8px)', margin: '0 -1rem 1.5rem', padding: '1rem' }}>
-                 <div style={{ width: 120, height: 120, margin: '0 auto' }}>
-                   <VaidyaOracle state={oracleState} />
-                 </div>
-               </div>
-            )}
-            
-            {messages.map((msg, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-                style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '0.75rem' }}
-              >
-                {msg.role === 'assistant' && (
-                  <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', border: '1px solid rgba(106,191,138,0.2)' }}>
-                    🌿
-                  </div>
-                )}
-                <div style={{ maxWidth: '85%' }}>
-                  <div className={`${msg.role === 'user' ? 'chat-user-bubble' : 'glass-card chat-assistant-bubble'}`} style={{ 
-                    padding: msg.role === 'user' ? '0.85rem 1.25rem' : '1.25rem 1.5rem', 
-                    borderRadius: msg.role === 'user' ? '24px 24px 4px 24px' : '4px 24px 24px 24px', 
-                    background: msg.role === 'user' ? 'linear-gradient(135deg, #1a4d2e, #2d7a45)' : undefined, 
-                    border: msg.role === 'user' ? '1px solid rgba(106,191,138,0.3)' : undefined, 
-                    color: msg.role === 'user' ? '#f0e6c8' : 'rgba(232,223,200,0.9)',
-                    boxShadow: msg.role === 'user' ? '0 8px 24px rgba(0,0,0,0.2)' : undefined
-                  }}>
-                    {msg.role === 'assistant' ? <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content, doshaColor) }} /> : msg.content}
-                    
-                    {/* Source Cards */}
-                    {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                      <div style={{ marginTop: '1.25rem', borderTop: '1px solid rgba(106,191,138,0.12)', paddingTop: '0.9rem' }}>
-                        <div style={{ fontSize: '0.68rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.65rem', opacity: 0.8 }}>Consulted Classical Texts:</div>
-                        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-                          {msg.sources.map((src, idx) => (
-                            <button 
-                              key={idx} 
-                              onClick={() => setSelectedSource(src)}
-                              className="glass-card" 
-                              style={{ 
-                                padding: '0.45rem 0.85rem', 
-                                border: '1px solid rgba(201, 168, 76, 0.25)', 
-                                borderRadius: 12, 
-                                fontSize: '0.78rem', 
-                                color: '#e8dfc8', 
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.45rem',
-                                transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
-                              }}
-                              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03) translateY(-1px)'}
-                              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                            >
-                              <span style={{ width: 14, height: 14, color: '#6abf8a' }}>{traditionIcons[src.tradition?.toLowerCase() || 'ayurveda']}</span>
-                              <span style={{ fontWeight: 500 }}>{src.source}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {msg.role === 'assistant' && voiceSupported && (
-                    <button onClick={() => speakText(msg.content)} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: isSpeaking ? '#6abf8a' : 'rgba(200,200,200,0.3)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }} className="chat-meta-text">
-                      {isSpeaking ? '🔊 Speaking...' : '🔈 Listen'}
-                    </button>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-            {loading && !streaming && (
-              <ChatSkeleton />
-            )}
-            
-            {streaming && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}
-              >
-                <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🌿</div>
-                <div className="glass-card chat-assistant-bubble" style={{ maxWidth: '85%', padding: '1.25rem 1.5rem', borderRadius: '4px 24px 24px 24px', color: 'rgba(232,223,200,0.9)' }}>
-                  <div dangerouslySetInnerHTML={{ __html: renderMarkdown(streaming, doshaColor) }} />
-                  <span style={{ color: '#6abf8a', animation: 'blink 1s infinite' }}>▋</span>
-                </div>
-              </motion.div>
-            )}
-            {loading && !streaming && (
-              <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.85rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div className="glass-card" style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🌿</div>
-                  <div className="glass-card" style={{ padding: '0.75rem 1.25rem', borderRadius: '4px 20px 20px 20px', color: 'rgba(232,223,200,0.5)', fontSize: '0.9rem' }}>
-                    Vaidya is consulting the Council{thinkingDots}
-                  </div>
-                </div>
-                
-                {/* Knowledge Pulse 2.0 */}
-                <motion.div 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  style={{ marginLeft: 44, display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.6rem 1.25rem', background: 'rgba(74,222,128,0.03)', border: '1px solid rgba(74,222,128,0.1)', borderRadius: 16 }}
-                >
-                  <div className="knowledge-pulse-core">
-                    <div className="knowledge-pulse-ring" />
-                    <div className="knowledge-pulse-ring" style={{ animationDelay: '0.5s' }} />
-                  </div>
-                  <span style={{ fontSize: '0.7rem', color: '#4ade80', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    Accessing AI Brain Wisdom...
-                  </span>
-                </motion.div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+            {/* Right conversation area */}
+            <section className="chat-main">
+              {/* Messages */}
+              <ChatMessagesPanel
+                messages={messages}
+                loading={loading}
+                streaming={streaming}
+                oracleState={oracleState}
+                doshaColor={doshaColor}
+                renderMarkdown={renderMarkdown}
+                voiceSupported={voiceSupported}
+                isSpeaking={isSpeaking}
+                thinkingDots={thinkingDots}
+                onSpeakText={speakText}
+                onSelectSource={setSelectedSource}
+                messagesEndRef={messagesEndRef}
+              />
 
           {/* Input area */}
-          <div className="liquid-glass" style={{ padding: '1rem', paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
-
-            {/* Attachment previews */}
-            {attachments.length > 0 && (
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.6rem', padding: '0.5rem 0' }}>
-                {attachments.map(att => (
-                  <div key={att.id} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', border: `1px solid ${attachmentColorMap[att.type]}30`, borderRadius: 10, padding: '0.3rem 0.5rem', maxWidth: 200 }}>
-                    {att.type === 'image' && att.preview ? (
-                      <Image src={att.preview} alt="" width={28} height={28} style={{ borderRadius: 6, objectFit: 'cover', flexShrink: 0 }} unoptimized />
-                    ) : (
-                      <span style={{ fontSize: '1rem', flexShrink: 0 }}>{attachmentIconMap[att.type]}</span>
-                    )}
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ color: `${attachmentColorMap[att.type]}`, fontSize: '0.7rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{att.name}</div>
-                      {att.size && <div style={{ color: 'rgba(200,200,200,0.35)', fontSize: '0.6rem' }}>{att.size}</div>}
-                    </div>
-                    <button onClick={() => removeAttachment(att.id)} style={{ background: 'none', border: 'none', color: 'rgba(200,200,200,0.3)', fontSize: '0.9rem', cursor: 'pointer', flexShrink: 0, lineHeight: 1, padding: '0 2px' }}>×</button>
-                  </div>
-                ))}
-                {attachLoading && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.3rem 0.75rem', color: 'rgba(200,200,200,0.4)', fontSize: '0.75rem' }}>
-                    ⏳ Processing...
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Link input */}
-            {showLinkInput && (
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.6rem' }}>
-                <input ref={linkInputRef} type="url" value={linkInput} onChange={e => setLinkInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleAddLink(); if (e.key === 'Escape') { setShowLinkInput(false); setLinkInput('') } }}
-                  placeholder="Paste a health article URL..."
-                  style={{ flex: 1, padding: '0.6rem 0.9rem', borderRadius: 12, border: '1px solid rgba(201,168,76,0.3)', background: 'rgba(255,255,255,0.04)', color: '#e8dfc8', fontSize: '0.85rem', outline: 'none', fontFamily: '"DM Sans", system-ui, sans-serif' }}
-                  autoFocus
-                />
-                <button onClick={handleAddLink} disabled={!isValidUrl(linkInput)} style={{ padding: '0.6rem 1rem', background: isValidUrl(linkInput) ? 'rgba(201,168,76,0.15)' : 'transparent', border: `1px solid ${isValidUrl(linkInput) ? 'rgba(201,168,76,0.4)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 12, color: isValidUrl(linkInput) ? '#c9a84c' : 'rgba(200,200,200,0.3)', fontSize: '0.85rem', cursor: isValidUrl(linkInput) ? 'pointer' : 'not-allowed', fontWeight: 600, whiteSpace: 'nowrap' }}>Add →</button>
-                <button onClick={() => { setShowLinkInput(false); setLinkInput('') }} style={{ padding: '0.6rem 0.75rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: 'rgba(200,200,200,0.35)', fontSize: '0.85rem', cursor: 'pointer' }}>✕</button>
-              </div>
-            )}
-
-            {/* Main input row */}
-            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'flex-end', maxWidth: 700, margin: '0 auto' }}>
-              {/* Hidden file input */}
-              <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={handleFileSelect} style={{ display: 'none' }} />
-
-              {/* Attach button */}
-              <button onClick={() => fileInputRef.current?.click()} disabled={attachments.length >= 4} title="Attach image or PDF" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: attachments.length > 0 ? 'rgba(122,175,212,0.12)' : 'rgba(106,191,138,0.06)', border: `1px solid ${attachments.length > 0 ? 'rgba(122,175,212,0.4)' : 'rgba(106,191,138,0.15)'}`, color: attachments.length > 0 ? '#7aafd4' : 'rgba(200,200,200,0.4)', cursor: attachments.length >= 4 ? 'not-allowed' : 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
-                📎
-              </button>
-
-              {/* Link button */}
-              <button onClick={() => { setShowLinkInput(!showLinkInput); setTimeout(() => linkInputRef.current?.focus(), 50) }} title="Add a link" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: showLinkInput ? 'rgba(201,168,76,0.12)' : 'rgba(106,191,138,0.06)', border: `1px solid ${showLinkInput ? 'rgba(201,168,76,0.4)' : 'rgba(106,191,138,0.15)'}`, color: showLinkInput ? '#c9a84c' : 'rgba(200,200,200,0.4)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
-                🔗
-              </button>
-
-              {/* Voice button */}
-              {voiceSupported && (
-                <button onClick={startListening} style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: isListening ? 'rgba(232,131,90,0.2)' : 'rgba(106,191,138,0.06)', border: `1px solid ${isListening ? 'rgba(232,131,90,0.5)' : 'rgba(106,191,138,0.15)'}`, color: isListening ? '#e8835a' : 'rgba(200,200,200,0.4)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {isListening ? '⏸' : '🎤'}
-                </button>
-              )}
-
-              <textarea ref={textareaRef} value={input} onChange={handleTextarea} onKeyDown={handleKey}
-                placeholder={attachments.length > 0 ? 'Ask Vaidya about the attached file...' : dosha ? tx.chat_placeholder_dosha.replace('{dosha}', dosha) : tx.chat_placeholder}
-                rows={1} style={{ flex: 1, padding: '0.75rem 1rem', borderRadius: 22, border: '1px solid rgba(106,191,138,0.15)', background: 'rgba(255,255,255,0.04)', color: '#e8dfc8', fontSize: '0.9rem', resize: 'none', outline: 'none', lineHeight: 1.5, maxHeight: 140, overflowY: 'auto', fontFamily: '"DM Sans", system-ui, sans-serif' }} />
-
-              <button onClick={() => sendMessage()} disabled={loading || (!input.trim() && attachments.length === 0)} style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, background: loading || (!input.trim() && attachments.length === 0) ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #2d5a1b, #4a9e6a)', border: 'none', color: loading || (!input.trim() && attachments.length === 0) ? 'rgba(255,255,255,0.2)' : '#fff', cursor: loading || (!input.trim() && attachments.length === 0) ? 'not-allowed' : 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↑</button>
-            </div>
-
-            {/* Hint row */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '0.35rem' }}>
-              <span style={{ color: 'rgba(200,200,200,0.18)', fontSize: '0.6rem' }}>📎 reports & photos</span>
-              <span style={{ color: 'rgba(200,200,200,0.18)', fontSize: '0.6rem' }}>🔗 articles & links</span>
-              <span style={{ color: 'rgba(200,200,200,0.18)', fontSize: '0.6rem' }}>🎤 voice</span>
-            </div>
+          <ChatComposer
+            attachments={attachments}
+            attachLoading={attachLoading}
+            showLinkInput={showLinkInput}
+            linkInput={linkInput}
+            voiceSupported={voiceSupported}
+            isListening={isListening}
+            input={input}
+            loading={loading}
+            placeholder={attachments.length > 0 ? 'Ask Vaidya about the attached file...' : dosha ? tx.chat_placeholder_dosha.replace('{dosha}', dosha) : tx.chat_placeholder}
+            fileInputRef={fileInputRef}
+            linkInputRef={linkInputRef}
+            textareaRef={textareaRef}
+            onFileSelect={handleFileSelect}
+            onRemoveAttachment={removeAttachment}
+            onToggleLinkInput={() => { setShowLinkInput(!showLinkInput); setTimeout(() => linkInputRef.current?.focus(), 50) }}
+            onLinkInputChange={setLinkInput}
+            onAddLink={handleAddLink}
+            onCancelLinkInput={() => { setShowLinkInput(false); setLinkInput('') }}
+            onStartListening={startListening}
+            onInputChange={handleTextarea}
+            onInputKeyDown={handleKey}
+            onSendMessage={() => sendMessage()}
+          />
+            </section>
           </div>
         </div>
       )}
 
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { margin: 0; background: #05100a; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(106,191,138,0.2); border-radius: 2px; }
-        .synthesis-header { font-family: var(--font-cormorant), serif; font-size: 1.25rem; font-weight: 700; color: #c9a84c; margin-bottom: 0.75rem; letter-spacing: 0.05em; border-bottom: 1px solid rgba(201, 168, 76, 0.2); padding-bottom: 0.3rem;}
-        @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        .markdown-content strong { font-weight: 600; color: #6abf8a; }
-        .markdown-content br + br { display: block; margin-top: 0.5rem; content: ""; }
-      `}</style>
     </main>
   )
 }

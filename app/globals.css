@@ -136,6 +136,21 @@ body {
   font-size: 0.72rem;
 }
 
+.chat-shell {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #6abf8a;
+}
+
+.markdown-content br + br {
+  display: block;
+  margin-top: 0.5rem;
+  content: "";
+}
+
 /* Hide scrollbar for internal views to feel native */
 .native-scroll::-webkit-scrollbar { display: none; }
 .native-scroll { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
@@ -160,6 +175,66 @@ img { max-width: 100%; }
   .chat-assistant-bubble {
     font-size: 0.92rem;
     line-height: 1.75;
+  }
+}
+
+@media (min-width: 1024px) {
+  .chat-shell {
+    padding: 0 1rem 1rem;
+  }
+  .chat-desktop-layout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 0.9rem;
+    flex: 1;
+    min-height: 0;
+    padding-top: 0.85rem;
+  }
+  .chat-sidebar {
+    height: calc(100dvh - 150px);
+    overflow-y: auto;
+  }
+  .chat-system-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .chat-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .chat-message-scroll {
+    border-radius: 18px 18px 0 0;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-bottom: none;
+  }
+  .chat-input-shell {
+    border-radius: 0 0 18px 18px;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-top: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .chat-desktop-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+  }
+  .chat-sidebar {
+    border-top: none;
+    border-radius: 0;
+    padding: 0.7rem 1rem !important;
+  }
+  .chat-system-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  .chat-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 }
 
@@ -191,6 +266,16 @@ img { max-width: 100%; }
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .knowledge-pulse-core {

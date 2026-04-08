@@ -93,11 +93,28 @@ const Particles = ({ count = 500, state = 'idle' }: { count?: number; state?: st
 };
 
 export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
+  const modeLabel =
+    state === 'idle'
+      ? 'Clinical Oracle'
+      : state === 'thinking'
+        ? 'Synthesizing'
+        : state === 'listening'
+          ? 'Listening'
+          : 'Responding'
+
   return (
-    <div style={{ width: '100%', height: '350px', position: 'relative', cursor: 'pointer' }}>
+    <div style={{ width: '100%', height: '340px', position: 'relative' }}>
       <div style={{
         position: 'absolute',
-        inset: '20% 15%',
+        inset: 8,
+        borderRadius: 28,
+        border: '1px solid rgba(255,255,255,0.08)',
+        background: 'linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))',
+        backdropFilter: 'blur(16px)',
+      }} />
+      <div style={{
+        position: 'absolute',
+        inset: '16% 18%',
         background: state === 'thinking'
           ? 'radial-gradient(circle, rgba(201,168,76,0.28) 0%, rgba(201,168,76,0.03) 65%, transparent 85%)'
           : 'radial-gradient(circle, rgba(106,191,138,0.22) 0%, rgba(106,191,138,0.03) 65%, transparent 85%)',
@@ -106,11 +123,12 @@ export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
         pointerEvents: 'none',
       }} />
       <Canvas 
-        camera={{ position: [0, 0, 4.5], fov: 45 }}
+        camera={{ position: [0, 0, 4.5], fov: 42 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
+        <ambientLight intensity={0.62} />
+        <pointLight position={[8, 8, 8]} intensity={1.1} />
+        <pointLight position={[-6, -6, -6]} intensity={0.35} color="#6abf8a" />
         <Float speed={state === 'thinking' ? 5 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
           <OrbCore state={state} />
           <Particles state={state} />
@@ -125,22 +143,22 @@ export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
         pointerEvents: 'none',
         width: '100%'
       }}>
-        <h3 style={{ 
+        <h3 style={{
           color: state === 'listening' ? '#6abf8a' : '#c9a84c', 
           fontFamily: '"Cormorant Garamond", serif', 
-          fontSize: '1.8rem', 
+          fontSize: '1.65rem',
           margin: 0,
-          letterSpacing: '0.05em',
+          letterSpacing: '0.04em',
           textShadow: `0 0 15px ${state === 'listening' ? 'rgba(106,191,138,0.4)' : 'rgba(201,168,76,0.4)'}`,
           transition: 'all 0.5s'
         }}>VAIDYA</h3>
         <p style={{ 
-          color: 'rgba(232, 223, 200, 0.4)', 
-          fontSize: '0.65rem', 
+          color: 'rgba(232, 223, 200, 0.52)', 
+          fontSize: '0.68rem',
           textTransform: 'uppercase', 
-          letterSpacing: '0.3em',
+          letterSpacing: '0.22em',
           marginTop: '0.2rem'
-        }}>{state === 'idle' ? 'Neural Oracle Mode' : state.toUpperCase() + '...'}</p>
+        }}>{modeLabel}</p>
       </div>
     </div>
   );

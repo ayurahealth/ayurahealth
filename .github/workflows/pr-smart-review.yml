@@ -1,0 +1,75 @@
+name: PR Smart Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+jobs:
+  quality-review:
+    name: Automated Quality Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type Check
+        run: npx tsc --noEmit
+
+      - name: SEO Guard
+        run: npm run seo:guard
+
+      - name: Build Validation
+        run: npm run build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+          CLERK_SECRET_KEY: sk_test_dummy
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+          RAZORPAY_KEY_ID: rzp_test_dummy
+          RAZORPAY_KEY_SECRET: dummy_secret
+          NEXT_TELEMETRY_DISABLED: 1
+          PRISMA_SKIP_POSTINSTALL_GENERATE: 1
+
+  smart-comment:
+    name: PR Summary Comment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Post smart review checklist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              "## Smart Review Checklist",
+              "",
+              "- [ ] UI looks correct on laptop and mobile",
+              "- [ ] API behavior matches selected medicine systems",
+              "- [ ] No hardcoded secrets or env leaks",
+              "- [ ] SEO pages still index correctly (`robots`, `sitemap`)",
+              "- [ ] Build/lint/typecheck are green",
+              "",
+              "Automation has already run lint, typecheck, build, and SEO guard in this PR."
+            ].join("\n");
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
