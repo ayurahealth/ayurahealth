@@ -11,6 +11,7 @@ import VaidyaOracle from '../../components/VaidyaOracle'
 import { ChatSkeleton } from '../../components/BoneyardLoaders'
 import EngagementStory from '../../components/EngagementStory'
 import Logo from '../../components/Logo'
+import SystemCard from '../../components/ui/SystemCard'
 
 interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[] }
 interface Attachment {
@@ -825,7 +826,7 @@ export default function ChatPage() {
 
       {screen === 'chat' && (
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
-          <div className="liquid-glass" style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="liquid-glass ios-surface" style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Logo size={26} showText={true} href="/" />
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <button 
@@ -834,7 +835,7 @@ export default function ChatPage() {
               >
                 {showClock ? '🕒 Hide Clock' : '🕒 Show Clock'}
               </button>
-              <div style={{ padding: '0.25rem 0.6rem', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <div className="ios-chip active" style={{ padding: '0.25rem 0.6rem', borderRadius: 12, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
                 <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
               </div>
@@ -842,32 +843,18 @@ export default function ChatPage() {
             </div>
           </div>
           {/* System cards */}
-          <div className="liquid-glass" style={{ padding: '0.7rem 1rem', borderTop: 'none', borderBottom: '1px solid rgba(106,191,138,0.08)' }}>
+          <div className="liquid-glass ios-surface" style={{ padding: '0.7rem 1rem', borderTop: 'none', borderBottom: '1px solid rgba(106,191,138,0.08)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.45rem' }}>
               {MEDICINE_SYSTEMS.map(sys => {
                 const active = selectedSystems.includes(sys.id)
                 return (
-                  <button
+                  <SystemCard
                     key={sys.id}
+                    label={sys.label}
+                    icon={traditionIcons[sys.icon]}
+                    active={active}
                     onClick={() => toggleSystem(sys.id)}
-                    style={{
-                      padding: '0.55rem 0.45rem',
-                      borderRadius: 12,
-                      border: `1px solid ${active ? 'rgba(201,168,76,0.5)' : 'rgba(255,255,255,0.08)'}`,
-                      background: active ? 'linear-gradient(135deg, rgba(201,168,76,0.18), rgba(106,191,138,0.12))' : 'rgba(255,255,255,0.02)',
-                      color: active ? '#e8dfc8' : 'rgba(232,223,200,0.55)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '0.28rem',
-                      transition: 'all 0.2s',
-                      minHeight: 62,
-                    }}
-                  >
-                    <span style={{ width: 16, height: 16, color: active ? '#6abf8a' : 'rgba(232,223,200,0.5)' }}>{traditionIcons[sys.icon]}</span>
-                    <span style={{ fontSize: '0.66rem', fontWeight: active ? 700 : 500, lineHeight: 1.1 }}>{sys.label}</span>
-                  </button>
+                  />
                 )
               })}
             </div>
@@ -880,7 +867,7 @@ export default function ChatPage() {
           </div>
 
           {selectedSystems.length > 0 && (
-            <div className="liquid-glass" style={{ padding: '0.55rem 1rem', borderTop: 'none', marginTop: '-1px', color: 'rgba(232,223,200,0.8)', fontSize: '0.78rem' }}>
+            <div className="liquid-glass ios-surface" style={{ padding: '0.55rem 1rem', borderTop: 'none', marginTop: '-1px', color: 'rgba(232,223,200,0.8)', fontSize: '0.78rem' }}>
               <span style={{ color: '#6abf8a', fontWeight: 700, marginRight: 8 }}>Active:</span>
               {selectedSystems
                 .map((id) => MEDICINE_SYSTEMS.find((s) => s.id === id)?.label || id)
@@ -938,13 +925,11 @@ export default function ChatPage() {
                   </div>
                 )}
                 <div style={{ maxWidth: '85%' }}>
-                  <div className={msg.role === 'user' ? "" : "glass-card"} style={{ 
+                  <div className={`${msg.role === 'user' ? 'chat-user-bubble' : 'glass-card chat-assistant-bubble'}`} style={{ 
                     padding: msg.role === 'user' ? '0.85rem 1.25rem' : '1.25rem 1.5rem', 
                     borderRadius: msg.role === 'user' ? '24px 24px 4px 24px' : '4px 24px 24px 24px', 
                     background: msg.role === 'user' ? 'linear-gradient(135deg, #1a4d2e, #2d7a45)' : undefined, 
                     border: msg.role === 'user' ? '1px solid rgba(106,191,138,0.3)' : undefined, 
-                    fontSize: '0.95rem', 
-                    lineHeight: 1.8, 
                     color: msg.role === 'user' ? '#f0e6c8' : 'rgba(232,223,200,0.9)',
                     boxShadow: msg.role === 'user' ? '0 8px 24px rgba(0,0,0,0.2)' : undefined
                   }}>
@@ -984,7 +969,7 @@ export default function ChatPage() {
                     )}
                   </div>
                   {msg.role === 'assistant' && voiceSupported && (
-                    <button onClick={() => speakText(msg.content)} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: isSpeaking ? '#6abf8a' : 'rgba(200,200,200,0.3)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <button onClick={() => speakText(msg.content)} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: isSpeaking ? '#6abf8a' : 'rgba(200,200,200,0.3)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }} className="chat-meta-text">
                       {isSpeaking ? '🔊 Speaking...' : '🔈 Listen'}
                     </button>
                   )}
@@ -1002,7 +987,7 @@ export default function ChatPage() {
                 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}
               >
                 <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🌿</div>
-                <div className="glass-card" style={{ maxWidth: '85%', padding: '1.25rem 1.5rem', borderRadius: '4px 24px 24px 24px', fontSize: '0.95rem', lineHeight: 1.8, color: 'rgba(232,223,200,0.9)' }}>
+                <div className="glass-card chat-assistant-bubble" style={{ maxWidth: '85%', padding: '1.25rem 1.5rem', borderRadius: '4px 24px 24px 24px', color: 'rgba(232,223,200,0.9)' }}>
                   <div dangerouslySetInnerHTML={{ __html: renderMarkdown(streaming, doshaColor) }} />
                   <span style={{ color: '#6abf8a', animation: 'blink 1s infinite' }}>▋</span>
                 </div>

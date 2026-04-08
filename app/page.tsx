@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Nav from '../components/Nav'
 import VaidyaOracle from '../components/VaidyaOracle'
+import Surface from '../components/ui/Surface'
+import IOSButton from '../components/ui/IOSButton'
 
 /* ─── Translations ─────────────────────────────────────────────────────── */
 const T: Record<string, {
@@ -371,21 +373,18 @@ export default function LandingPage() {
           transition={{ type: 'spring', stiffness: 80, damping: 22, delay: 0.28 }}
           style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.2rem', width: '100%', maxWidth: 680 }}
         >
-          <form 
-            onSubmit={handleTeaserSubmit}
+          <Surface
+            variant="strong"
             style={{ 
               width: '100%', 
-              background: 'rgba(255,255,255,0.03)', 
-              border: '1px solid rgba(106,191,138,0.25)', 
               borderRadius: 24, 
               padding: '0.5rem', 
               display: 'flex', 
               alignItems: 'center', 
               gap: '0.5rem',
-              backdropFilter: 'blur(16px)',
-              boxShadow: '0 12px 40px rgba(0,0,0,0.5), inset 0 2px 10px rgba(255,255,255,0.02)'
             }}
           >
+            <form onSubmit={handleTeaserSubmit} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <textarea
               value={teaserPrompt}
               onChange={(e) => setTeaserPrompt(e.target.value)}
@@ -410,7 +409,7 @@ export default function LandingPage() {
                 lineHeight: 1.5
               }}
             />
-            <button 
+            <button
               type="submit"
               disabled={!teaserPrompt.trim()}
               style={{
@@ -433,7 +432,8 @@ export default function LandingPage() {
                 <polyline points="5 12 12 5 19 12"></polyline>
               </svg>
             </button>
-          </form>
+            </form>
+          </Surface>
           
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '0.5rem' }}>
             <Link href="/diet" style={{ color: 'rgba(106,191,138,0.8)', fontSize: '0.85rem', textDecoration: 'none', border: '1px solid rgba(106,191,138,0.2)', padding: '0.35rem 0.8rem', borderRadius: 980 }}>
@@ -450,7 +450,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           STATS BAR
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '3rem 2rem', borderTop: '1px solid rgba(106,191,138,0.07)', borderBottom: '1px solid rgba(106,191,138,0.07)' }}>
+      <section className="ds-section-compact" style={{ borderTop: '1px solid rgba(106,191,138,0.07)', borderBottom: '1px solid rgba(106,191,138,0.07)' }}>
         <div style={{ maxWidth: 800, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
           {STATS.map((s, i) => (
             <motion.div
@@ -471,7 +471,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           FEATURES
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '6rem 2rem', maxWidth: 1060, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <section className="ds-section" style={{ maxWidth: 1060, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <motion.p
           initial={{ opacity: 0, y: 10 }} 
           whileInView={{ opacity: 1, y: 0 }} 
@@ -508,7 +508,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           SAMPLE RESPONSE
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '6rem 2rem', maxWidth: 720, margin: '0 auto' }}>
+      <section className="ds-section" style={{ maxWidth: 720, margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <p style={{ textAlign: 'center', color: 'rgba(106,191,138,0.4)', fontSize: '0.72rem', marginBottom: '1rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>Sample VAIDYA Response</p>
           <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', fontWeight: 300, textAlign: 'center', color: '#e8dfc8', marginBottom: '2.5rem' }}>
@@ -538,7 +538,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           TESTIMONIALS
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '6rem 2rem', maxWidth: 920, margin: '0 auto' }}>
+      <section className="ds-section" style={{ maxWidth: 920, margin: '0 auto' }}>
         <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
           style={{ textAlign: 'center', color: 'rgba(106,191,138,0.4)', fontSize: '0.72rem', marginBottom: '3.5rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>
           Why people trust AyuraHealth
@@ -581,7 +581,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           8 TRADITIONS
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '6rem 2rem', maxWidth: 1000, margin: '0 auto' }}>
+      <section className="ds-section" style={{ maxWidth: 1000, margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.9rem, 4vw, 2.8rem)', fontWeight: 300, textAlign: 'center', marginBottom: '0.5rem', color: '#e8dfc8' }}>{t.traditions}</h2>
           <p style={{ textAlign: 'center', color: 'rgba(106,191,138,0.4)', fontSize: '0.75rem', marginBottom: '3rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: '-apple-system, sans-serif' }}>{t.tradSub}</p>
@@ -602,7 +602,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           HOW VAIDYA WORKS
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '6rem 2rem', maxWidth: 780, margin: '0 auto' }}>
+      <section className="ds-section" style={{ maxWidth: 780, margin: '0 auto' }}>
         <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
           style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.9rem, 4vw, 2.8rem)', fontWeight: 300, marginBottom: '3.5rem', color: '#e8dfc8' }}>
           {t.how}
@@ -630,15 +630,15 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           FINAL CTA
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '8rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="ds-section" style={{ textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div className="glow" style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 800, height: 600, background: 'radial-gradient(ellipse, rgba(26,77,46,0.2) 0%, transparent 65%)' }} />
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ fontSize: '3.2rem', marginBottom: '1.5rem' }}>🌿</div>
           <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(2.2rem, 5vw, 4.2rem)', fontWeight: 300, lineHeight: 1.12, marginBottom: '1.1rem', color: '#e8dfc8' }}>{t.finalCta}</h2>
           <p style={{ color: 'rgba(232,223,200,0.38)', marginBottom: '2.8rem', fontSize: '0.95rem', fontFamily: '-apple-system, sans-serif' }}>{t.finalSub}</p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href={`/chat?lang=${lang}`} className="btn-primary" style={{ fontSize: '1.05rem', padding: '1rem 3rem' }}>Start Free Assessment →</Link>
-            <Link href="/diet" className="btn-secondary">Generate Diet Chart</Link>
+            <IOSButton href={`/chat?lang=${lang}`} style={{ fontSize: '1.05rem', padding: '1rem 1.6rem', width: 'auto' }}>Start Free Assessment →</IOSButton>
+            <IOSButton href="/diet" variant="secondary" style={{ width: 'auto' }}>Generate Diet Chart</IOSButton>
           </div>
           <p style={{ marginTop: '1.8rem', fontSize: '0.73rem', color: 'rgba(232,223,200,0.18)', fontFamily: '-apple-system, sans-serif' }}>⚕️ Educational guidance only · Not a substitute for professional medical advice</p>
         </motion.div>
@@ -647,7 +647,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           NEWSLETTER
       ══════════════════════════════════════════════════════ */}
-      <section style={{ padding: '3.5rem 1rem', background: 'rgba(45,90,27,0.05)', borderTop: '1px solid rgba(106,191,138,0.07)' }}>
+      <section className="ds-section-compact" style={{ background: 'rgba(45,90,27,0.05)', borderTop: '1px solid rgba(106,191,138,0.07)' }}>
         <div style={{ maxWidth: 520, margin: '0 auto', textAlign: 'center' }}>
           <h3 style={{ fontSize: '1.4rem', fontWeight: 300, fontFamily: '"Cormorant Garamond", serif', color: '#e8dfc8', marginBottom: '0.6rem' }}>Stay Updated</h3>
           <p style={{ color: 'rgba(232,223,200,0.45)', marginBottom: '1.5rem', fontSize: '0.88rem', fontFamily: '-apple-system, sans-serif' }}>Get the latest on new features, health insights, and announcements.</p>

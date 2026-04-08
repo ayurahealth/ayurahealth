@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import Logo from '../../components/Logo'
+import Surface from '../../components/ui/Surface'
+import IOSButton from '../../components/ui/IOSButton'
 
 // Server-verified pricing (must match server-side PRICES in API routes)
 const PRICING_TIERS = [
@@ -176,7 +178,11 @@ export default function PricingPage() {
       <section style={{ padding: '2rem 2rem 5rem', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
           {PRICING_TIERS.map((tier) => (
-            <div key={tier.name} className={`pricing-card${tier.highlighted ? ' highlighted' : ''}`}>
+            <Surface
+              key={tier.name}
+              className={`pricing-card${tier.highlighted ? ' highlighted' : ''}`}
+              variant={tier.highlighted ? 'strong' : 'default'}
+            >
               {tier.badge && <div className="badge-pill">{tier.badge}</div>}
 
               <h3 style={{ fontSize: '1.4rem', fontFamily: '"Cormorant Garamond", serif', fontWeight: 400, color: '#e8dfc8', marginBottom: '0.4rem' }}>{tier.name}</h3>
@@ -191,15 +197,15 @@ export default function PricingPage() {
               </div>
 
               {tier.highlighted ? (
-                <button className="btn-primary" onClick={() => window.location.href = `${tier.ctaHref}&billing=${billing}&currency=${currency}`} style={{ marginBottom: '2rem' }}>
+                <IOSButton onClick={() => window.location.href = `${tier.ctaHref}&billing=${billing}&currency=${currency}`} style={{ marginBottom: '2rem' }}>
                   {tier.cta}
-                </button>
+                </IOSButton>
               ) : tier.priceUSD === 0 ? (
-                <a href={tier.ctaHref} className="btn-outline" style={{ marginBottom: '2rem' }}>{tier.cta}</a>
+                <IOSButton href={tier.ctaHref} variant="secondary" style={{ marginBottom: '2rem' }}>{tier.cta}</IOSButton>
               ) : (
-                <button className="btn-outline" onClick={() => window.location.href = `${tier.ctaHref}&billing=${billing}&currency=${currency}`} style={{ marginBottom: '2rem' }}>
+                <IOSButton variant="secondary" onClick={() => window.location.href = `${tier.ctaHref}&billing=${billing}&currency=${currency}`} style={{ marginBottom: '2rem' }}>
                   {tier.cta}
-                </button>
+                </IOSButton>
               )}
 
               <ul style={{ listStyle: 'none' }}>
@@ -207,7 +213,7 @@ export default function PricingPage() {
                   <li key={f} className="feature-li">{f}</li>
                 ))}
               </ul>
-            </div>
+            </Surface>
           ))}
         </div>
 
@@ -244,7 +250,7 @@ export default function PricingPage() {
         <p style={{ fontSize: '0.95rem', color: 'rgba(232,223,200,0.45)', marginBottom: '2rem', maxWidth: 500, margin: '0 auto 2rem', fontFamily: '-apple-system, sans-serif' }}>
           Start free, upgrade anytime. Ancient wisdom meets modern AI.
         </p>
-        <Link href="/chat" className="btn-primary" style={{ maxWidth: 280, margin: '0 auto' }}>Start Free Assessment →</Link>
+        <IOSButton href="/chat" style={{ maxWidth: 280, margin: '0 auto' }}>Start Free Assessment →</IOSButton>
       </section>
 
       {/* Footer */}
