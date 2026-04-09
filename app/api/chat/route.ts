@@ -26,6 +26,8 @@ const chatSchema = z.object({
     url: z.string().url().optional(),
   })).max(5).optional(),
   deepThink: z.boolean().optional(),
+  modelPreference: z.enum(['auto', 'claude', 'gpt', 'gemini']).optional(),
+  webSearch: z.boolean().optional(),
   sessionId: z.string().uuid().optional(),
   vedicContext: z.string().max(20000).optional(),
 })
@@ -36,6 +38,12 @@ interface KnowledgeChunkResult {
   tradition: string;
   source: string;
   similarity: number;
+}
+
+interface WebSearchResult {
+  title: string
+  source: string
+  content: string
 }
 
 interface ChatSessionRecord {
@@ -123,6 +131,8 @@ export async function POST(req: NextRequest) {
       lang,
       attachments,
       deepThink,
+      modelPreference,
+      webSearch,
       sessionId,
       vedicContext,
     } = validation.data
@@ -257,9 +267,12 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
     const lastMsg = messages[messages.length - 1]
     const userQuery = lastMsg.role === 'user' ? lastMsg.content : ''
 
+    const preferredModel = modelPreference || 'auto'
+
     // ── AI Brain: Vector Search (RAG) ────────────────────────────────────────
     let knowledgeCtx = ''
     let chunks: KnowledgeChunkResult[] = []
+    let webChunks: KnowledgeChunkResult[] = []
 
     if (userQuery && userQuery.length > 3) {
       try {
@@ -287,6 +300,25 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
         }
       } catch (err) {
         console.error('AI Brain Retrieval Error:', err)
+      }
+    }
+
+    if (webSearch && userQuery && userQuery.length > 3) {
+      try {
+        const webResults = await fetchWebSearchResults(userQuery)
+        if (webResults.length > 0) {
+          webChunks = webResults.map((r) => ({
+            title: r.title,
+            content: r.content,
+            tradition: 'Web',
+            source: r.source,
+            similarity: 1,
+          }))
+          knowledgeCtx += `\nWEB SEARCH (RECENT SOURCES):\n` +
+            webResults.map((r) => `[Web] ${r.title}: ${r.content} (${r.source})`).join('\n')
+        }
+      } catch (err) {
+        console.error('WEB_SEARCH_ERROR:', err)
       }
     }
 
@@ -379,19 +411,29 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
       )
     }
 
-    const useNemotron = prefersNemotron && hasOpenRouter
+    const openRouterModelMap = {
+      claude: process.env.OPENROUTER_MODEL_CLAUDE || 'anthropic/claude-3.5-sonnet',
+      gpt: process.env.OPENROUTER_MODEL_GPT || 'openai/gpt-4o-mini',
+      gemini: process.env.OPENROUTER_MODEL_GEMINI || 'google/gemini-2.0-flash-001',
+      auto: process.env.OPENROUTER_MODEL || 'anthropic/claude-3-haiku',
+    } as const
 
-    const apiUrl = useNemotron
+    const shouldUseOpenRouter = hasOpenRouter && (
+      preferredModel !== 'auto' || prefersNemotron
+    )
+    const useOpenRouter = shouldUseOpenRouter
+
+    const apiUrl = useOpenRouter
       ? 'https://openrouter.ai/api/v1/chat/completions'
       : 'https://api.groq.com/openai/v1/chat/completions'
 
-    const model = useNemotron
-      ? (process.env.OPENROUTER_MODEL || 'anthropic/claude-3-haiku')
+    const model = useOpenRouter
+      ? openRouterModelMap[preferredModel]
       : hasImages
         ? 'meta-llama/llama-4-scout-17b-16e-instruct'
         : 'llama-3.3-70b-versatile'
 
-    const authKey = useNemotron ? process.env.OPENROUTER_API_KEY : process.env.GROQ_API_KEY
+    const authKey = useOpenRouter ? process.env.OPENROUTER_API_KEY : process.env.GROQ_API_KEY
     if (!authKey) {
       return NextResponse.json(
         { error: 'VAIDYA provider key missing for selected model route.' },
@@ -403,9 +445,9 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
       'Authorization': `Bearer ${authKey}`,
       'Content-Type': 'application/json',
     }
-    if (useNemotron) {
+    if (useOpenRouter) {
       fetchHeaders['HTTP-Referer'] = 'https://ayurahealth.com'
-      fetchHeaders['X-Title'] = 'AyuraHealth VAIDYA Deep Mind'
+      fetchHeaders['X-Title'] = 'AyuraHealth VAIDYA Multi-Model'
     }
 
     const response = await fetch(apiUrl, {
@@ -423,15 +465,15 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       const details = errorData.error?.message || response.statusText
-      console.error('VAIDYA_AI_ERROR:', { status: response.status, details, model, provider: useNemotron ? 'OpenRouter' : 'Groq' })
+      console.error('VAIDYA_AI_ERROR:', { status: response.status, details, model, provider: useOpenRouter ? 'OpenRouter' : 'Groq' })
       
-      if (useNemotron && hasGroq) {
+      if (useOpenRouter && hasGroq) {
         const fallback = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages], max_tokens: 3000, temperature: 0.6, stream: true }),
         })
-        if (fallback.ok) return new NextResponse(createStream(fallback, { sources: chunks }), { headers: streamHeaders })
+        if (fallback.ok) return new NextResponse(createStream(fallback, { sources: [...chunks, ...webChunks] }), { headers: streamHeaders })
       }
       return NextResponse.json({ error: 'AI service temporarily unavailable.', details }, { status: 500 })
     }
@@ -460,12 +502,53 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
       }
     }
 
-    return new NextResponse(createStream(response, { sources: chunks, sessionId: activeSessionId, userId: clerkUser?.id }), { headers: streamHeaders })
+    return new NextResponse(createStream(response, { sources: [...chunks, ...webChunks], sessionId: activeSessionId, userId: clerkUser?.id }), { headers: streamHeaders })
 
   } catch (err) {
     console.error('CHAT_API_CRASH:', err)
     return NextResponse.json({ error: 'Internal server error', details: String(err) }, { status: 500 })
   }
+}
+
+async function fetchWebSearchResults(query: string): Promise<WebSearchResult[]> {
+  const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; AyuraHealthBot/1.0; +https://ayurahealth.com)',
+    },
+  })
+  if (!response.ok) return []
+  const html = await response.text()
+
+  const anchorRegex = /<a[^>]*class="[^"]*result__a[^"]*"[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/g
+  const results: WebSearchResult[] = []
+  let match: RegExpExecArray | null
+
+  while ((match = anchorRegex.exec(html)) !== null && results.length < 5) {
+    const source = decodeHtml(match[1] || '').trim()
+    const title = stripTags(decodeHtml(match[2] || '')).trim()
+    if (!source || !title) continue
+    results.push({
+      title,
+      source,
+      content: `Recent reference related to "${query}".`,
+    })
+  }
+
+  return results
+}
+
+function stripTags(value: string): string {
+  return value.replace(/<[^>]*>/g, '')
+}
+
+function decodeHtml(value: string): string {
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
 }
 
 const streamHeaders = {

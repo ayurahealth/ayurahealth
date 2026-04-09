@@ -20,6 +20,7 @@ interface Attachment {
 }
 type Dosha = 'Vata' | 'Pitta' | 'Kapha'
 type Screen = 'landing' | 'welcome' | 'quiz' | 'result' | 'chat'
+type ModelPreference = 'auto' | 'claude' | 'gpt' | 'gemini'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SR = any
 interface ChatSource {
@@ -33,6 +34,7 @@ const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
 const THEME_PREF_KEY = 'ayura_theme_pref_v1'
+const AI_PREF_KEY = 'ayura_ai_pref_v1'
 const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
@@ -178,6 +180,28 @@ export default function ChatPage() {
       return 'dark'
     }
   })
+  const [modelPreference, setModelPreference] = useState<ModelPreference>(() => {
+    if (typeof window === 'undefined') return 'auto'
+    try {
+      const raw = localStorage.getItem(AI_PREF_KEY)
+      if (!raw) return 'auto'
+      const parsed = JSON.parse(raw) as { model?: ModelPreference }
+      return parsed.model ?? 'auto'
+    } catch {
+      return 'auto'
+    }
+  })
+  const [webSearchEnabled, setWebSearchEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      const raw = localStorage.getItem(AI_PREF_KEY)
+      if (!raw) return false
+      const parsed = JSON.parse(raw) as { webSearch?: boolean }
+      return Boolean(parsed.webSearch)
+    } catch {
+      return false
+    }
+  })
   const [vedicContext, setVedicContext] = useState<string | null>(null)
   const [vedicEnabled, setVedicEnabled] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
@@ -240,6 +264,16 @@ export default function ChatPage() {
     } catch {}
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(AI_PREF_KEY, JSON.stringify({
+        model: modelPreference,
+        webSearch: webSearchEnabled,
+      }))
+    } catch {}
+  }, [modelPreference, webSearchEnabled])
 
   // Persist Vedic preferences
   useEffect(() => {
@@ -527,6 +561,8 @@ export default function ChatPage() {
           systems: selectedSystems,
           incognito,
           dosha,
+          modelPreference,
+          webSearch: webSearchEnabled,
           lang: (typeof window !== 'undefined' ? localStorage.getItem('ayura_lang') || lang : lang),
           attachments: currentAttachments,
           vedicContext: vedicEnabled ? (vedicContext || undefined) : undefined,
@@ -1269,6 +1305,42 @@ export default function ChatPage() {
                 <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
                 <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
               </div>
+              <select
+                value={modelPreference}
+                onChange={(e) => setModelPreference(e.target.value as ModelPreference)}
+                className="ios-chip"
+                title="Choose intelligence model"
+                style={{
+                  padding: '0.24rem 0.56rem',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.66rem',
+                  color: 'rgba(232,223,200,0.85)',
+                  background: 'rgba(255,255,255,0.06)'
+                }}
+              >
+                <option value="auto">Auto AI</option>
+                <option value="claude">Claude</option>
+                <option value="gpt">ChatGPT</option>
+                <option value="gemini">Gemini</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => setWebSearchEnabled((v) => !v)}
+                className={`ios-chip ${webSearchEnabled ? 'active' : ''}`}
+                style={{
+                  padding: '0.24rem 0.56rem',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.66rem',
+                  color: webSearchEnabled ? '#6abf8a' : 'rgba(232,223,200,0.8)'
+                }}
+                title="Include live web sources"
+              >
+                🌐 Web {webSearchEnabled ? 'On' : 'Off'}
+              </button>
               <button
                 type="button"
                 onClick={() => setShowObsidianModal(true)}
