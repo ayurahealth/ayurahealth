@@ -294,12 +294,34 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
 ` : ''
 
     const attachmentCtx = safeAttachments.length > 0
-      ? safeAttachments
-          .filter(a => a.type !== 'image')
-          .map(a =>
+      ? `\nATTACHED DOCUMENTS/IMAGES:\n` +
+          safeAttachments.map(a =>
+            a.type === 'image' ? `[IMAGE: "${a.name}"]` :
             a.type === 'pdf' ? `\n[MEDICAL DOCUMENT: "${a.name}"]\n${a.content}` :
             a.type === 'link' ? `\n[ARTICLE: "${a.name}"]\n${a.content}` : ''
           ).join('') : ''
+
+    // ── Clinical Memory: Persistent Global Context ──────────────────────────
+    let clinicalMemoryCtx = ''
+    if (clerkUser && clerkUser.id) {
+      if (!prismaClient) {
+        const prismaMod = await import('../../../lib/prisma')
+        prismaClient = prismaMod.prisma
+      }
+      try {
+        const memories = await prismaClient.userMemory.findMany({
+          where: { userId: clerkUser.id },
+          orderBy: { createdAt: 'desc' },
+          take: 20
+        })
+        if (memories.length > 0) {
+          clinicalMemoryCtx = `\nVAIDYA CLINICAL MEMORY (PATIENT FILE):\n` +
+            memories.map(m => `[${m.category}] ${m.content} (Source: ${m.source})`).join('\n')
+        }
+      } catch (err) {
+        console.error('CLINICAL_MEMORY_FETCH_ERROR:', err)
+      }
+    }
 
     const lastMsg = messages[messages.length - 1]
     const userQuery = lastMsg.role === 'user' ? lastMsg.content : ''
@@ -430,6 +452,7 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
 PROMPT PROFILE: ${promptProfile.name.toUpperCase()}
 ${promptProfile.instruction}
 ${autoRecoveryPolicy.applied ? `AUTO RECOVERY POLICY ACTIVE: ${autoRecoveryPolicy.reasons.join(' | ')}` : ''}
+${clinicalMemoryCtx}
 ${responseTemplate}${vedicSection}`
 
     const hasImages = safeAttachments.some(a => a.type === 'image')

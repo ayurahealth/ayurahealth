@@ -3,6 +3,8 @@
 import SystemCard from '../ui/SystemCard'
 import { traditionIcons } from '../TraditionIcons'
 
+import VedicHealthScore from '../vedic/VedicHealthScore'
+
 interface MedicineSystem {
   id: string
   label: string
@@ -16,6 +18,11 @@ interface ChatSidebarProps {
   systemDetail: Record<string, string>
   messagesCount: number
   incognito: boolean
+  // Vedic Score Data
+  healthScore?: number
+  doshaBalance?: number
+  dashaInfluence?: number
+  sentimentScore?: number
 }
 
 export default function ChatSidebar({
@@ -25,9 +32,19 @@ export default function ChatSidebar({
   systemDetail,
   messagesCount,
   incognito,
+  healthScore = 72,
+  doshaBalance = 80,
+  dashaInfluence = 65,
+  sentimentScore = 70
 }: ChatSidebarProps) {
   return (
-    <aside className="liquid-glass ios-surface chat-sidebar" style={{ padding: '0.9rem' }}>
+    <aside className="liquid-glass ios-surface chat-sidebar" style={{ padding: '0.9rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <VedicHealthScore 
+        score={healthScore}
+        doshaBalance={doshaBalance}
+        dashaInfluence={dashaInfluence}
+        sentimentScore={sentimentScore}
+      />
       <div style={{ fontSize: '0.68rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.6rem' }}>
         Consultation Systems
       </div>

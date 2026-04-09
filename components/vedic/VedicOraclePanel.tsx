@@ -4,6 +4,7 @@ import type { VedicOracleResponse } from '@/lib/vedic/types'
 import BirthChartInput from './BirthChartInput'
 import PlanetaryHealthCard from './PlanetaryHealthCard'
 import VedicClockWidget from './VedicClockWidget'
+import HolographicLabMap from '../diagnostics/HolographicLabMap'
 
 interface Props {
   initialDosha?: string
@@ -14,7 +15,7 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', onContextReady
   const [oracleData, setOracleData] = useState<VedicOracleResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'chart' | 'elements' | 'math' | 'remedies' | 'daily'>('chart')
+  const [activeTab, setActiveTab] = useState<'chart' | 'elements' | 'math' | 'remedies' | 'daily' | 'labs'>('chart')
   const [birthDataEntered, setBirthDataEntered] = useState(false)
 
   async function fetchOracleData(birthData: {
@@ -60,6 +61,7 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', onContextReady
     { id: 'math', label: '🔢 Vedic Math', emoji: '🔢' },
     { id: 'remedies', label: '💎 Remedies', emoji: '💎' },
     { id: 'daily', label: '📅 Today', emoji: '📅' },
+    { id: 'labs', label: '🧬 Labs', emoji: '🧬' },
   ] as const
 
   if (!birthDataEntered) {
@@ -529,6 +531,18 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', onContextReady
         {activeTab === 'daily' && (
           <div>
             <VedicClockWidget guidance={dailyVedicGuidance} />
+          </div>
+        )}
+        {/* LABS TAB */}
+        {activeTab === 'labs' && (
+          <div>
+            <h3 style={{ color: '#c9a84c', fontSize: '0.85rem', marginBottom: '0.8rem', fontFamily: 'Georgia, serif' }}>
+              🧬 3D Biologic Synthesis Map
+            </h3>
+            <p style={{ color: 'rgba(232,223,200,0.5)', fontSize: '0.78rem', marginBottom: '1.2rem', lineHeight: 1.5 }}>
+              Visualizing modern biomarkers through the lens of Pancha Bhuta (Elemental) and Dhatu (Tissue) systems.
+            </p>
+            <HolographicLabMap />
           </div>
         )}
 

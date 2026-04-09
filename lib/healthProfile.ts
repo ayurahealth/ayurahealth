@@ -77,3 +77,20 @@ export function extractHealthClues(text: string, profile: HealthProfile): Health
 
   return updated
 }
+
+/**
+ * Syncs the local health profile to the server-side Clinical Memory.
+ */
+export async function syncProfileToCloud(profile: HealthProfile) {
+  try {
+    const res = await fetch('/api/profile/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profile)
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('Failed to sync profile to clinical memory:', err);
+    return false;
+  }
+}
