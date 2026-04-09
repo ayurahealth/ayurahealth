@@ -53,14 +53,14 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
     const trimmed = raw.trim()
     if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed
 
-    const slashParts = trimmed.split('/')
-    if (slashParts.length === 3) {
-      // Supports DD/MM/YYYY and YYYY/MM/DD
-      if (slashParts[0]?.length === 4) {
-        const [y, m, d] = slashParts
+    const parts = trimmed.includes('/') ? trimmed.split('/') : trimmed.split('-')
+    if (parts.length === 3) {
+      // Supports DD/MM/YYYY, YYYY/MM/DD, DD-MM-YYYY, YYYY-MM-DD
+      if (parts[0]?.length === 4) {
+        const [y, m, d] = parts
         return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
       }
-      const [d, m, y] = slashParts
+      const [d, m, y] = parts
       if (y?.length === 4) {
         return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
       }
@@ -70,10 +70,20 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
 
   function isValidIsoDate(input: string): boolean {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) return false
-    const parsed = new Date(`${input}T00:00:00`)
-    if (Number.isNaN(parsed.getTime())) return false
-    const normalized = parsed.toISOString().slice(0, 10)
-    return normalized === input && input <= getLocalIsoDate()
+    const [yRaw, mRaw, dRaw] = input.split('-')
+    const year = Number.parseInt(yRaw || '', 10)
+    const month = Number.parseInt(mRaw || '', 10)
+    const day = Number.parseInt(dRaw || '', 10)
+    if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return false
+    if (month < 1 || month > 12 || day < 1 || day > 31) return false
+
+    const utc = new Date(Date.UTC(year, month - 1, day))
+    const validCalendarDate =
+      utc.getUTCFullYear() === year &&
+      utc.getUTCMonth() === month - 1 &&
+      utc.getUTCDate() === day
+
+    return validCalendarDate && input <= getLocalIsoDate()
   }
 
   function handleCitySelect(cityName: string) {
@@ -143,8 +153,7 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
             border: '1px solid rgba(201,168,76,0.2)',
             borderRadius: 10, color: '#e8dfc8',
             fontSize: '0.88rem',
-            boxSizing: 'border-box',
-            colorScheme: 'dark'
+            boxSizing: 'border-box'
           }}
         />
         {dateError && (
@@ -167,8 +176,7 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(201,168,76,0.2)',
             borderRadius: 10, color: '#e8dfc8', fontSize: '0.88rem',
-            boxSizing: 'border-box',
-            colorScheme: 'dark'
+            boxSizing: 'border-box'
           }}
         />
       </div>

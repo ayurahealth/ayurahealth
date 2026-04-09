@@ -333,3 +333,48 @@ img { max-width: 100%; }
   border: 1px solid rgba(201, 168, 76, 0.3);
   letter-spacing: 0.05em;
 }
+
+:root[data-theme='light'] .liquid-glass {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(21, 51, 34, 0.16);
+  border-top-color: rgba(21, 51, 34, 0.22);
+  box-shadow: 0 10px 30px rgba(16, 34, 22, 0.16);
+}
+
+:root[data-theme='light'] .glass-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(21, 51, 34, 0.12);
+}
+
+:root[data-theme='light'] .glass-card:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(47, 122, 73, 0.28);
+}
+
+:root[data-theme='light'] .ios-chip {
+  background: rgba(21, 51, 34, 0.05);
+  color: rgba(21, 51, 34, 0.86);
+  border-color: rgba(21, 51, 34, 0.18);
+}
+
+:root[data-theme='light'] .ios-segmented-item {
+  color: rgba(21, 51, 34, 0.8);
+}
+
+:root[data-theme='light'] .chat-meta-text {
+  color: rgba(21, 51, 34, 0.62);
+}
+
+:root[data-theme='light'] .chat-message-scroll {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(21, 51, 34, 0.12);
+}
+
+:root[data-theme='light'] .chat-input-shell {
+  border-color: rgba(21, 51, 34, 0.12);
+}
+
+:root[data-theme='light'] .chat-assistant-bubble,
+:root[data-theme='light'] .chat-assistant-bubble * {
+  color: #153322 !important;
+}
