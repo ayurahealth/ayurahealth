@@ -549,15 +549,30 @@ export default function ChatPage() {
     })
   }
 
-  const exportChatToObsidian = useCallback(() => {
+  const exportChatToObsidian = useCallback((options?: { includeSources?: boolean; selectedOnly?: boolean }) => {
     if (messages.length === 0) return
+
+    const includeSources = Boolean(options?.includeSources)
+    let exportMessages = messages
+
+    if (options?.selectedOnly) {
+      const input = window.prompt(
+        `Export last how many messages? (1-${messages.length})`,
+        String(Math.min(10, messages.length))
+      )
+      if (!input) return
+      const count = Number.parseInt(input, 10)
+      if (!Number.isFinite(count) || count < 1) return
+      const safeCount = Math.min(messages.length, count)
+      exportMessages = messages.slice(-safeCount)
+    }
 
     const now = new Date()
     const iso = now.toISOString()
     const datePart = iso.slice(0, 10)
     const timePart = iso.slice(11, 16).replace(':', '-')
     const doshaPart = dosha ? sanitizeFilePart(dosha) : 'general'
-    const fileName = `ayurahealth-${datePart}-${timePart}-${doshaPart}.md`
+    const fileName = `AyuraHealth/Consultations/ayurahealth-${datePart}-${timePart}-${doshaPart}${includeSources ? '-sources' : ''}.md`
 
     const frontmatter = [
       '---',
@@ -568,20 +583,36 @@ export default function ChatPage() {
       `systems: [${selectedSystems.map(s => `"${s}"`).join(', ')}]`,
       `language: "${lang}"`,
       `vedic_context_used: ${Boolean(vedicEnabled && vedicContext)}`,
-      `message_count: ${messages.length}`,
+      `message_count: ${exportMessages.length}`,
       'tags: ["ayurahealth","consultation","wellness-ai"]',
       '---',
       '',
     ].join('\n')
 
-    const body = messages.map((m, idx) => {
+    const body = exportMessages.map((m, idx) => {
       const role = m.role === 'assistant' ? 'VAIDYA' : 'User'
       const content = m.content.replace(/\r\n/g, '\n')
       return `## ${idx + 1}. ${role}\n\n${content}\n`
     }).join('\n')
 
+    const sourcesBlock = includeSources
+      ? exportMessages
+          .map((m, idx) => {
+            if (!m.sources || m.sources.length === 0) return ''
+            const list = m.sources.map((s, i) =>
+              `- ${i + 1}. **${s.tradition}** — ${s.title} (${s.source})\n  - ${s.content.slice(0, 260).replace(/\n/g, ' ')}${s.content.length > 260 ? '...' : ''}`
+            ).join('\n')
+            return `### Sources for message ${idx + 1}\n${list}\n`
+          })
+          .filter(Boolean)
+          .join('\n')
+      : ''
+
     const footer = [
       '',
+      sourcesBlock ? '## Sources & Citations\n' : '',
+      sourcesBlock,
+      sourcesBlock ? '' : '',
       '---',
       '',
       '_Educational guidance only. Not medical advice._',
@@ -928,7 +959,7 @@ export default function ChatPage() {
               </div>
               <button
                 type="button"
-                onClick={exportChatToObsidian}
+                onClick={() => exportChatToObsidian()}
                 disabled={messages.length === 0}
                 className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
                 style={{
@@ -943,6 +974,42 @@ export default function ChatPage() {
                 title="Export this consultation as Markdown for Obsidian"
               >
                 ⬇ Export .md
+              </button>
+              <button
+                type="button"
+                onClick={() => exportChatToObsidian({ includeSources: true })}
+                disabled={messages.length === 0}
+                className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
+                style={{
+                  padding: '0.28rem 0.62rem',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
+                  opacity: messages.length > 0 ? 1 : 0.45,
+                  fontSize: '0.7rem',
+                  color: '#c9a84c'
+                }}
+                title="Export consultation + sources/citations for Obsidian"
+              >
+                📚 Export + Sources
+              </button>
+              <button
+                type="button"
+                onClick={() => exportChatToObsidian({ selectedOnly: true })}
+                disabled={messages.length === 0}
+                className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
+                style={{
+                  padding: '0.28rem 0.62rem',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
+                  opacity: messages.length > 0 ? 1 : 0.45,
+                  fontSize: '0.7rem',
+                  color: '#c9a84c'
+                }}
+                title="Export only the most recent N messages"
+              >
+                ✂️ Export Selected
               </button>
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.5)', fontSize: '0.8rem', cursor: 'pointer' }}>Exit</button>
             </div>
