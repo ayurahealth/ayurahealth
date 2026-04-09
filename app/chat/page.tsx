@@ -43,6 +43,7 @@ interface Attachment {
 type Dosha = 'Vata' | 'Pitta' | 'Kapha'
 type Screen = 'landing' | 'welcome' | 'quiz' | 'result' | 'chat'
 type ModelPreference = 'auto' | 'claude' | 'gpt' | 'gemini' | 'deepseek' | 'mistral' | 'llama' | 'groq'
+type ThemeName = 'green' | 'gold' | 'forest' | 'ocean' | 'plum' | 'sunset' | 'slate' | 'rose'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SR = any
 interface ChatSource {
@@ -74,6 +75,16 @@ const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
 const THEME_PREF_KEY = 'ayura_theme_pref_v1'
 const AI_PREF_KEY = 'ayura_ai_pref_v1'
 const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
+const THEME_OPTIONS: Array<{ id: ThemeName; label: string }> = [
+  { id: 'green', label: 'Original Green' },
+  { id: 'gold', label: 'Light Gold' },
+  { id: 'forest', label: 'Forest' },
+  { id: 'ocean', label: 'Ocean' },
+  { id: 'plum', label: 'Plum' },
+  { id: 'sunset', label: 'Sunset' },
+  { id: 'slate', label: 'Slate' },
+  { id: 'rose', label: 'Rose' },
+]
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
   try {
@@ -209,13 +220,16 @@ export default function ChatPage() {
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
   const [showObsidianModal, setShowObsidianModal] = useState(false)
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'dark'
+  const [theme, setTheme] = useState<ThemeName>(() => {
+    if (typeof window === 'undefined') return 'green'
     try {
       const saved = localStorage.getItem(THEME_PREF_KEY)
-      return saved === 'light' ? 'light' : 'dark'
+      const allowed: ThemeName[] = ['green', 'gold', 'forest', 'ocean', 'plum', 'sunset', 'slate', 'rose']
+      if (saved === 'dark') return 'green'
+      if (saved === 'light') return 'gold'
+      return saved && allowed.includes(saved as ThemeName) ? (saved as ThemeName) : 'green'
     } catch {
-      return 'dark'
+      return 'green'
     }
   })
   const [modelPreference, setModelPreference] = useState<ModelPreference>(() => {
@@ -1379,9 +1393,9 @@ export default function ChatPage() {
 
       {screen === 'chat' && (
         <div className="chat-shell" style={{ position: 'relative', zIndex: 1, maxWidth: 1180, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
-          <div className="liquid-glass ios-surface chat-topbar" style={{ padding: '0.48rem 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="liquid-glass ios-surface chat-topbar" style={{ padding: '0.42rem 0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Logo size={24} showText={true} href="/" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.38rem' }}>
               <div className="ios-chip active chat-disclaimer-chip" style={{ padding: '0.2rem 0.5rem', borderRadius: 11, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
                 <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
@@ -1392,11 +1406,11 @@ export default function ChatPage() {
                 className="ios-chip"
                 title="Choose intelligence model"
                 style={{
-                  padding: '0.24rem 0.56rem',
+                  padding: '0.22rem 0.5rem',
                   borderRadius: 12,
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '0.66rem',
+                  fontSize: '0.64rem',
                   color: 'rgba(232,223,200,0.85)',
                   background: 'rgba(255,255,255,0.06)'
                 }}
@@ -1429,11 +1443,11 @@ export default function ChatPage() {
                 onClick={() => setWebSearchEnabled((v) => !v)}
                 className={`ios-chip ${webSearchEnabled ? 'active' : ''}`}
                 style={{
-                  padding: '0.24rem 0.56rem',
+                  padding: '0.22rem 0.5rem',
                   borderRadius: 12,
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '0.66rem',
+                  fontSize: '0.64rem',
                   color: webSearchEnabled ? '#6abf8a' : 'rgba(232,223,200,0.8)'
                 }}
                 title="Include live web sources"
@@ -1446,35 +1460,39 @@ export default function ChatPage() {
                 disabled={messages.length === 0}
                 className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
                 style={{
-                  padding: '0.24rem 0.56rem',
+                  padding: '0.22rem 0.5rem',
                   borderRadius: 12,
                   border: 'none',
                   cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
                   opacity: messages.length > 0 ? 1 : 0.45,
-                  fontSize: '0.66rem',
+                  fontSize: '0.64rem',
                   color: '#c9a84c'
                 }}
                 title="Open premium Obsidian export options"
               >
                 🧠 Obsidian Export
               </button>
-              <button
-                type="button"
-                onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+              <select
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as ThemeName)}
                 className="ios-chip"
                 style={{
-                  padding: '0.24rem 0.56rem',
+                  padding: '0.22rem 0.5rem',
                   borderRadius: 12,
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '0.66rem',
+                  fontSize: '0.64rem',
                   color: 'rgba(232,223,200,0.8)'
                 }}
-                title="Toggle light/dark mode"
+                title="Choose app theme"
               >
-                {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
-              </button>
-              <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.74rem', cursor: 'pointer' }}>Exit</button>
+                {THEME_OPTIONS.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+              <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.7rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
           <div className="chat-desktop-layout">

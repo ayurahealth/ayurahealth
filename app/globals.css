@@ -17,18 +17,90 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; height: 100%; }
   --ios-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-:root[data-theme='light'] {
-  --ios-bg: #edf5ee;
-  --ios-text: #1f3b2a;
-  --ios-muted: rgba(31, 59, 42, 0.7);
-  --ios-primary: #3f8a5f;
-  --ios-accent: #b08a2d;
-  --ios-surface: rgba(247, 244, 231, 0.9);
-  --ios-surface-strong: rgba(252, 248, 236, 0.97);
-  --ios-stroke: rgba(58, 96, 72, 0.18);
-  --ios-stroke-strong: rgba(79, 132, 97, 0.35);
-  --ios-shadow-xl: 0 12px 30px rgba(36, 62, 45, 0.14);
-  --ios-shadow-md: 0 6px 14px rgba(36, 62, 45, 0.1);
+:root[data-theme='gold'] {
+  --ios-bg: #16130c;
+  --ios-text: #efe2c0;
+  --ios-muted: rgba(239, 226, 192, 0.66);
+  --ios-primary: #bda15f;
+  --ios-accent: #d5b36a;
+  --ios-surface: rgba(42, 34, 22, 0.74);
+  --ios-surface-strong: rgba(50, 40, 26, 0.84);
+  --ios-stroke: rgba(239, 226, 192, 0.12);
+  --ios-stroke-strong: rgba(213, 179, 106, 0.36);
+  --ios-shadow-xl: 0 14px 34px rgba(12, 10, 6, 0.5);
+  --ios-shadow-md: 0 7px 18px rgba(12, 10, 6, 0.36);
+}
+
+:root[data-theme='forest'] {
+  --ios-bg: #07120d;
+  --ios-text: #e2f0de;
+  --ios-muted: rgba(226, 240, 222, 0.64);
+  --ios-primary: #5ea874;
+  --ios-accent: #b5b06a;
+  --ios-surface: rgba(12, 32, 22, 0.76);
+  --ios-surface-strong: rgba(14, 38, 25, 0.86);
+  --ios-stroke: rgba(226, 240, 222, 0.1);
+  --ios-stroke-strong: rgba(94, 168, 116, 0.36);
+}
+
+:root[data-theme='ocean'] {
+  --ios-bg: #06141a;
+  --ios-text: #e2eef5;
+  --ios-muted: rgba(226, 238, 245, 0.64);
+  --ios-primary: #63a8c2;
+  --ios-accent: #8fc7d8;
+  --ios-surface: rgba(14, 31, 39, 0.76);
+  --ios-surface-strong: rgba(18, 39, 49, 0.86);
+  --ios-stroke: rgba(226, 238, 245, 0.1);
+  --ios-stroke-strong: rgba(99, 168, 194, 0.36);
+}
+
+:root[data-theme='plum'] {
+  --ios-bg: #130b18;
+  --ios-text: #f0e5f6;
+  --ios-muted: rgba(240, 229, 246, 0.64);
+  --ios-primary: #b28dd2;
+  --ios-accent: #d2a8d9;
+  --ios-surface: rgba(34, 22, 42, 0.76);
+  --ios-surface-strong: rgba(42, 26, 52, 0.86);
+  --ios-stroke: rgba(240, 229, 246, 0.1);
+  --ios-stroke-strong: rgba(178, 141, 210, 0.36);
+}
+
+:root[data-theme='sunset'] {
+  --ios-bg: #1a0e0b;
+  --ios-text: #f3dfd6;
+  --ios-muted: rgba(243, 223, 214, 0.64);
+  --ios-primary: #d8896d;
+  --ios-accent: #e9b37f;
+  --ios-surface: rgba(44, 24, 19, 0.76);
+  --ios-surface-strong: rgba(52, 28, 22, 0.86);
+  --ios-stroke: rgba(243, 223, 214, 0.1);
+  --ios-stroke-strong: rgba(216, 137, 109, 0.36);
+}
+
+:root[data-theme='slate'] {
+  --ios-bg: #0f1318;
+  --ios-text: #e2e9f0;
+  --ios-muted: rgba(226, 233, 240, 0.64);
+  --ios-primary: #84a3c2;
+  --ios-accent: #9fb8cc;
+  --ios-surface: rgba(24, 31, 39, 0.76);
+  --ios-surface-strong: rgba(29, 37, 47, 0.86);
+  --ios-stroke: rgba(226, 233, 240, 0.1);
+  --ios-stroke-strong: rgba(132, 163, 194, 0.36);
+}
+
+:root[data-theme='rose'] {
+  --ios-bg: #180d11;
+  --ios-text: #f3e1e8;
+  --ios-muted: rgba(243, 225, 232, 0.64);
+  --ios-primary: #ca8ca3;
+  --ios-accent: #e3a6ba;
+  --ios-surface: rgba(43, 23, 30, 0.76);
+  --ios-surface-strong: rgba(52, 27, 36, 0.86);
+  --ios-stroke: rgba(243, 225, 232, 0.1);
+  --ios-stroke-strong: rgba(202, 140, 163, 0.36);
 }
 body { 
   margin: 0; 
@@ -134,14 +206,14 @@ body {
 }
 
 .chat-assistant-bubble {
-  font-size: 0.95rem;
-  line-height: 1.82;
+  font-size: 0.93rem;
+  line-height: 1.74;
   letter-spacing: -0.003em;
 }
 
 .chat-user-bubble {
-  font-size: 0.92rem;
-  line-height: 1.65;
+  font-size: 0.9rem;
+  line-height: 1.58;
   letter-spacing: -0.002em;
 }
 
@@ -151,7 +223,7 @@ body {
 }
 
 .chat-shell {
-  padding: 0 0.75rem 0.75rem;
+  padding: 0 0.65rem 0.65rem;
 }
 
 .markdown-content strong {
@@ -195,13 +267,13 @@ img { max-width: 100%; }
 @media (min-width: 1024px) {
   .chat-topbar {
     border-radius: 16px;
-    min-height: 46px;
+    min-height: 42px;
   }
   .chat-disclaimer-chip {
     opacity: 0.92;
   }
   .chat-shell {
-    padding: 0 1rem 1rem;
+    padding: 0 0.85rem 0.85rem;
   }
   .chat-desktop-layout {
     display: grid;
@@ -209,7 +281,7 @@ img { max-width: 100%; }
     gap: 0.9rem;
     flex: 1;
     min-height: 0;
-    padding-top: 0.85rem;
+    padding-top: 0.7rem;
   }
   .chat-sidebar {
     height: calc(100dvh - 150px);
@@ -334,47 +406,3 @@ img { max-width: 100%; }
   letter-spacing: 0.05em;
 }
 
-:root[data-theme='light'] .liquid-glass {
-  background: rgba(255, 255, 255, 0.94);
-  border-color: rgba(21, 51, 34, 0.16);
-  border-top-color: rgba(21, 51, 34, 0.22);
-  box-shadow: 0 10px 30px rgba(16, 34, 22, 0.16);
-}
-
-:root[data-theme='light'] .glass-card {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(21, 51, 34, 0.12);
-}
-
-:root[data-theme='light'] .glass-card:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(47, 122, 73, 0.28);
-}
-
-:root[data-theme='light'] .ios-chip {
-  background: rgba(21, 51, 34, 0.05);
-  color: rgba(21, 51, 34, 0.86);
-  border-color: rgba(21, 51, 34, 0.18);
-}
-
-:root[data-theme='light'] .ios-segmented-item {
-  color: rgba(21, 51, 34, 0.8);
-}
-
-:root[data-theme='light'] .chat-meta-text {
-  color: rgba(21, 51, 34, 0.62);
-}
-
-:root[data-theme='light'] .chat-message-scroll {
-  background: rgba(255, 255, 255, 0.88);
-  border-color: rgba(21, 51, 34, 0.12);
-}
-
-:root[data-theme='light'] .chat-input-shell {
-  border-color: rgba(21, 51, 34, 0.12);
-}
-
-:root[data-theme='light'] .chat-assistant-bubble,
-:root[data-theme='light'] .chat-assistant-bubble * {
-  color: #153322 !important;
-}
