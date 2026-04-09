@@ -37,6 +37,69 @@ interface ChatMessagesPanelProps {
   messagesEndRef: RefObject<HTMLDivElement | null>
 }
 
+interface StructuredResponse {
+  answer?: string
+  keyPoints: string[]
+  sources: string[]
+  followUps: string[]
+}
+
+function parseStructuredResponse(raw: string): StructuredResponse {
+  const text = raw.replace(/\r\n/g, '\n').trim()
+  const lines = text.split('\n')
+  let section: 'answer' | 'keyPoints' | 'sources' | 'followUps' | '' = ''
+  const out: StructuredResponse = { keyPoints: [], sources: [], followUps: [] }
+
+  const sectionMap: Array<{ pattern: RegExp; key: 'answer' | 'keyPoints' | 'sources' | 'followUps' }> = [
+    { pattern: /^#{1,3}\s*answer\b/i, key: 'answer' },
+    { pattern: /^#{1,3}\s*key\s*points?\b/i, key: 'keyPoints' },
+    { pattern: /^#{1,3}\s*sources?\b/i, key: 'sources' },
+    { pattern: /^#{1,3}\s*follow-?\s*ups?\b/i, key: 'followUps' },
+    { pattern: /^\*\*answer\*\*/i, key: 'answer' },
+    { pattern: /^\*\*key\s*points?\*\*/i, key: 'keyPoints' },
+    { pattern: /^\*\*sources?\*\*/i, key: 'sources' },
+    { pattern: /^\*\*follow-?\s*ups?\*\*/i, key: 'followUps' },
+  ]
+
+  const pushBullet = (value: string) => {
+    const cleaned = value.replace(/^[-*]\s+/, '').replace(/^\d+\.\s+/, '').trim()
+    if (!cleaned) return
+    if (section === 'keyPoints') out.keyPoints.push(cleaned)
+    if (section === 'sources') out.sources.push(cleaned)
+    if (section === 'followUps') out.followUps.push(cleaned)
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed) continue
+    const hit = sectionMap.find(({ pattern }) => pattern.test(trimmed))
+    if (hit) {
+      section = hit.key
+      continue
+    }
+
+    if (section === 'answer') {
+      out.answer = out.answer ? `${out.answer}\n${trimmed}` : trimmed
+      continue
+    }
+
+    if (/^[-*]\s+/.test(trimmed) || /^\d+\.\s+/.test(trimmed)) {
+      pushBullet(trimmed)
+      continue
+    }
+
+    if (section === 'keyPoints' || section === 'sources' || section === 'followUps') {
+      pushBullet(trimmed)
+    } else if (!out.answer) {
+      out.answer = trimmed
+    } else {
+      out.answer = `${out.answer}\n${trimmed}`
+    }
+  }
+
+  return out
+}
+
 export default function ChatMessagesPanel({
   messages,
   loading,
@@ -92,6 +155,14 @@ export default function ChatMessagesPanel({
             </div>
           )}
           <div style={{ maxWidth: '85%' }}>
+            {(() => {
+              const structured = msg.role === 'assistant' ? parseStructuredResponse(msg.content) : null
+              const hasStructuredSections = Boolean(
+                structured &&
+                (structured.keyPoints.length > 0 || structured.sources.length > 0 || structured.followUps.length > 0)
+              )
+
+              return (
             <div
               className={`${msg.role === 'user' ? 'chat-user-bubble' : 'glass-card chat-assistant-bubble'}`}
               style={{
@@ -103,7 +174,46 @@ export default function ChatMessagesPanel({
                 boxShadow: msg.role === 'user' ? '0 8px 24px rgba(0,0,0,0.2)' : undefined,
               }}
             >
-              {msg.role === 'assistant' ? <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content, doshaColor) }} /> : msg.content}
+              {msg.role === 'assistant' && hasStructuredSections && structured ? (
+                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '0.75rem 0.85rem' }}>
+                    <div style={{ fontSize: '0.64rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                      Answer
+                    </div>
+                    <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(structured.answer || msg.content, doshaColor) }} />
+                  </div>
+
+                  {structured.keyPoints.length > 0 && (
+                    <div style={{ background: 'rgba(106,191,138,0.04)', border: '1px solid rgba(106,191,138,0.18)', borderRadius: 12, padding: '0.7rem 0.85rem' }}>
+                      <div style={{ fontSize: '0.64rem', color: '#6abf8a', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                        Key Points
+                      </div>
+                      <div style={{ display: 'grid', gap: '0.28rem' }}>
+                        {structured.keyPoints.map((point, idx) => (
+                          <div key={idx} style={{ color: 'rgba(232,223,200,0.88)', fontSize: '0.82rem' }}>• {point}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {structured.followUps.length > 0 && (
+                    <div style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.18)', borderRadius: 12, padding: '0.7rem 0.85rem' }}>
+                      <div style={{ fontSize: '0.64rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                        Follow-ups
+                      </div>
+                      <div style={{ display: 'grid', gap: '0.28rem' }}>
+                        {structured.followUps.map((followUp, idx) => (
+                          <div key={idx} style={{ color: 'rgba(232,223,200,0.82)', fontSize: '0.8rem' }}>- {followUp}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                msg.role === 'assistant'
+                  ? <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content, doshaColor) }} />
+                  : msg.content
+              )}
 
               {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                 <div style={{ marginTop: '1.25rem', borderTop: '1px solid rgba(106,191,138,0.12)', paddingTop: '0.9rem' }}>
@@ -171,6 +281,8 @@ export default function ChatMessagesPanel({
                 </div>
               )}
             </div>
+              )
+            })()}
             {msg.role === 'assistant' && voiceSupported && (
               <button onClick={() => onSpeakText(msg.content)} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: isSpeaking ? '#6abf8a' : 'rgba(200,200,200,0.3)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }} className="chat-meta-text">
                 {isSpeaking ? '🔊 Speaking...' : '🔈 Listen'}
