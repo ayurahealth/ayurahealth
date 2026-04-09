@@ -80,6 +80,12 @@ interface ResponseQuality {
   repaired: boolean
 }
 
+interface PromptProfile {
+  name: 'balanced' | 'strict' | 'recovery'
+  instruction: string
+  temperatureAdjust: number
+}
+
 interface PrismaChatClient {
   chatSession: {
     create(args: { data: { userId: string; topic: string; summary: string } }): Promise<ChatSessionRecord>
@@ -383,6 +389,7 @@ ${vedicContext}
 As VAIDYA, integrate the above Vedic Intelligence into your response. Reference the user's current Mahadasha, their elemental imbalances, and today's Vedic guidance when making recommendations. This is what sets AyuraHealth apart from every other health AI — the depth of personalisation through Jyotish, Vedic Science, and Vedic Mathematics.
 ` : ''
 
+    const promptProfile = buildPromptProfile(messages)
     const responseTemplate = `OUTPUT CONTRACT (ALWAYS FOLLOW):
 - Keep responses concise and practical.
 - Use this exact section order with markdown headings:
@@ -406,6 +413,8 @@ LANGUAGE: ${languageInstruction}
 ${isBloodReport ? bloodReportPrompt : ''}
 ${deepThink ? 'DEEP MIND MODE: Be more thorough within the selected system only. Keep final answer concise and practical.' : ''}
 RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.
+PROMPT PROFILE: ${promptProfile.name.toUpperCase()}
+${promptProfile.instruction}
 ${responseTemplate}${vedicSection}`
 
     const hasImages = safeAttachments.some(a => a.type === 'image')
@@ -523,7 +532,7 @@ ${responseTemplate}${vedicSection}`
       ...formattedMessages,
     ]
     const maxTokens = deepThink ? 4000 : 2500
-    const temperature = deepThink ? 0.6 : 0.7
+    const temperature = Math.max(0.2, Math.min(0.8, (deepThink ? 0.6 : 0.7) + promptProfile.temperatureAdjust))
     const requestStartedAt = Date.now()
     let completionText = await fetchCompletionText({
       apiUrl,
@@ -776,6 +785,45 @@ function scoreResponseQuality(text: string, repaired: boolean, latencyMs: number
     completeness,
     latencyMs: Math.max(0, Math.round(latencyMs)),
     repaired,
+  }
+}
+
+function buildPromptProfile(messages: Array<{ role: 'user' | 'assistant'; content: string }>): PromptProfile {
+  const recentAssistantMessages = messages
+    .filter((m) => m.role === 'assistant')
+    .slice(-4)
+
+  if (recentAssistantMessages.length === 0) {
+    return {
+      name: 'balanced',
+      instruction: 'Keep tone warm and concise. Follow the output contract exactly.',
+      temperatureAdjust: 0,
+    }
+  }
+
+  const structuredCount = recentAssistantMessages.filter((m) => hasStructuredSections(m.content)).length
+  const compliance = structuredCount / recentAssistantMessages.length
+
+  if (compliance < 0.4) {
+    return {
+      name: 'recovery',
+      instruction: 'High priority: recover strict markdown structure. Never skip any required section headings.',
+      temperatureAdjust: -0.2,
+    }
+  }
+
+  if (compliance < 0.75) {
+    return {
+      name: 'strict',
+      instruction: 'Prioritize section correctness and concise bullets over stylistic variety.',
+      temperatureAdjust: -0.1,
+    }
+  }
+
+  return {
+    name: 'balanced',
+    instruction: 'Keep quality high while preserving natural tone and concise actionability.',
+    temperatureAdjust: 0,
   }
 }
 
