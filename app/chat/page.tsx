@@ -34,7 +34,7 @@ interface Message {
 }
 interface AgentTrace { id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }
 type ResponseMode = 'fast' | 'deep' | 'research'
-type ProviderUsed = 'OpenRouter' | 'Groq' | ''
+type ProviderUsed = 'HuggingFace' | 'OpenRouter' | 'Groq' | ''
 interface Attachment {
   id: string; type: 'image' | 'pdf' | 'link'
   name: string; content: string

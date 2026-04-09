@@ -19,7 +19,7 @@ interface Message {
   sources?: ChatSource[]
   agentTrace?: Array<{ id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }>
   modelUsed?: string
-  providerUsed?: 'OpenRouter' | 'Groq' | ''
+  providerUsed?: 'HuggingFace' | 'OpenRouter' | 'Groq' | ''
   quality?: {
     formatScore: number
     completeness: number

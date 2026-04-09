@@ -472,6 +472,16 @@ ${responseTemplate}${vedicSection}`
     let authKey = ''
     let providerName = ''
 
+    const openRouterModelMap: Record<string, string> = {
+      auto: 'google/gemini-2.5-pro',
+      claude: 'anthropic/claude-3.7-sonnet',
+      gpt: 'openai/chatgpt-4o-latest',
+      gemini: 'google/gemini-2.5-flash',
+      deepseek: 'deepseek/deepseek-r1',
+      mistral: 'mistralai/mistral-large-2411',
+      llama: 'meta-llama/llama-3.3-70b-instruct'
+    };
+
     if (useHuggingFace) {
       model = hasImages ? 'google/medgemma-1.5-4b-it' : 'epfl-llm/meditron-70b'
       apiUrl = `https://api-inference.huggingface.co/models/${model}/v1/chat/completions`
@@ -644,7 +654,7 @@ ${responseTemplate}${vedicSection}`
       userId: clerkUser?.id,
       agentTrace,
       modelUsed: model,
-      providerUsed: providerName as 'OpenRouter' | 'Groq' | '',
+      providerUsed: providerName as 'HuggingFace' | 'OpenRouter' | 'Groq' | undefined,
       quality,
       policy: autoRecoveryPolicy,
     }), { headers: streamHeaders })
@@ -734,7 +744,7 @@ function createTextStream(text: string, metadata?: {
   userId?: string
   agentTrace?: AgentTraceItem[]
   modelUsed?: string
-  providerUsed?: 'OpenRouter' | 'Groq'
+  providerUsed?: 'HuggingFace' | 'OpenRouter' | 'Groq'
   quality?: ResponseQuality
   policy?: AutoRecoveryPolicy
 }): ReadableStream {
