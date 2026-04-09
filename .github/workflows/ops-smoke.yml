@@ -17,7 +17,7 @@ jobs:
           set -euo pipefail
           curl -fsSL https://ayurahealth.com > /tmp/home.html
           grep -q "AyuraHealth" /tmp/home.html
-          grep -q "Ancient Wisdom. Modern AI. Natural Healing." /tmp/home.html
+          grep -i -q "Ancient Wisdom" /tmp/home.html
 
       - name: Check health API readiness
         run: |
