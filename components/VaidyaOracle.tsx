@@ -176,6 +176,59 @@ const Particles = ({ count = 500, state = 'idle' }: { count?: number; state?: st
   );
 };
 
+const NeuralArcs = ({ state = 'idle' }: { state?: string }) => {
+  const ringA = useRef<THREE.Mesh>(null!);
+  const ringB = useRef<THREE.Mesh>(null!);
+  const ringC = useRef<THREE.Mesh>(null!);
+
+  const palette = useMemo(() => {
+    switch (state) {
+      case 'thinking':
+        return { a: '#ffd86b', b: '#8f7cff', c: '#7fffd4', speed: 0.62 };
+      case 'listening':
+        return { a: '#6fe3c5', b: '#4b7cff', c: '#d4b4ff', speed: 0.52 };
+      case 'responding':
+        return { a: '#7fffd4', b: '#a18bff', c: '#ffd86b', speed: 0.56 };
+      default:
+        return { a: '#8a7ff7', b: '#75d8b2', c: '#ffd9a8', speed: 0.44 };
+    }
+  }, [state]);
+
+  useFrame((s) => {
+    const t = s.clock.getElapsedTime();
+    const speed = palette.speed;
+    if (ringA.current) {
+      ringA.current.rotation.x = Math.PI / 2.4 + Math.sin(t * 0.45) * 0.16;
+      ringA.current.rotation.y = t * speed;
+    }
+    if (ringB.current) {
+      ringB.current.rotation.x = Math.PI / 3.1 + Math.cos(t * 0.52) * 0.18;
+      ringB.current.rotation.y = -t * speed * 0.86;
+    }
+    if (ringC.current) {
+      ringC.current.rotation.x = Math.PI / 2.7 + Math.sin(t * 0.38) * 0.14;
+      ringC.current.rotation.z = t * speed * 0.68;
+    }
+  });
+
+  return (
+    <group scale={1.18}>
+      <mesh ref={ringA} renderOrder={2}>
+        <torusGeometry args={[1.46, 0.014, 16, 180]} />
+        <meshBasicMaterial color={palette.a} transparent opacity={0.26} />
+      </mesh>
+      <mesh ref={ringB} renderOrder={2}>
+        <torusGeometry args={[1.32, 0.012, 16, 160]} />
+        <meshBasicMaterial color={palette.b} transparent opacity={0.22} />
+      </mesh>
+      <mesh ref={ringC} renderOrder={2}>
+        <torusGeometry args={[1.18, 0.01, 16, 140]} />
+        <meshBasicMaterial color={palette.c} transparent opacity={0.19} />
+      </mesh>
+    </group>
+  );
+};
+
 export default function VaidyaOracle({ state = 'idle', framed = false }: OracleProps) {
   const modeLabel =
     state === 'idle'
@@ -232,6 +285,7 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: OracleP
         <pointLight position={[0, -4, 3]} intensity={0.3} color="#8f7cff" />
         <Float speed={state === 'thinking' ? 5 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
           <OrbCore state={state} />
+          <NeuralArcs state={state} />
           <Particles state={state} />
         </Float>
       </Canvas>
