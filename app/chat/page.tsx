@@ -25,6 +25,12 @@ interface Message {
     latencyMs: number
     repaired: boolean
   }
+  policy?: {
+    applied: boolean
+    reasons: string[]
+    webSearchSuppressed: boolean
+    forceDeepThink: boolean
+  }
 }
 interface AgentTrace { id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }
 type ResponseMode = 'fast' | 'deep' | 'research'
@@ -53,6 +59,12 @@ interface ModelTrace {
     completeness: number
     latencyMs: number
     repaired: boolean
+  }
+  policy?: {
+    applied: boolean
+    reasons: string[]
+    webSearchSuppressed: boolean
+    forceDeepThink: boolean
   }
 }
 
@@ -641,7 +653,7 @@ export default function ChatPage() {
               } else if (d.agentTrace) {
                 currentAgentTrace = d.agentTrace
               } else if (d.modelUsed || d.providerUsed) {
-                currentModelTrace = { modelUsed: d.modelUsed, providerUsed: d.providerUsed, quality: d.quality }
+                currentModelTrace = { modelUsed: d.modelUsed, providerUsed: d.providerUsed, quality: d.quality, policy: d.policy }
               } else if (d.content) { 
                 full += d.content; setStreaming(full) 
               } 

@@ -86,6 +86,13 @@ interface PromptProfile {
   temperatureAdjust: number
 }
 
+interface AutoRecoveryPolicy {
+  applied: boolean
+  reasons: string[]
+  webSearchSuppressed: boolean
+  forceDeepThink: boolean
+}
+
 interface PrismaChatClient {
   chatSession: {
     create(args: { data: { userId: string; topic: string; summary: string } }): Promise<ChatSessionRecord>
@@ -298,6 +305,14 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
     const userQuery = lastMsg.role === 'user' ? lastMsg.content : ''
 
     const preferredModel = modelPreference || 'auto'
+    const promptProfile = buildPromptProfile(messages)
+    const autoRecoveryPolicy = buildAutoRecoveryPolicy({
+      promptProfile,
+      requestedDeepThink: Boolean(deepThink),
+      requestedWebSearch: Boolean(webSearch),
+    })
+    const effectiveDeepThink = autoRecoveryPolicy.forceDeepThink ? true : Boolean(deepThink)
+    const effectiveWebSearch = autoRecoveryPolicy.webSearchSuppressed ? false : Boolean(webSearch)
 
     // ── AI Brain: Vector Search (RAG) ────────────────────────────────────────
     let knowledgeCtx = ''
@@ -333,7 +348,7 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
       }
     }
 
-    if (webSearch && userQuery && userQuery.length > 3) {
+    if (effectiveWebSearch && userQuery && userQuery.length > 3) {
       try {
         const webResults = await fetchWebSearchResults(userQuery)
         if (webResults.length > 0) {
@@ -389,7 +404,6 @@ ${vedicContext}
 As VAIDYA, integrate the above Vedic Intelligence into your response. Reference the user's current Mahadasha, their elemental imbalances, and today's Vedic guidance when making recommendations. This is what sets AyuraHealth apart from every other health AI — the depth of personalisation through Jyotish, Vedic Science, and Vedic Mathematics.
 ` : ''
 
-    const promptProfile = buildPromptProfile(messages)
     const responseTemplate = `OUTPUT CONTRACT (ALWAYS FOLLOW):
 - Keep responses concise and practical.
 - Use this exact section order with markdown headings:
@@ -411,10 +425,11 @@ ${doshaCtx}
 ${councilBrief}
 LANGUAGE: ${languageInstruction}
 ${isBloodReport ? bloodReportPrompt : ''}
-${deepThink ? 'DEEP MIND MODE: Be more thorough within the selected system only. Keep final answer concise and practical.' : ''}
+${effectiveDeepThink ? 'DEEP MIND MODE: Be more thorough within the selected system only. Keep final answer concise and practical.' : ''}
 RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.
 PROMPT PROFILE: ${promptProfile.name.toUpperCase()}
 ${promptProfile.instruction}
+${autoRecoveryPolicy.applied ? `AUTO RECOVERY POLICY ACTIVE: ${autoRecoveryPolicy.reasons.join(' | ')}` : ''}
 ${responseTemplate}${vedicSection}`
 
     const hasImages = safeAttachments.some(a => a.type === 'image')
@@ -487,7 +502,7 @@ ${responseTemplate}${vedicSection}`
     }
 
     const agentTrace: AgentTraceItem[] = []
-    const orchestrateAgents = Boolean(deepThink || webSearch)
+    const orchestrateAgents = Boolean(effectiveDeepThink || effectiveWebSearch)
     if (orchestrateAgents && typeof userQuery === 'string' && userQuery.trim().length > 0) {
       try {
         const planner = await runAgentStep({
@@ -531,8 +546,8 @@ ${responseTemplate}${vedicSection}`
       { role: 'system', content: `${systemPrompt}${synthesizedAgentContext}` },
       ...formattedMessages,
     ]
-    const maxTokens = deepThink ? 4000 : 2500
-    const temperature = Math.max(0.2, Math.min(0.8, (deepThink ? 0.6 : 0.7) + promptProfile.temperatureAdjust))
+    const maxTokens = effectiveDeepThink ? 4000 : 2500
+    const temperature = Math.max(0.2, Math.min(0.8, (effectiveDeepThink ? 0.6 : 0.7) + promptProfile.temperatureAdjust + (autoRecoveryPolicy.applied ? -0.05 : 0)))
     const requestStartedAt = Date.now()
     let completionText = await fetchCompletionText({
       apiUrl,
@@ -560,6 +575,7 @@ ${responseTemplate}${vedicSection}`
           modelUsed: 'llama-3.3-70b-versatile',
           providerUsed: 'Groq',
           quality: fallbackQuality,
+          policy: autoRecoveryPolicy,
         }), { headers: streamHeaders })
       }
       return NextResponse.json({ error: 'AI service temporarily unavailable.', details: 'Primary and fallback providers failed.' }, { status: 500 })
@@ -625,6 +641,7 @@ ${responseTemplate}${vedicSection}`
       modelUsed: model,
       providerUsed: useOpenRouter ? 'OpenRouter' : 'Groq',
       quality,
+      policy: autoRecoveryPolicy,
     }), { headers: streamHeaders })
 
   } catch (err) {
@@ -714,11 +731,12 @@ function createTextStream(text: string, metadata?: {
   modelUsed?: string
   providerUsed?: 'OpenRouter' | 'Groq'
   quality?: ResponseQuality
+  policy?: AutoRecoveryPolicy
 }): ReadableStream {
   return new ReadableStream({
     async start(controller) {
       // ── Send Metadata First ───────────────────────────────────────────────
-      if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace || metadata.modelUsed || metadata.providerUsed || metadata.quality)) {
+      if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace || metadata.modelUsed || metadata.providerUsed || metadata.quality || metadata.policy)) {
         const metaStr = JSON.stringify({ 
           sources: metadata.sources || [], 
           sessionId: metadata.sessionId,
@@ -726,6 +744,7 @@ function createTextStream(text: string, metadata?: {
           modelUsed: metadata.modelUsed || '',
           providerUsed: metadata.providerUsed || '',
           quality: metadata.quality || null,
+          policy: metadata.policy || null,
         })
         controller.enqueue(new TextEncoder().encode(`data: ${metaStr}\n\n`))
       }
@@ -824,6 +843,35 @@ function buildPromptProfile(messages: Array<{ role: 'user' | 'assistant'; conten
     name: 'balanced',
     instruction: 'Keep quality high while preserving natural tone and concise actionability.',
     temperatureAdjust: 0,
+  }
+}
+
+function buildAutoRecoveryPolicy(args: {
+  promptProfile: PromptProfile
+  requestedDeepThink: boolean
+  requestedWebSearch: boolean
+}): AutoRecoveryPolicy {
+  const reasons: string[] = []
+  let webSearchSuppressed = false
+  let forceDeepThink = false
+
+  if (args.promptProfile.name === 'recovery') {
+    forceDeepThink = true
+    reasons.push('Quality recovery mode forced deeper reasoning.')
+    if (args.requestedWebSearch) {
+      webSearchSuppressed = true
+      reasons.push('Web search suppressed temporarily to improve formatting stability.')
+    }
+  } else if (args.promptProfile.name === 'strict' && args.requestedWebSearch) {
+    webSearchSuppressed = true
+    reasons.push('Strict mode temporarily reduced web noise for cleaner output contract.')
+  }
+
+  return {
+    applied: reasons.length > 0,
+    reasons,
+    webSearchSuppressed,
+    forceDeepThink: forceDeepThink || args.requestedDeepThink,
   }
 }
 

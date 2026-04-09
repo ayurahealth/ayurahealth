@@ -26,6 +26,12 @@ interface Message {
     latencyMs: number
     repaired: boolean
   }
+  policy?: {
+    applied: boolean
+    reasons: string[]
+    webSearchSuppressed: boolean
+    forceDeepThink: boolean
+  }
 }
 
 interface ChatMessagesPanelProps {
@@ -309,6 +315,20 @@ export default function ChatMessagesPanel({
                       title={`Completeness ${msg.quality.completeness}% • ${msg.quality.latencyMs}ms • repaired ${msg.quality.repaired ? 'yes' : 'no'}`}
                     >
                       Quality {msg.quality.formatScore}%
+                    </span>
+                  )}
+                  {msg.policy?.applied && (
+                    <span
+                      style={{
+                        fontSize: '0.62rem',
+                        color: '#e8dfc8',
+                        border: '1px solid rgba(232,223,200,0.25)',
+                        borderRadius: 999,
+                        padding: '0.12rem 0.48rem',
+                      }}
+                      title={msg.policy.reasons.join(' | ')}
+                    >
+                      Auto Recovery Applied
                     </span>
                   )}
                 </div>
