@@ -7,6 +7,7 @@ import * as THREE from 'three';
 
 interface OracleProps {
   state?: 'idle' | 'listening' | 'thinking' | 'responding';
+  framed?: boolean;
 }
 
 const OrbCore = ({ state = 'idle' }: OracleProps) => {
@@ -112,7 +113,7 @@ const Particles = ({ count = 500, state = 'idle' }: { count?: number; state?: st
   );
 };
 
-export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
+export default function VaidyaOracle({ state = 'idle', framed = false }: OracleProps) {
   const modeLabel =
     state === 'idle'
       ? 'Clinical Oracle'
@@ -124,32 +125,36 @@ export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
 
   return (
     <div style={{ width: '100%', height: '340px', position: 'relative' }}>
+      {framed && (
+        <>
+          <div style={{
+            position: 'absolute',
+            inset: 8,
+            borderRadius: 28,
+            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))',
+            backdropFilter: 'blur(16px)',
+          }} />
+          <div
+            style={{
+              position: 'absolute',
+              inset: '4% 10%',
+              borderRadius: 22,
+              border: '1px solid rgba(201,168,76,0.16)',
+              background: 'linear-gradient(145deg, rgba(201,168,76,0.08), rgba(106,191,138,0.04))',
+              filter: 'blur(0.2px)',
+              pointerEvents: 'none',
+            }}
+          />
+        </>
+      )}
       <div style={{
         position: 'absolute',
-        inset: 8,
-        borderRadius: 28,
-        border: '1px solid rgba(255,255,255,0.08)',
-        background: 'linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))',
-        backdropFilter: 'blur(16px)',
-      }} />
-      <div
-        style={{
-          position: 'absolute',
-          inset: '4% 10%',
-          borderRadius: 22,
-          border: '1px solid rgba(201,168,76,0.16)',
-          background: 'linear-gradient(145deg, rgba(201,168,76,0.08), rgba(106,191,138,0.04))',
-          filter: 'blur(0.2px)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div style={{
-        position: 'absolute',
-        inset: '16% 18%',
+        inset: framed ? '16% 18%' : '12% 16%',
         background: state === 'thinking'
           ? 'radial-gradient(circle, rgba(201,168,76,0.28) 0%, rgba(201,168,76,0.03) 65%, transparent 85%)'
           : 'radial-gradient(circle, rgba(106,191,138,0.22) 0%, rgba(106,191,138,0.03) 65%, transparent 85%)',
-        filter: 'blur(20px)',
+        filter: framed ? 'blur(20px)' : 'blur(24px)',
         zIndex: 0,
         pointerEvents: 'none',
       }} />

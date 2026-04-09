@@ -965,21 +965,13 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* Header */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(5,16,10,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(106,191,138,0.12)', padding: '0.7rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div onClick={() => setScreen('landing')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.4rem' }}>🌿</span>
-          <div>
-            <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.2rem', fontWeight: 700, color: '#c9a84c', letterSpacing: '0.02em' }}>AyuraHealth</div>
-            <div style={{ fontSize: '0.6rem', color: 'rgba(200,220,200,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Holistic Oracle</div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-
-          {dosha && screen === 'chat' && <div style={{ padding: '0.3rem 0.7rem', borderRadius: 20, fontSize: '0.75rem', border: `1px solid ${DOSHA_META[dosha].color}40`, background: DOSHA_META[dosha].bg, color: DOSHA_META[dosha].color }}>{DOSHA_META[dosha].emoji} {dosha}</div>}
-          {screen === 'chat' && !incognito && <button onClick={() => setShowClearConfirm(true)} style={{ padding: '0.3rem 0.5rem', borderRadius: 20, fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent', color: 'rgba(200,200,200,0.3)', cursor: 'pointer' }}>🗑️</button>}
-        </div>
-      </header>
+      {/* Header (hidden on chat where dedicated topbar is used) */}
+      {screen !== 'chat' && (
+        <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(5,16,10,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(106,191,138,0.12)', padding: '0.7rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Logo size={30} showText={true} href="/" />
+          <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }} />
+        </header>
+      )}
 
       {/* ── LANDING SCREEN ─────────────────────────────────────────────────── */}
       {screen === 'landing' && (
