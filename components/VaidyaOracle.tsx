@@ -13,13 +13,47 @@ interface OracleProps {
 const OrbCore = ({ state = 'idle' }: OracleProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const shell = useRef<THREE.Mesh>(null!);
+  const innerCore = useRef<THREE.Mesh>(null!);
+  const halo = useRef<THREE.Mesh>(null!);
   
   const config = useMemo(() => {
     switch (state) {
-      case 'listening': return { color: '#6abf8a', distort: 0.5, speed: 4, emissive: '#2d7a45' };
-      case 'thinking':  return { color: '#c9a84c', distort: 0.8, speed: 8, emissive: '#c9a84c' };
-      case 'responding': return { color: '#34d399', distort: 0.6, speed: 3, emissive: '#1a4d2e' };
-      default:           return { color: '#c9a84c', distort: 0.4, speed: 2, emissive: '#1a4d2e' };
+      case 'listening':
+        return {
+          colorA: '#6fe3c5',
+          colorB: '#4b7cff',
+          distort: 0.48,
+          speed: 3.8,
+          emissive: '#6fe3c5',
+          pulse: 1.8,
+        };
+      case 'thinking':
+        return {
+          colorA: '#8f7cff',
+          colorB: '#ffd86b',
+          distort: 0.78,
+          speed: 7.2,
+          emissive: '#ffd86b',
+          pulse: 2.7,
+        };
+      case 'responding':
+        return {
+          colorA: '#7fffd4',
+          colorB: '#a18bff',
+          distort: 0.58,
+          speed: 3.1,
+          emissive: '#7fffd4',
+          pulse: 2.1,
+        };
+      default:
+        return {
+          colorA: '#75d8b2',
+          colorB: '#8a7ff7',
+          distort: 0.4,
+          speed: 1.9,
+          emissive: '#8a7ff7',
+          pulse: 1.4,
+        };
     }
   }, [state]);
 
@@ -32,8 +66,17 @@ const OrbCore = ({ state = 'idle' }: OracleProps) => {
     if (shell.current) {
       shell.current.rotation.y = -time * 0.22;
       shell.current.rotation.x = Math.cos(time / 5) * 0.06;
-      const pulse = 1 + Math.sin(time * (state === 'thinking' ? 2.4 : 1.6)) * 0.025;
+      const pulse = 1 + Math.sin(time * config.pulse) * 0.028;
       shell.current.scale.setScalar(pulse);
+    }
+    if (innerCore.current) {
+      const innerPulse = 0.86 + Math.sin(time * (config.pulse + 0.65)) * 0.06;
+      innerCore.current.scale.setScalar(innerPulse);
+      innerCore.current.rotation.z = time * 0.35;
+    }
+    if (halo.current) {
+      halo.current.rotation.y = time * 0.12;
+      halo.current.rotation.x = -time * 0.08;
     }
   });
 
@@ -41,25 +84,45 @@ const OrbCore = ({ state = 'idle' }: OracleProps) => {
     <group>
       <Sphere ref={mesh} args={[1, 64, 64]} scale={1.2}>
         <MeshDistortMaterial
-          color={config.color}
+          color={config.colorA}
           attach="material"
           distort={config.distort}
           speed={config.speed}
-          roughness={0}
-          metalness={1}
+          roughness={0.05}
+          metalness={0.85}
           emissive={config.emissive}
-          emissiveIntensity={state === 'thinking' ? 1.25 : 0.55}
+          emissiveIntensity={state === 'thinking' ? 1.35 : 0.72}
+        />
+      </Sphere>
+      <Sphere ref={innerCore} args={[0.62, 64, 64]} scale={1.2}>
+        <meshPhysicalMaterial
+          transparent
+          opacity={0.58}
+          roughness={0.08}
+          metalness={0.2}
+          clearcoat={0.9}
+          clearcoatRoughness={0.1}
+          color={config.colorB}
+          emissive={config.colorA}
+          emissiveIntensity={0.5}
         />
       </Sphere>
       <Sphere ref={shell} args={[1.04, 64, 64]} scale={1.2}>
         <meshPhysicalMaterial
           transparent
-          opacity={0.13}
+          opacity={0.16}
           roughness={0}
           metalness={0.4}
           clearcoat={1}
           clearcoatRoughness={0}
-          color={state === 'thinking' ? '#f4d17f' : '#9ed6b2'}
+          color={config.colorB}
+        />
+      </Sphere>
+      <Sphere ref={halo} args={[1.28, 64, 64]} scale={1.2}>
+        <meshBasicMaterial
+          transparent
+          opacity={0.11}
+          color={config.colorA}
         />
       </Sphere>
     </group>
@@ -103,10 +166,10 @@ const Particles = ({ count = 500, state = 'idle' }: { count?: number; state?: st
         />
       </bufferGeometry>
       <pointsMaterial
-        size={state === 'listening' ? 0.025 : 0.015}
-        color={state === 'listening' ? '#6abf8a' : '#c9a84c'}
+        size={state === 'thinking' ? 0.02 : 0.016}
+        color={state === 'thinking' ? '#ffd86b' : state === 'listening' ? '#6fe3c5' : '#8f7cff'}
         transparent
-        opacity={0.6}
+        opacity={0.72}
         sizeAttenuation
       />
     </points>
@@ -152,8 +215,8 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: OracleP
         position: 'absolute',
         inset: framed ? '16% 18%' : '12% 16%',
         background: state === 'thinking'
-          ? 'radial-gradient(circle, rgba(201,168,76,0.28) 0%, rgba(201,168,76,0.03) 65%, transparent 85%)'
-          : 'radial-gradient(circle, rgba(106,191,138,0.22) 0%, rgba(106,191,138,0.03) 65%, transparent 85%)',
+          ? 'radial-gradient(circle, rgba(255,216,107,0.33) 0%, rgba(143,124,255,0.18) 42%, rgba(255,216,107,0.03) 70%, transparent 90%)'
+          : 'radial-gradient(circle, rgba(111,227,197,0.28) 0%, rgba(138,127,247,0.15) 44%, rgba(111,227,197,0.03) 70%, transparent 90%)',
         filter: framed ? 'blur(20px)' : 'blur(24px)',
         zIndex: 0,
         pointerEvents: 'none',
@@ -162,10 +225,11 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: OracleP
         camera={{ position: [0, 0, 4.5], fov: 42 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.62} />
-        <pointLight position={[8, 8, 8]} intensity={1.1} />
-        <pointLight position={[-6, -6, -6]} intensity={0.35} color="#6abf8a" />
-        <pointLight position={[0, 4, -4]} intensity={0.45} color="#f7cd6d" />
+        <ambientLight intensity={0.56} />
+        <pointLight position={[8, 8, 8]} intensity={1.05} color="#b2c7ff" />
+        <pointLight position={[-6, -5, -6]} intensity={0.4} color="#6fe3c5" />
+        <pointLight position={[0, 5, -3]} intensity={0.48} color="#ffd86b" />
+        <pointLight position={[0, -4, 3]} intensity={0.3} color="#8f7cff" />
         <Float speed={state === 'thinking' ? 5 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
           <OrbCore state={state} />
           <Particles state={state} />
@@ -181,12 +245,12 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: OracleP
         width: '100%'
       }}>
         <h3 style={{
-          color: state === 'listening' ? '#6abf8a' : '#c9a84c', 
+          color: state === 'thinking' ? '#ffd86b' : state === 'listening' ? '#6fe3c5' : '#d7c5ff',
           fontFamily: '"Cormorant Garamond", serif', 
           fontSize: '1.65rem',
           margin: 0,
           letterSpacing: '0.04em',
-          textShadow: `0 0 15px ${state === 'listening' ? 'rgba(106,191,138,0.4)' : 'rgba(201,168,76,0.4)'}`,
+          textShadow: `0 0 16px ${state === 'thinking' ? 'rgba(255,216,107,0.45)' : state === 'listening' ? 'rgba(111,227,197,0.45)' : 'rgba(143,124,255,0.45)'}`,
           transition: 'all 0.5s'
         }}>VAIDYA</h3>
         <p style={{ 
