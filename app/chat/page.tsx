@@ -10,6 +10,7 @@ import Logo from '../../components/Logo'
 import ChatSidebar from '../../components/chat/ChatSidebar'
 import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
+import VedicOraclePanel from '@/components/vedic/VedicOraclePanel'
 
 interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[] }
 interface Attachment {
@@ -155,6 +156,7 @@ export default function ChatPage() {
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
+  const [vedicContext, setVedicContext] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -415,8 +417,17 @@ export default function ChatPage() {
     setMessages(newMessages); setLoading(true); setStreaming('')
     try {
       const res = await fetch('/api/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages, systems: selectedSystems, incognito, dosha, lang: (typeof window !== "undefined" ? localStorage.getItem("ayura_lang") || lang : lang), attachments: currentAttachments }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: newMessages,
+          systems: selectedSystems,
+          incognito,
+          dosha,
+          lang: (typeof window !== 'undefined' ? localStorage.getItem('ayura_lang') || lang : lang),
+          attachments: currentAttachments,
+          vedicContext: vedicContext || undefined,
+        }),
       })
       if (!res.ok) {
         let apiError = 'API error'
@@ -843,6 +854,10 @@ export default function ChatPage() {
 
             {/* Right conversation area */}
             <section className="chat-main">
+              <VedicOraclePanel
+                initialDosha={dosha ?? 'Vata'}
+                onContextReady={(context) => setVedicContext(context)}
+              />
               {/* Messages */}
               <ChatMessagesPanel
                 messages={messages}

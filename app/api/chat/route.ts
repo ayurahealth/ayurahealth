@@ -7,6 +7,7 @@ export const runtime = 'nodejs'
 
 import { checkRateLimit } from '../../../lib/rateLimit'
 import { COUNCIL_OF_AGENTS, SYNTHESIS_PROMPT } from '../../../lib/ai/agents'
+import { AYURAHEALTH_MYTHOS } from '../../../lib/ai/mythos'
 import { z } from 'zod'
 
 const chatSchema = z.object({
@@ -26,6 +27,7 @@ const chatSchema = z.object({
   })).max(5).optional(),
   deepThink: z.boolean().optional(),
   sessionId: z.string().uuid().optional(),
+  vedicContext: z.string().max(20000).optional(),
 })
 
 interface KnowledgeChunkResult {
@@ -114,7 +116,16 @@ export async function POST(req: NextRequest) {
       }, { status: 400 })
     }
 
-    const { messages, systems, dosha, lang, attachments, deepThink, sessionId } = validation.data
+    const {
+      messages,
+      systems,
+      dosha,
+      lang,
+      attachments,
+      deepThink,
+      sessionId,
+      vedicContext,
+    } = validation.data
     let prismaClient: PrismaChatClient | null = null
 
     // ── Paywall: count existing AI responses & enforce limit ─────────────────
@@ -309,7 +320,15 @@ Be thorough. Be specific. Cite actual biomarker values from the report.
           ? 'Respond in natural Japanese using proper Japanese script (日本語: ひらがな・カタカナ・漢字). Do not use romaji. Use full sentences and bullet points, not one word per line.'
           : `Respond entirely in ${langName}. Every single word must be in ${langName}. Do not use English. Use complete sentences and avoid splitting words across separate lines.`
 
+    const vedicSection = vedicContext ? `
+
+${vedicContext}
+
+As VAIDYA, integrate the above Vedic Intelligence into your response. Reference the user's current Mahadasha, their elemental imbalances, and today's Vedic guidance when making recommendations. This is what sets AyuraHealth apart from every other health AI — the depth of personalisation through Jyotish, Vedic Science, and Vedic Mathematics.
+` : ''
+
     const systemPrompt = `${VAIDYA_SYSTEM}
+${AYURAHEALTH_MYTHOS}
 ${safeSystems.length === 1 ? strictStyle : safeSystems.length > 1 ? multiStyle : SYNTHESIS_PROMPT}
 ${selectedSystems}
 ${doshaCtx}
@@ -317,7 +336,7 @@ ${councilBrief}
 LANGUAGE: ${languageInstruction}
 ${isBloodReport ? bloodReportPrompt : ''}
 ${deepThink ? 'DEEP MIND MODE: Be more thorough within the selected system only. Keep final answer concise and practical.' : ''}
-RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.`
+RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.${vedicSection}`
 
     const hasImages = safeAttachments.some(a => a.type === 'image')
 
