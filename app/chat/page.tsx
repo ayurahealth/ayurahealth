@@ -912,6 +912,18 @@ export default function ChatPage() {
     ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.latencyMs || 0), 0) / qualityWindow.length)
     : 0
   const repairCount = qualityWindow.filter((m) => Boolean(m.quality?.repaired)).length
+  const qualityHealth: 'green' | 'yellow' | 'red' =
+    avgQualityScore >= 90 && avgCompleteness >= 90 && avgLatency <= 9000
+      ? 'green'
+      : avgQualityScore >= 75 && avgCompleteness >= 75 && avgLatency <= 14000
+        ? 'yellow'
+        : 'red'
+  const qualityHealthColor = qualityHealth === 'green' ? '#6abf8a' : qualityHealth === 'yellow' ? '#c9a84c' : '#e8835a'
+  const qualityActions: string[] = []
+  if (avgQualityScore < 85) qualityActions.push('Switch mode to Deep or Research for stronger format adherence.')
+  if (avgCompleteness < 85) qualityActions.push('Use one system only to reduce output drift and improve section completion.')
+  if (avgLatency > 12000) qualityActions.push('Turn Web Off unless needed to reduce response latency.')
+  if (repairCount > 2) qualityActions.push('Prefer Auto AI model for stability; provider switching can improve consistency.')
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--ios-bg)', fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--ios-text)', position: 'relative', overflow: 'hidden' }}>
@@ -1462,11 +1474,11 @@ export default function ChatPage() {
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: '0.66rem',
-                  color: avgQualityScore >= 90 ? '#6abf8a' : '#c9a84c'
+                  color: qualityHealthColor
                 }}
                 title="Show response quality console"
               >
-                📈 Quality {qualityWindow.length > 0 ? `${avgQualityScore}%` : 'N/A'}
+                📈 Quality {qualityWindow.length > 0 ? `${avgQualityScore}%` : 'N/A'} {qualityWindow.length > 0 ? `(${qualityHealth.toUpperCase()})` : ''}
               </button>
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.74rem', cursor: 'pointer' }}>Exit</button>
             </div>
@@ -1478,12 +1490,59 @@ export default function ChatPage() {
                   Quality Console (Last {qualityWindow.length})
                 </div>
                 <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: qualityHealthColor, borderColor: `${qualityHealthColor}66` }}>
+                    Health {qualityHealth.toUpperCase()}
+                  </span>
                   <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Score {avgQualityScore}%</span>
                   <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Sections {avgCompleteness}%</span>
                   <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Latency {avgLatency}ms</span>
                   <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: repairCount > 0 ? '#c9a84c' : '#6abf8a' }}>Repairs {repairCount}</span>
                 </div>
               </div>
+              {qualityWindow.length > 0 && (
+                <div style={{ marginBottom: '0.55rem', borderRadius: 12, border: `1px solid ${qualityHealthColor}4d`, background: `${qualityHealthColor}14`, padding: '0.45rem 0.6rem' }}>
+                  <div style={{ fontSize: '0.67rem', color: qualityHealthColor, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+                    Quality Advisor
+                  </div>
+                  {qualityActions.length > 0 ? (
+                    <div style={{ display: 'grid', gap: '0.22rem' }}>
+                      {qualityActions.slice(0, 3).map((tip, idx) => (
+                        <div key={idx} style={{ fontSize: '0.74rem', color: 'rgba(232,223,200,0.85)' }}>- {tip}</div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '0.74rem', color: 'rgba(232,223,200,0.85)' }}>
+                      Quality is healthy. Keep current settings.
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => setResponseMode('deep')}
+                      className="ios-chip"
+                      style={{ border: 'none', padding: '0.2rem 0.45rem', borderRadius: 10, fontSize: '0.65rem', color: '#c9a84c', cursor: 'pointer' }}
+                    >
+                      Use Deep Mode
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setResponseMode('research')}
+                      className="ios-chip"
+                      style={{ border: 'none', padding: '0.2rem 0.45rem', borderRadius: 10, fontSize: '0.65rem', color: '#6abf8a', cursor: 'pointer' }}
+                    >
+                      Use Research Mode
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWebSearchEnabled(false)}
+                      className="ios-chip"
+                      style={{ border: 'none', padding: '0.2rem 0.45rem', borderRadius: 10, fontSize: '0.65rem', color: 'rgba(232,223,200,0.82)', cursor: 'pointer' }}
+                    >
+                      Turn Web Off
+                    </button>
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: '0.25rem' }}>
                 {qualityWindow.map((m, idx) => {
                   const score = m.quality?.formatScore || 0
