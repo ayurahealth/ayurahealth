@@ -462,12 +462,12 @@ ${responseTemplate}${vedicSection}`
     }
 
     // Provider priority:
-    // 1. HuggingFace — only used for image analysis (medgemma multimodal)
-    // 2. Groq — primary text provider (fast, generous free tier, works out of box)
+    // 1. HuggingFace Serverless Router — high-performance multimodal (vision)
+    // 2. Groq — primary text provider (fast, robust for chat)
     // 3. OpenRouter — secondary text fallback
-    const useHuggingFace = hasHuggingFace && hasImages
-    const useGroqPrimary = !useHuggingFace && hasGroq
-    const useOpenRouter = !useHuggingFace && !hasGroq && hasOpenRouter
+    const useHuggingFaceRouter = hasHuggingFace && hasImages
+    const useGroqPrimary = !useHuggingFaceRouter && hasGroq
+    const useOpenRouter = !useHuggingFaceRouter && !hasGroq && hasOpenRouter
 
     // Model Selection Logic
     let apiUrl = ''
@@ -485,12 +485,12 @@ ${responseTemplate}${vedicSection}`
       llama: 'meta-llama/llama-3.3-70b-instruct'
     };
 
-    if (useHuggingFace) {
-      // Image analysis with medgemma multimodal
-      model = 'google/medgemma-1.5-4b-it'
-      apiUrl = `https://api-inference.huggingface.co/models/${model}/v1/chat/completions`
+    if (useHuggingFaceRouter) {
+      // Advanced Vision via HF OpenAI-compatible Router
+      model = 'google/gemma-4-31B-it:novita'
+      apiUrl = 'https://router.huggingface.co/v1/chat/completions'
       authKey = process.env.HUGGINGFACE_API_KEY!
-      providerName = 'HuggingFace'
+      providerName = 'HuggingFaceRouter'
     } else if (useGroqPrimary) {
       // Fast, reliable text responses via Groq
       model = 'llama-3.3-70b-versatile'
@@ -583,7 +583,7 @@ ${responseTemplate}${vedicSection}`
       temperature,
     })
 
-    if (!completionText && !useHuggingFace && useOpenRouter && hasGroq) {
+    if (!completionText && !useHuggingFaceRouter && useOpenRouter && hasGroq) {
       completionText = await fetchCompletionText({
         apiUrl: 'https://api.groq.com/openai/v1/chat/completions',
         headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
