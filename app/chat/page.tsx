@@ -30,6 +30,7 @@ interface ChatSource {
 }
 
 const STORAGE_KEY = 'ayurahealth_v1'
+const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
   try {
@@ -157,6 +158,28 @@ export default function ChatPage() {
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
   const [vedicContext, setVedicContext] = useState<string | null>(null)
+  const [vedicEnabled, setVedicEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true
+    try {
+      const raw = localStorage.getItem(VEDIC_PREF_KEY)
+      if (!raw) return true
+      const parsed = JSON.parse(raw) as { enabled?: boolean }
+      return typeof parsed.enabled === 'boolean' ? parsed.enabled : true
+    } catch {
+      return true
+    }
+  })
+  const [vedicPanelOpen, setVedicPanelOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      const raw = localStorage.getItem(VEDIC_PREF_KEY)
+      if (!raw) return false
+      const parsed = JSON.parse(raw) as { open?: boolean }
+      return typeof parsed.open === 'boolean' ? parsed.open : false
+    } catch {
+      return false
+    }
+  })
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -171,6 +194,14 @@ export default function ChatPage() {
       localStorage.setItem('ayura_lang', lang)
     }
   }, [lang])
+
+  // Persist Vedic preferences
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(VEDIC_PREF_KEY, JSON.stringify({ enabled: vedicEnabled, open: vedicPanelOpen }))
+    } catch {}
+  }, [vedicEnabled, vedicPanelOpen])
 
   const doshaColor = dosha ? DOSHA_META[dosha].color : '#6abf8a'
   const tx = t[lang]
@@ -426,7 +457,7 @@ export default function ChatPage() {
           dosha,
           lang: (typeof window !== 'undefined' ? localStorage.getItem('ayura_lang') || lang : lang),
           attachments: currentAttachments,
-          vedicContext: vedicContext || undefined,
+          vedicContext: vedicEnabled ? (vedicContext || undefined) : undefined,
         }),
       })
       if (!res.ok) {
@@ -854,10 +885,56 @@ export default function ChatPage() {
 
             {/* Right conversation area */}
             <section className="chat-main">
-              <VedicOraclePanel
-                initialDosha={dosha ?? 'Vata'}
-                onContextReady={(context) => setVedicContext(context)}
-              />
+              <div className="ios-surface" style={{ padding: '0.6rem 0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => setVedicPanelOpen(v => !v)}
+                      className={`ios-chip ${vedicPanelOpen ? 'active' : ''}`}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.6rem', borderRadius: 12 }}
+                    >
+                      <span style={{ opacity: 0.9 }}>🔭</span>
+                      <span style={{ fontSize: '0.75rem', color: vedicPanelOpen ? '#c9a84c' : 'rgba(232,223,200,0.7)' }}>
+                        {vedicPanelOpen ? 'Hide Vedic Oracle' : 'Open Vedic Oracle'}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setVedicEnabled(v => !v)}
+                      className={`ios-chip ${vedicEnabled ? 'active' : ''}`}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.6rem', borderRadius: 12 }}
+                      title="When off, VAIDYA will ignore Vedic personalization even if calculated."
+                    >
+                      <span style={{ opacity: 0.9 }}>{vedicEnabled ? '✅' : '⛔️'}</span>
+                      <span style={{ fontSize: '0.75rem', color: vedicEnabled ? '#c9a84c' : 'rgba(232,223,200,0.7)' }}>
+                        Use Vedic context
+                      </span>
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {vedicContext ? (
+                      <div className="chat-meta-text" style={{ color: vedicEnabled ? 'rgba(106,191,138,0.9)' : 'rgba(232,223,200,0.4)' }}>
+                        {vedicEnabled ? 'Vedic context ready' : 'Vedic context disabled'}
+                      </div>
+                    ) : (
+                      <div className="chat-meta-text" style={{ color: 'rgba(232,223,200,0.35)' }}>
+                        Optional personalization
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {vedicPanelOpen && (
+                <VedicOraclePanel
+                  initialDosha={dosha ?? 'Vata'}
+                  onContextReady={(context) => setVedicContext(context)}
+                />
+              )}
+
               {/* Messages */}
               <ChatMessagesPanel
                 messages={messages}
