@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   guard-main:
@@ -16,18 +17,37 @@ jobs:
       - name: Explain policy
         run: |
           echo "Main branch guard is active."
-          echo "Preferred flow: feature branch -> PR -> merge commit."
+          echo "Preferred flow: feature branch -> PR -> merge."
           echo "This workflow allows:"
-          echo "1) Standard merge commits from PRs ('Merge pull request ...')"
+          echo "1) Any commit associated with a Pull Request merge"
           echo "2) Emergency overrides with [main-ok] in commit message"
 
-      - name: Validate push type
+      - name: Detect PR association for pushed commit
+        id: pr_check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.sha;
+            const res = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha: sha,
+            });
+            core.info(`Associated PRs for ${sha}: ${res.data.length}`);
+            core.setOutput('has_pr', res.data.length > 0 ? 'true' : 'false');
+
+      - name: Validate push policy
         env:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          HAS_PR: ${{ steps.pr_check.outputs.has_pr }}
         run: |
           echo "Head commit message: $COMMIT_MESSAGE"
-          if [[ "$COMMIT_MESSAGE" == Merge\ pull\ request* ]]; then
-            echo "Detected PR merge commit. Guard passed."
+          echo "Has associated PR: $HAS_PR"
+
+          if [[ "$HAS_PR" == "true" ]]; then
+            echo "Commit is associated with a PR. Guard passed."
             exit 0
           fi
 
