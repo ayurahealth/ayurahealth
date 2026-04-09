@@ -683,9 +683,8 @@ export default function ChatPage() {
         ...currentModelTrace,
       }]); 
       setStreaming('');
-      // Auto-speak JARVIS response
-      vaidyaVoice.speak(full, () => setIsSpeaking(false));
-      setIsSpeaking(true);
+      // Auto-speak removed per user feedback
+      setIsSpeaking(false);
 
 
       if (currentModelTrace.quality) {

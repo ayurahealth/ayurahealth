@@ -272,7 +272,7 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: { state
           letterSpacing: '0.4em', margin: 0, textShadow: `0 0 15px ${accentColor}`
         }}>VAIDYA</h2>
         <div style={{ color: `${accentColor}aa`, fontSize: '0.6rem', marginTop: '5px', letterSpacing: '0.2em' }}>
-          JARVIS EDITION v4.1
+          NEURAL V-ORACLE SYNTHESIS
         </div>
       </div>
     </div>
