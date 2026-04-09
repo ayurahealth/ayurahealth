@@ -8,6 +8,13 @@ import VaidyaOracle from '../components/VaidyaOracle'
 import Surface from '../components/ui/Surface'
 import IOSButton from '../components/ui/IOSButton'
 
+import dynamic from 'next/dynamic'
+
+const WebGLBackground = dynamic(() => import('../components/WebGLBackground'), { 
+  ssr: false,
+  loading: () => <div style={{ position: 'absolute', inset: 0, background: '#020504' }} />
+})
+
 /* ─── Translations ─────────────────────────────────────────────────────── */
 const T: Record<string, {
   tagline: string; sub: string; cta: string; free: string;
@@ -157,11 +164,11 @@ export default function LandingPage() {
   }
 
   return (
-    <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#05100a', minHeight: '100vh', color: '#e8dfc8', overflowX: 'hidden' }}>
+    <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#010302', minHeight: '100vh', color: '#e8dfc8', overflowX: 'hidden' }}>
       <div className="premium-bg-glow" />
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #05100a !important; color: #e8dfc8; -webkit-font-smoothing: antialiased; }
+        body { background: #010302; font-family: 'DM Sans', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
         /* ── Scroll progress ── */
         .scroll-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #2d7a45, #6abf8a, #c9a84c); transform-origin: 0%; z-index: 999; }
@@ -174,7 +181,7 @@ export default function LandingPage() {
           line-height: 1.02;
           letter-spacing: -0.035em;
           white-space: pre-line;
-          background: linear-gradient(135deg, #e8dfc8 0%, #c9a84c 30%, #6abf8a 70%, #2d7a45 100%);
+          background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 30%, #6abf8a 70%, #34d399 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -319,10 +326,9 @@ export default function LandingPage() {
           HERO
       ══════════════════════════════════════════════════════ */}
       <section ref={heroRef} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '8rem 2rem 5rem', position: 'relative', overflow: 'hidden' }}>
-        {/* Ambient glows */}
-        <div className="glow" style={{ top: '-15%', left: '50%', transform: 'translateX(-50%)', width: 1200, height: 900, background: 'radial-gradient(ellipse, rgba(26,77,46,0.32) 0%, rgba(106,191,138,0.05) 40%, transparent 65%)' }} />
-        <div className="glow" style={{ top: '30%', right: '-20%', width: 600, height: 600, background: 'radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%)' }} />
-        <div className="glow" style={{ bottom: '5%', left: '-15%', width: 500, height: 500, background: 'radial-gradient(ellipse, rgba(45,122,69,0.1) 0%, transparent 70%)' }} />
+        
+        {/* Dynamic WebGL Canvas Rendering */}
+        <WebGLBackground />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
