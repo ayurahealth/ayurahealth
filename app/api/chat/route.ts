@@ -46,6 +46,12 @@ interface WebSearchResult {
   content: string
 }
 
+interface AgentTraceItem {
+  id: 'planner' | 'researcher' | 'synthesizer'
+  label: string
+  summary: string
+}
+
 interface ChatSessionRecord {
   id: string
 }
@@ -450,12 +456,53 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
       fetchHeaders['X-Title'] = 'AyuraHealth VAIDYA Multi-Model'
     }
 
+    const agentTrace: AgentTraceItem[] = []
+    const orchestrateAgents = Boolean(deepThink || webSearch)
+    if (orchestrateAgents && typeof userQuery === 'string' && userQuery.trim().length > 0) {
+      try {
+        const planner = await runAgentStep({
+          apiUrl,
+          headers: fetchHeaders,
+          model,
+          roleInstruction: 'You are Planner Agent. Build a short plan for answering this user health query safely. Return max 4 bullets.',
+          userInput: userQuery,
+        })
+        if (planner) {
+          agentTrace.push({ id: 'planner', label: 'Planner', summary: planner.slice(0, 320) })
+        }
+
+        const researcher = await runAgentStep({
+          apiUrl,
+          headers: fetchHeaders,
+          model,
+          roleInstruction: `You are Research Agent. Use this context and return concise evidence bullets:\n${knowledgeCtx || 'No extra context found.'}`,
+          userInput: userQuery,
+        })
+        if (researcher) {
+          agentTrace.push({ id: 'researcher', label: 'Researcher', summary: researcher.slice(0, 420) })
+        }
+      } catch (err) {
+        console.error('AGENT_ORCHESTRATION_ERROR:', err)
+      }
+    }
+
+    const synthesizedAgentContext = agentTrace.length > 0
+      ? `\nAGENT TRACE BRIEF:\n${agentTrace.map((a) => `- ${a.label}: ${a.summary}`).join('\n')}\n`
+      : ''
+    if (orchestrateAgents) {
+      agentTrace.push({
+        id: 'synthesizer',
+        label: 'Synthesizer',
+        summary: 'Combining planner and research outputs into one concise clinical response.',
+      })
+    }
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: fetchHeaders,
       body: JSON.stringify({
         model,
-        messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages],
+        messages: [{ role: 'system', content: `${systemPrompt}${synthesizedAgentContext}` }, ...formattedMessages],
         max_tokens: deepThink ? 4000 : 2500,
         temperature: deepThink ? 0.6 : 0.7,
         stream: true,
@@ -473,7 +520,7 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
           headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages], max_tokens: 3000, temperature: 0.6, stream: true }),
         })
-        if (fallback.ok) return new NextResponse(createStream(fallback, { sources: [...chunks, ...webChunks] }), { headers: streamHeaders })
+        if (fallback.ok) return new NextResponse(createStream(fallback, { sources: [...chunks, ...webChunks], agentTrace }), { headers: streamHeaders })
       }
       return NextResponse.json({ error: 'AI service temporarily unavailable.', details }, { status: 500 })
     }
@@ -502,7 +549,7 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
       }
     }
 
-    return new NextResponse(createStream(response, { sources: [...chunks, ...webChunks], sessionId: activeSessionId, userId: clerkUser?.id }), { headers: streamHeaders })
+    return new NextResponse(createStream(response, { sources: [...chunks, ...webChunks], sessionId: activeSessionId, userId: clerkUser?.id, agentTrace }), { headers: streamHeaders })
 
   } catch (err) {
     console.error('CHAT_API_CRASH:', err)
@@ -538,6 +585,32 @@ async function fetchWebSearchResults(query: string): Promise<WebSearchResult[]> 
   return results
 }
 
+async function runAgentStep(args: {
+  apiUrl: string
+  headers: Record<string, string>
+  model: string
+  roleInstruction: string
+  userInput: string
+}): Promise<string> {
+  const response = await fetch(args.apiUrl, {
+    method: 'POST',
+    headers: args.headers,
+    body: JSON.stringify({
+      model: args.model,
+      stream: false,
+      temperature: 0.2,
+      max_tokens: 350,
+      messages: [
+        { role: 'system', content: args.roleInstruction },
+        { role: 'user', content: args.userInput },
+      ],
+    }),
+  })
+  if (!response.ok) return ''
+  const json = await response.json().catch(() => null) as { choices?: Array<{ message?: { content?: string } }> } | null
+  return json?.choices?.[0]?.message?.content?.trim() || ''
+}
+
 function stripTags(value: string): string {
   return value.replace(/<[^>]*>/g, '')
 }
@@ -557,7 +630,7 @@ const streamHeaders = {
   'Connection': 'keep-alive',
 }
 
-function createStream(response: Response, metadata?: { sources?: KnowledgeChunkResult[], sessionId?: string, userId?: string }): ReadableStream {
+function createStream(response: Response, metadata?: { sources?: KnowledgeChunkResult[], sessionId?: string, userId?: string, agentTrace?: AgentTraceItem[] }): ReadableStream {
   return new ReadableStream({
     async start(controller) {
       const reader = response.body?.getReader()
@@ -565,10 +638,11 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
       if (!reader) { controller.close(); return }
 
       // ── Send Metadata First ───────────────────────────────────────────────
-      if (metadata && (metadata.sources || metadata.sessionId)) {
+      if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace)) {
         const metaStr = JSON.stringify({ 
           sources: metadata.sources || [], 
-          sessionId: metadata.sessionId 
+          sessionId: metadata.sessionId,
+          agentTrace: metadata.agentTrace || [],
         })
         controller.enqueue(new TextEncoder().encode(`data: ${metaStr}\n\n`))
       }

@@ -17,6 +17,7 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   sources?: ChatSource[]
+  agentTrace?: Array<{ id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }>
 }
 
 interface ChatMessagesPanelProps {
@@ -129,6 +130,22 @@ export default function ChatMessagesPanel({
                         <span style={{ width: 14, height: 14, color: '#6abf8a' }}>{traditionIcons[src.tradition?.toLowerCase() || 'ayurveda']}</span>
                         <span style={{ fontWeight: 500 }}>{src.source}</span>
                       </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {msg.role === 'assistant' && msg.agentTrace && msg.agentTrace.length > 0 && (
+                <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(201,168,76,0.14)', paddingTop: '0.75rem' }}>
+                  <div style={{ fontSize: '0.66rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.45rem' }}>
+                    Agent Trace
+                  </div>
+                  <div style={{ display: 'grid', gap: '0.45rem' }}>
+                    {msg.agentTrace.map((step) => (
+                      <div key={`${step.id}-${step.label}`} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '0.45rem 0.6rem' }}>
+                        <div style={{ color: '#6abf8a', fontSize: '0.7rem', fontWeight: 600 }}>{step.label}</div>
+                        <div style={{ color: 'rgba(232,223,200,0.58)', fontSize: '0.72rem', marginTop: '0.15rem' }}>{step.summary}</div>
+                      </div>
                     ))}
                   </div>
                 </div>

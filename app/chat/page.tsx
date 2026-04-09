@@ -12,7 +12,8 @@ import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
 import VedicOraclePanel from '@/components/vedic/VedicOraclePanel'
 
-interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[] }
+interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[]; agentTrace?: AgentTrace[] }
+interface AgentTrace { id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }
 interface Attachment {
   id: string; type: 'image' | 'pdf' | 'link'
   name: string; content: string
@@ -581,7 +582,7 @@ export default function ChatPage() {
         }
         throw new Error(apiError)
       }
-      const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''; let currentSources: ChatSource[] = []; let buffer = ''
+      const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''; let currentSources: ChatSource[] = []; let currentAgentTrace: AgentTrace[] = []; let buffer = ''
       if (reader) {
         while (true) {
           const { done, value } = await reader.read(); if (done) break
@@ -598,6 +599,8 @@ export default function ChatPage() {
               const d = JSON.parse(trimmed.slice(6))
               if (d.sources) { 
                 currentSources = d.sources 
+              } else if (d.agentTrace) {
+                currentAgentTrace = d.agentTrace
               } else if (d.content) { 
                 full += d.content; setStreaming(full) 
               } 
@@ -607,7 +610,7 @@ export default function ChatPage() {
           }
         }
       }
-      setMessages(prev => [...prev, { role: 'assistant', content: full, sources: currentSources }]); setStreaming('')
+      setMessages(prev => [...prev, { role: 'assistant', content: full, sources: currentSources, agentTrace: currentAgentTrace }]); setStreaming('')
       
       if (newMessages.length <= 2 && activeUser && !incognito) {
         fetch('/api/chat-session', {
