@@ -461,12 +461,15 @@ ${responseTemplate}${vedicSection}`
       )
     }
 
-    // Default to Hugging Face if key is available, else fallback
-    const useHuggingFace = hasHuggingFace
-    const useOpenRouter = !useHuggingFace && hasOpenRouter
-    
+    // Provider priority:
+    // 1. HuggingFace — only used for image analysis (medgemma multimodal)
+    // 2. Groq — primary text provider (fast, generous free tier, works out of box)
+    // 3. OpenRouter — secondary text fallback
+    const useHuggingFace = hasHuggingFace && hasImages
+    const useGroqPrimary = !useHuggingFace && hasGroq
+    const useOpenRouter = !useHuggingFace && !hasGroq && hasOpenRouter
+
     // Model Selection Logic
-    // If HuggingFace: Text -> meditron-70b, Images -> medgemma-1.5-4b-it
     let apiUrl = ''
     let model = ''
     let authKey = ''
@@ -483,20 +486,27 @@ ${responseTemplate}${vedicSection}`
     };
 
     if (useHuggingFace) {
-      model = hasImages ? 'google/medgemma-1.5-4b-it' : 'epfl-llm/meditron-70b'
+      // Image analysis with medgemma multimodal
+      model = 'google/medgemma-1.5-4b-it'
       apiUrl = `https://api-inference.huggingface.co/models/${model}/v1/chat/completions`
       authKey = process.env.HUGGINGFACE_API_KEY!
       providerName = 'HuggingFace'
+    } else if (useGroqPrimary) {
+      // Fast, reliable text responses via Groq
+      model = 'llama-3.3-70b-versatile'
+      apiUrl = 'https://api.groq.com/openai/v1/chat/completions'
+      authKey = process.env.GROQ_API_KEY!
+      providerName = 'Groq'
     } else if (useOpenRouter) {
-      model = openRouterModelMap[preferredModel === 'groq' ? 'auto' : preferredModel]
+      model = openRouterModelMap[preferredModel === 'groq' ? 'auto' : preferredModel] || openRouterModelMap.auto
       apiUrl = 'https://openrouter.ai/api/v1/chat/completions'
       authKey = process.env.OPENROUTER_API_KEY!
       providerName = 'OpenRouter'
     } else {
-      model = hasImages ? 'llama-4-scout-17b-16e-instruct' : 'llama-3.3-70b-versatile'
-      apiUrl = 'https://api.groq.com/openai/v1/chat/completions'
-      authKey = process.env.GROQ_API_KEY!
-      providerName = 'Groq'
+      return NextResponse.json(
+        { error: 'VAIDYA is not configured. No AI provider is available.' },
+        { status: 503 }
+      )
     }
 
     if (!authKey) {
