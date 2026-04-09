@@ -158,13 +158,11 @@ const ArcReactorCore = ({ state = 'idle' }: OracleProps) => {
 ────────────────────────────────────────────────────────────── */
 const HudRings = ({ state = 'idle' }: { state?: string }) => {
   const rings = useRef<THREE.Group>(null!);
-  const ringRefs = [
-    useRef<THREE.Mesh>(null!),
-    useRef<THREE.Mesh>(null!),
-    useRef<THREE.Mesh>(null!),
-    useRef<THREE.Mesh>(null!),
-    useRef<THREE.Mesh>(null!),
-  ];
+  const ring0 = useRef<THREE.Mesh>(null!);
+  const ring1 = useRef<THREE.Mesh>(null!);
+  const ring2 = useRef<THREE.Mesh>(null!);
+  const ring3 = useRef<THREE.Mesh>(null!);
+  const ring4 = useRef<THREE.Mesh>(null!);
 
   const config = useMemo(() => {
     const base = state === 'thinking'
@@ -182,54 +180,56 @@ const HudRings = ({ state = 'idle' }: { state?: string }) => {
     const sp = config.speed;
 
     // Ring 1 — Main equatorial
-    if (ringRefs[0].current) {
-      ringRefs[0].current.rotation.x = Math.PI / 2;
-      ringRefs[0].current.rotation.z = t * sp;
+    if (ring0.current) {
+      ring0.current.rotation.x = Math.PI / 2;
+      ring0.current.rotation.z = t * sp;
     }
     // Ring 2 — Tilted orbital A
-    if (ringRefs[1].current) {
-      ringRefs[1].current.rotation.x = Math.PI / 2.8 + Math.sin(t * 0.3) * 0.1;
-      ringRefs[1].current.rotation.y = t * sp * 0.7;
+    if (ring1.current) {
+      ring1.current.rotation.x = Math.PI / 2.8 + Math.sin(t * 0.3) * 0.1;
+      ring1.current.rotation.y = t * sp * 0.7;
     }
     // Ring 3 — Tilted orbital B (counter-rotate)
-    if (ringRefs[2].current) {
-      ringRefs[2].current.rotation.x = Math.PI / 1.6 + Math.cos(t * 0.25) * 0.08;
-      ringRefs[2].current.rotation.y = -t * sp * 0.55;
+    if (ring2.current) {
+      ring2.current.rotation.x = Math.PI / 1.6 + Math.cos(t * 0.25) * 0.08;
+      ring2.current.rotation.y = -t * sp * 0.55;
     }
     // Ring 4 — Vertical scan ring
-    if (ringRefs[3].current) {
-      ringRefs[3].current.rotation.y = Math.PI / 2;
-      ringRefs[3].current.rotation.z = t * sp * 0.45;
-      ringRefs[3].current.rotation.x = Math.sin(t * 0.2) * 0.12;
+    if (ring3.current) {
+      ring3.current.rotation.y = Math.PI / 2;
+      ring3.current.rotation.z = t * sp * 0.45;
+      ring3.current.rotation.x = Math.sin(t * 0.2) * 0.12;
     }
     // Ring 5 — Diagonal accent
-    if (ringRefs[4].current) {
-      ringRefs[4].current.rotation.x = Math.PI / 3.5;
-      ringRefs[4].current.rotation.z = -t * sp * 0.35;
-      ringRefs[4].current.rotation.y = Math.cos(t * 0.18) * 0.15;
+    if (ring4.current) {
+      ring4.current.rotation.x = Math.PI / 3.5;
+      ring4.current.rotation.z = -t * sp * 0.35;
+      ring4.current.rotation.y = Math.cos(t * 0.18) * 0.15;
     }
   });
 
-  const ringData = [
-    { radius: 1.35, tube: 0.012, segs: 200, opMult: 1.0 },
-    { radius: 1.50, tube: 0.008, segs: 180, opMult: 0.7 },
-    { radius: 1.22, tube: 0.010, segs: 160, opMult: 0.8 },
-    { radius: 1.65, tube: 0.006, segs: 140, opMult: 0.5 },
-    { radius: 1.10, tube: 0.007, segs: 120, opMult: 0.6 },
-  ];
-
   return (
     <group ref={rings} scale={1.1}>
-      {ringData.map((r, i) => (
-        <mesh key={i} ref={ringRefs[i]} renderOrder={2}>
-          <torusGeometry args={[r.radius, r.tube, 8, r.segs]} />
-          <meshBasicMaterial
-            color={config.color}
-            transparent
-            opacity={config.opacity * r.opMult}
-          />
-        </mesh>
-      ))}
+      <mesh ref={ring0} renderOrder={2}>
+        <torusGeometry args={[1.35, 0.012, 8, 200]} />
+        <meshBasicMaterial color={config.color} transparent opacity={config.opacity * 1.0} />
+      </mesh>
+      <mesh ref={ring1} renderOrder={2}>
+        <torusGeometry args={[1.50, 0.008, 8, 180]} />
+        <meshBasicMaterial color={config.color} transparent opacity={config.opacity * 0.7} />
+      </mesh>
+      <mesh ref={ring2} renderOrder={2}>
+        <torusGeometry args={[1.22, 0.010, 8, 160]} />
+        <meshBasicMaterial color={config.color} transparent opacity={config.opacity * 0.8} />
+      </mesh>
+      <mesh ref={ring3} renderOrder={2}>
+        <torusGeometry args={[1.65, 0.006, 8, 140]} />
+        <meshBasicMaterial color={config.color} transparent opacity={config.opacity * 0.5} />
+      </mesh>
+      <mesh ref={ring4} renderOrder={2}>
+        <torusGeometry args={[1.10, 0.007, 8, 120]} />
+        <meshBasicMaterial color={config.color} transparent opacity={config.opacity * 0.6} />
+      </mesh>
     </group>
   );
 };

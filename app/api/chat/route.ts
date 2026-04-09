@@ -450,7 +450,6 @@ ${responseTemplate}${vedicSection}`
     }
 
     const indicLangs = ['sa', 'ta', 'te', 'kn', 'ml', 'pa', 'gu', 'mr', 'bn', 'ur', 'fa', 'ar', 'he']
-    const autoDeepMind = indicLangs.includes(safeLang) || isBloodReport
     const hasHuggingFace = Boolean(process.env.HUGGINGFACE_API_KEY)
     const hasOpenRouter = Boolean(process.env.OPENROUTER_API_KEY)
     const hasGroq = Boolean(process.env.GROQ_API_KEY)
@@ -645,7 +644,7 @@ ${responseTemplate}${vedicSection}`
       userId: clerkUser?.id,
       agentTrace,
       modelUsed: model,
-      providerUsed: providerName as any,
+      providerUsed: providerName as 'OpenRouter' | 'Groq' | '',
       quality,
       policy: autoRecoveryPolicy,
     }), { headers: streamHeaders })
