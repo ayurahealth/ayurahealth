@@ -20,39 +20,40 @@ const OrbCore = ({ state = 'idle' }: OracleProps) => {
     switch (state) {
       case 'listening':
         return {
-          colorA: '#6fe3c5',
-          colorB: '#4b7cff',
-          distort: 0.48,
-          speed: 3.8,
-          emissive: '#6fe3c5',
-          pulse: 1.8,
+          colorA: '#000000', // Deep black core
+          colorB: '#00e5ff', // Cyan speculars
+          distort: 0.65,
+          speed: 4.5,
+          emissive: '#00e5ff',
+          pulse: 2.2,
         };
       case 'thinking':
         return {
-          colorA: '#8f7cff',
-          colorB: '#ffd86b',
-          distort: 0.78,
-          speed: 7.2,
-          emissive: '#ffd86b',
-          pulse: 2.7,
+          colorA: '#111111',
+          colorB: '#ffaa00', // Molten Gold
+          distort: 0.95, // Insane distortion for processing state
+          speed: 8.5,
+          emissive: '#ff9000',
+          pulse: 3.5,
         };
       case 'responding':
         return {
-          colorA: '#7fffd4',
-          colorB: '#a18bff',
-          distort: 0.58,
-          speed: 3.1,
-          emissive: '#7fffd4',
-          pulse: 2.1,
+          colorA: '#0a0a0a',
+          colorB: '#5e43ff', // Deep purples and blues
+          distort: 0.75,
+          speed: 3.8,
+          emissive: '#5e43ff',
+          pulse: 2.5,
         };
       default:
+        // Idle
         return {
-          colorA: '#75d8b2',
-          colorB: '#8a7ff7',
-          distort: 0.4,
-          speed: 1.9,
-          emissive: '#8a7ff7',
-          pulse: 1.4,
+          colorA: '#090909', // Pitch black metallic base
+          colorB: '#c9a84c', // Subtle gold hints
+          distort: 0.45,
+          speed: 1.5,
+          emissive: '#332a10', // Low golden ambient glow
+          pulse: 1.2,
         };
     }
   }, [state]);
@@ -82,47 +83,48 @@ const OrbCore = ({ state = 'idle' }: OracleProps) => {
 
   return (
     <group>
-      <Sphere ref={mesh} args={[1, 64, 64]} scale={1.2}>
+      <Sphere ref={mesh} args={[1, 128, 128]} scale={1.2}>
         <MeshDistortMaterial
           color={config.colorA}
           attach="material"
           distort={config.distort}
           speed={config.speed}
-          roughness={0.05}
-          metalness={0.85}
+          roughness={0.12} // Smooth wet/liquid look
+          metalness={1.0} // Fully metallic
           emissive={config.emissive}
-          emissiveIntensity={state === 'thinking' ? 1.35 : 0.72}
+          emissiveIntensity={state === 'thinking' ? 2.5 : 0.85}
+          clearcoat={1.0}
         />
       </Sphere>
-      <Sphere ref={innerCore} args={[0.62, 64, 64]} scale={1.2}>
+      <Sphere ref={innerCore} args={[0.55, 64, 64]} scale={1.2}>
         <meshPhysicalMaterial
           transparent
-          opacity={0.58}
-          roughness={0.08}
-          metalness={0.2}
-          clearcoat={0.9}
-          clearcoatRoughness={0.1}
-          color={config.colorB}
-          emissive={config.colorA}
-          emissiveIntensity={0.5}
-        />
-      </Sphere>
-      <Sphere ref={shell} args={[1.04, 64, 64]} scale={1.2}>
-        <meshPhysicalMaterial
-          transparent
-          opacity={0.16}
+          opacity={0.8}
           roughness={0}
-          metalness={0.4}
-          clearcoat={1}
-          clearcoatRoughness={0}
+          metalness={1.0}
+          clearcoat={1.0}
           color={config.colorB}
+          emissive={config.colorB}
+          emissiveIntensity={1.2}
         />
       </Sphere>
-      <Sphere ref={halo} args={[1.28, 64, 64]} scale={1.2}>
+      <Sphere ref={shell} args={[1.05, 128, 128]} scale={1.2}>
+        <meshPhysicalMaterial
+          transparent
+          opacity={0.15}
+          roughness={0.05}
+          metalness={0.9}
+          clearcoat={1}
+          color="#ffffff"
+          envMapIntensity={2.0}
+        />
+      </Sphere>
+      <Sphere ref={halo} args={[1.35, 32, 32]} scale={1.2}>
         <meshBasicMaterial
           transparent
-          opacity={0.11}
-          color={config.colorA}
+          opacity={state === 'idle' ? 0.05 : 0.15}
+          color={config.emissive}
+          wireframe={true} // Sci-fi structural aesthetic
         />
       </Sphere>
     </group>
@@ -166,10 +168,10 @@ const Particles = ({ count = 500, state = 'idle' }: { count?: number; state?: st
         />
       </bufferGeometry>
       <pointsMaterial
-        size={state === 'thinking' ? 0.02 : 0.016}
-        color={state === 'thinking' ? '#ffd86b' : state === 'listening' ? '#6fe3c5' : '#8f7cff'}
+        size={state === 'thinking' ? 0.025 : 0.015}
+        color={state === 'thinking' ? '#ffaa00' : state === 'listening' ? '#00e5ff' : '#ffffff'}
         transparent
-        opacity={0.72}
+        opacity={0.85}
         sizeAttenuation
       />
     </points>
@@ -184,13 +186,13 @@ const NeuralArcs = ({ state = 'idle' }: { state?: string }) => {
   const palette = useMemo(() => {
     switch (state) {
       case 'thinking':
-        return { a: '#ffd86b', b: '#8f7cff', c: '#7fffd4', speed: 0.62 };
+        return { a: '#ffaa00', b: '#ff5500', c: '#ffffff', speed: 0.85 };
       case 'listening':
-        return { a: '#6fe3c5', b: '#4b7cff', c: '#d4b4ff', speed: 0.52 };
+        return { a: '#00e5ff', b: '#0055ff', c: '#ffffff', speed: 0.65 };
       case 'responding':
-        return { a: '#7fffd4', b: '#a18bff', c: '#ffd86b', speed: 0.56 };
+        return { a: '#5e43ff', b: '#d4b4ff', c: '#ffffff', speed: 0.70 };
       default:
-        return { a: '#8a7ff7', b: '#75d8b2', c: '#ffd9a8', speed: 0.44 };
+        return { a: '#c9a84c', b: '#8c7022', c: '#ffffff', speed: 0.35 };
     }
   }, [state]);
 
@@ -268,8 +270,10 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: OracleP
         position: 'absolute',
         inset: framed ? '16% 18%' : '12% 16%',
         background: state === 'thinking'
-          ? 'radial-gradient(circle, rgba(255,216,107,0.33) 0%, rgba(143,124,255,0.18) 42%, rgba(255,216,107,0.03) 70%, transparent 90%)'
-          : 'radial-gradient(circle, rgba(111,227,197,0.28) 0%, rgba(138,127,247,0.15) 44%, rgba(111,227,197,0.03) 70%, transparent 90%)',
+          ? 'radial-gradient(circle, rgba(255,170,0,0.3) 0%, rgba(255,85,0,0.15) 35%, transparent 70%)'
+          : state === 'listening' 
+          ? 'radial-gradient(circle, rgba(0,229,255,0.25) 0%, rgba(0,85,255,0.15) 35%, transparent 70%)'
+          : 'radial-gradient(circle, rgba(201,168,76,0.2) 0%, rgba(140,112,34,0.1) 40%, transparent 80%)',
         filter: framed ? 'blur(20px)' : 'blur(24px)',
         zIndex: 0,
         pointerEvents: 'none',
@@ -278,11 +282,11 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: OracleP
         camera={{ position: [0, 0, 4.5], fov: 42 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.56} />
-        <pointLight position={[8, 8, 8]} intensity={1.05} color="#b2c7ff" />
-        <pointLight position={[-6, -5, -6]} intensity={0.4} color="#6fe3c5" />
-        <pointLight position={[0, 5, -3]} intensity={0.48} color="#ffd86b" />
-        <pointLight position={[0, -4, 3]} intensity={0.3} color="#8f7cff" />
+        <ambientLight intensity={0.4} />
+        <pointLight position={[8, 8, 8]} intensity={1.5} color="#ffffff" />
+        <pointLight position={[-6, -5, -6]} intensity={0.8} color={state === 'thinking' ? '#ff5500' : '#4b7cff'} />
+        <pointLight position={[0, 8, -3]} intensity={1.0} color={state === 'listening' ? '#00e5ff' : '#c9a84c'} />
+        <pointLight position={[0, -4, 5]} intensity={0.6} color="#ffffff" />
         <Float speed={state === 'thinking' ? 5 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
           <OrbCore state={state} />
           <NeuralArcs state={state} />
@@ -299,12 +303,12 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: OracleP
         width: '100%'
       }}>
         <h3 style={{
-          color: state === 'thinking' ? '#ffd86b' : state === 'listening' ? '#6fe3c5' : '#d7c5ff',
+          color: state === 'thinking' ? '#ffaa00' : state === 'listening' ? '#00e5ff' : '#e8dfc8',
           fontFamily: '"Cormorant Garamond", serif', 
           fontSize: '1.65rem',
           margin: 0,
-          letterSpacing: '0.04em',
-          textShadow: `0 0 16px ${state === 'thinking' ? 'rgba(255,216,107,0.45)' : state === 'listening' ? 'rgba(111,227,197,0.45)' : 'rgba(143,124,255,0.45)'}`,
+          letterSpacing: '0.08em',
+          textShadow: `0 0 20px ${state === 'thinking' ? 'rgba(255,170,0,0.6)' : state === 'listening' ? 'rgba(0,229,255,0.6)' : 'rgba(201,168,76,0.3)'}`,
           transition: 'all 0.5s'
         }}>VAIDYA</h3>
         <p style={{ 

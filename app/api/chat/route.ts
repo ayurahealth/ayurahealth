@@ -451,46 +451,49 @@ ${responseTemplate}${vedicSection}`
 
     const indicLangs = ['sa', 'ta', 'te', 'kn', 'ml', 'pa', 'gu', 'mr', 'bn', 'ur', 'fa', 'ar', 'he']
     const autoDeepMind = indicLangs.includes(safeLang) || isBloodReport
-    const prefersNemotron = (deepThink || autoDeepMind) && !hasImages
+    const autoDeepMind = indicLangs.includes(safeLang) || isBloodReport
+    const hasHuggingFace = Boolean(process.env.HUGGINGFACE_API_KEY)
     const hasOpenRouter = Boolean(process.env.OPENROUTER_API_KEY)
     const hasGroq = Boolean(process.env.GROQ_API_KEY)
 
-    if (!hasOpenRouter && !hasGroq) {
+    if (!hasHuggingFace && !hasOpenRouter && !hasGroq) {
       return NextResponse.json(
-        { error: 'VAIDYA is not configured. Missing GROQ_API_KEY/OPENROUTER_API_KEY in deployment environment.' },
+        { error: 'VAIDYA is not configured. Missing HUGGINGFACE_API_KEY in deployment environment.' },
         { status: 503 }
       )
     }
 
-    const openRouterModelMap = {
-      claude: process.env.OPENROUTER_MODEL_CLAUDE || 'anthropic/claude-3.5-sonnet',
-      gpt: process.env.OPENROUTER_MODEL_GPT || 'openai/gpt-4o-mini',
-      gemini: process.env.OPENROUTER_MODEL_GEMINI || 'google/gemini-2.0-flash-001',
-      deepseek: process.env.OPENROUTER_MODEL_DEEPSEEK || 'deepseek/deepseek-chat-v3-0324',
-      mistral: process.env.OPENROUTER_MODEL_MISTRAL || 'mistralai/mistral-small-3.2-24b-instruct',
-      llama: process.env.OPENROUTER_MODEL_LLAMA || 'meta-llama/llama-3.3-70b-instruct',
-      auto: process.env.OPENROUTER_MODEL || 'anthropic/claude-3-haiku',
-    } as const
+    // Default to Hugging Face if key is available, else fallback
+    const useHuggingFace = hasHuggingFace
+    const useOpenRouter = !useHuggingFace && hasOpenRouter
+    
+    // Model Selection Logic
+    // If HuggingFace: Text -> meditron-70b, Images -> medgemma-1.5-4b-it
+    let apiUrl = ''
+    let model = ''
+    let authKey = ''
+    let providerName = ''
 
-    const shouldUseOpenRouter = hasOpenRouter && (
-      (preferredModel !== 'auto' && preferredModel !== 'groq') || prefersNemotron
-    )
-    const useOpenRouter = shouldUseOpenRouter
+    if (useHuggingFace) {
+      model = hasImages ? 'google/medgemma-1.5-4b-it' : 'epfl-llm/meditron-70b'
+      apiUrl = `https://api-inference.huggingface.co/models/${model}/v1/chat/completions`
+      authKey = process.env.HUGGINGFACE_API_KEY!
+      providerName = 'HuggingFace'
+    } else if (useOpenRouter) {
+      model = openRouterModelMap[preferredModel === 'groq' ? 'auto' : preferredModel]
+      apiUrl = 'https://openrouter.ai/api/v1/chat/completions'
+      authKey = process.env.OPENROUTER_API_KEY!
+      providerName = 'OpenRouter'
+    } else {
+      model = hasImages ? 'llama-4-scout-17b-16e-instruct' : 'llama-3.3-70b-versatile'
+      apiUrl = 'https://api.groq.com/openai/v1/chat/completions'
+      authKey = process.env.GROQ_API_KEY!
+      providerName = 'Groq'
+    }
 
-    const apiUrl = useOpenRouter
-      ? 'https://openrouter.ai/api/v1/chat/completions'
-      : 'https://api.groq.com/openai/v1/chat/completions'
-
-    const model = useOpenRouter
-      ? openRouterModelMap[preferredModel === 'groq' ? 'auto' : preferredModel]
-      : hasImages
-        ? 'meta-llama/llama-4-scout-17b-16e-instruct'
-        : 'llama-3.3-70b-versatile'
-
-    const authKey = useOpenRouter ? process.env.OPENROUTER_API_KEY : process.env.GROQ_API_KEY
     if (!authKey) {
       return NextResponse.json(
-        { error: 'VAIDYA provider key missing for selected model route.' },
+        { error: `VAIDYA provider key missing for selected ${providerName} route.` },
         { status: 503 }
       )
     }
@@ -499,6 +502,7 @@ ${responseTemplate}${vedicSection}`
       'Authorization': `Bearer ${authKey}`,
       'Content-Type': 'application/json',
     }
+    
     if (useOpenRouter) {
       fetchHeaders['HTTP-Referer'] = 'https://ayurahealth.com'
       fetchHeaders['X-Title'] = 'AyuraHealth VAIDYA Multi-Model'
@@ -561,7 +565,7 @@ ${responseTemplate}${vedicSection}`
       temperature,
     })
 
-    if (!completionText && useOpenRouter && hasGroq) {
+    if (!completionText && !useHuggingFace && useOpenRouter && hasGroq) {
       completionText = await fetchCompletionText({
         apiUrl: 'https://api.groq.com/openai/v1/chat/completions',
         headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
@@ -642,7 +646,7 @@ ${responseTemplate}${vedicSection}`
       userId: clerkUser?.id,
       agentTrace,
       modelUsed: model,
-      providerUsed: useOpenRouter ? 'OpenRouter' : 'Groq',
+      providerUsed: providerName as any,
       quality,
       policy: autoRecoveryPolicy,
     }), { headers: streamHeaders })
