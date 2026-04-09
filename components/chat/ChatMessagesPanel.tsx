@@ -196,6 +196,19 @@ export default function ChatMessagesPanel({
                     </div>
                   )}
 
+                  {structured.sources.length > 0 && (
+                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '0.7rem 0.85rem' }}>
+                      <div style={{ fontSize: '0.64rem', color: '#9fc6ff', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                        Sources
+                      </div>
+                      <div style={{ display: 'grid', gap: '0.28rem' }}>
+                        {structured.sources.map((src, idx) => (
+                          <div key={idx} style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.78rem' }}>- {src}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {structured.followUps.length > 0 && (
                     <div style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.18)', borderRadius: 12, padding: '0.7rem 0.85rem' }}>
                       <div style={{ fontSize: '0.64rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>

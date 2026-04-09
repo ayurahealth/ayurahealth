@@ -365,6 +365,19 @@ ${vedicContext}
 As VAIDYA, integrate the above Vedic Intelligence into your response. Reference the user's current Mahadasha, their elemental imbalances, and today's Vedic guidance when making recommendations. This is what sets AyuraHealth apart from every other health AI — the depth of personalisation through Jyotish, Vedic Science, and Vedic Mathematics.
 ` : ''
 
+    const responseTemplate = `OUTPUT CONTRACT (ALWAYS FOLLOW):
+- Keep responses concise and practical.
+- Use this exact section order with markdown headings:
+### Answer
+[2-5 short paragraphs or bullets with direct recommendation]
+### Key Points
+- [3-6 actionable bullets]
+### Sources
+- [Only if sources are available; otherwise write: "- No external sources used."]
+### Follow-ups
+- [2-4 smart next questions the user can ask]
+- Never invent clinical certainty. If unsure, state uncertainty briefly and provide safe next step.`
+
     const systemPrompt = `${VAIDYA_SYSTEM}
 ${AYURAHEALTH_MYTHOS}
 ${safeSystems.length === 1 ? strictStyle : safeSystems.length > 1 ? multiStyle : SYNTHESIS_PROMPT}
@@ -374,7 +387,8 @@ ${councilBrief}
 LANGUAGE: ${languageInstruction}
 ${isBloodReport ? bloodReportPrompt : ''}
 ${deepThink ? 'DEEP MIND MODE: Be more thorough within the selected system only. Keep final answer concise and practical.' : ''}
-RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.${vedicSection}`
+RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for detail.
+${responseTemplate}${vedicSection}`
 
     const hasImages = safeAttachments.some(a => a.type === 'image')
 
