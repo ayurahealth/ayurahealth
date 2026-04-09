@@ -67,12 +67,20 @@ interface ModelTrace {
     forceDeepThink: boolean
   }
 }
+interface QualityHistoryItem {
+  ts: number
+  formatScore: number
+  completeness: number
+  latencyMs: number
+  repaired: boolean
+}
 
 const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
 const THEME_PREF_KEY = 'ayura_theme_pref_v1'
 const AI_PREF_KEY = 'ayura_ai_pref_v1'
+const QUALITY_HISTORY_KEY = 'ayura_quality_history_v1'
 const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
@@ -292,6 +300,7 @@ export default function ChatPage() {
   const [obsidianRelatedNotes, setObsidianRelatedNotes] = useState('')
   const [obsidianSetupNote, setObsidianSetupNote] = useState('')
   const [showQualityConsole, setShowQualityConsole] = useState(false)
+  const [qualityHistory, setQualityHistory] = useState<QualityHistoryItem[]>([])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -325,6 +334,23 @@ export default function ChatPage() {
       }))
     } catch {}
   }, [modelPreference, webSearchEnabled, responseMode])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = localStorage.getItem(QUALITY_HISTORY_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw) as QualityHistoryItem[]
+      if (Array.isArray(parsed)) setQualityHistory(parsed.slice(-200))
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(QUALITY_HISTORY_KEY, JSON.stringify(qualityHistory.slice(-200)))
+    } catch {}
+  }, [qualityHistory])
 
   // Persist Vedic preferences
   useEffect(() => {
@@ -670,6 +696,28 @@ export default function ChatPage() {
         agentTrace: currentAgentTrace,
         ...currentModelTrace,
       }]); setStreaming('')
+
+      if (currentModelTrace.quality) {
+        const item: QualityHistoryItem = {
+          ts: Date.now(),
+          formatScore: currentModelTrace.quality.formatScore,
+          completeness: currentModelTrace.quality.completeness,
+          latencyMs: currentModelTrace.quality.latencyMs,
+          repaired: currentModelTrace.quality.repaired,
+        }
+        setQualityHistory((prev) => [...prev.slice(-199), item])
+        fetch('/api/quality-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...item,
+            modelUsed: currentModelTrace.modelUsed || '',
+            providerUsed: currentModelTrace.providerUsed || '',
+            responseMode,
+            policyApplied: Boolean(currentModelTrace.policy?.applied),
+          }),
+        }).catch(() => {})
+      }
       
       if (newMessages.length <= 2 && activeUser && !incognito) {
         fetch('/api/chat-session', {
@@ -914,6 +962,7 @@ export default function ChatPage() {
   const qualityWindow = messages
     .filter((m): m is Message & { quality: NonNullable<Message['quality']> } => m.role === 'assistant' && Boolean(m.quality))
     .slice(-10)
+  const persistedWindow = qualityHistory.slice(-10)
   const avgQualityScore = qualityWindow.length > 0
     ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.formatScore || 0), 0) / qualityWindow.length)
     : 0
@@ -924,6 +973,12 @@ export default function ChatPage() {
     ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.latencyMs || 0), 0) / qualityWindow.length)
     : 0
   const repairCount = qualityWindow.filter((m) => Boolean(m.quality?.repaired)).length
+  const persistedAvgScore = persistedWindow.length > 0
+    ? Math.round(persistedWindow.reduce((sum, q) => sum + q.formatScore, 0) / persistedWindow.length)
+    : 0
+  const persistedAvgLatency = persistedWindow.length > 0
+    ? Math.round(persistedWindow.reduce((sum, q) => sum + q.latencyMs, 0) / persistedWindow.length)
+    : 0
   const qualityHealth: 'green' | 'yellow' | 'red' =
     avgQualityScore >= 90 && avgCompleteness >= 90 && avgLatency <= 9000
       ? 'green'
@@ -1509,6 +1564,8 @@ export default function ChatPage() {
                   <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Sections {avgCompleteness}%</span>
                   <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Latency {avgLatency}ms</span>
                   <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: repairCount > 0 ? '#c9a84c' : '#6abf8a' }}>Repairs {repairCount}</span>
+                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.75)' }}>History Score {persistedAvgScore || avgQualityScore}%</span>
+                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.75)' }}>History Latency {persistedAvgLatency || avgLatency}ms</span>
                 </div>
               </div>
               {qualityWindow.length > 0 && (
