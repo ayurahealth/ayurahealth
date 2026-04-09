@@ -18,6 +18,8 @@ interface Message {
   content: string
   sources?: ChatSource[]
   agentTrace?: Array<{ id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }>
+  modelUsed?: string
+  providerUsed?: 'OpenRouter' | 'Groq' | ''
 }
 
 interface ChatMessagesPanelProps {
@@ -106,7 +108,7 @@ export default function ChatMessagesPanel({
               {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                 <div style={{ marginTop: '1.25rem', borderTop: '1px solid rgba(106,191,138,0.12)', paddingTop: '0.9rem' }}>
                   <div style={{ fontSize: '0.68rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.65rem', opacity: 0.8 }}>Consulted Classical Texts:</div>
-                  <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'grid', gap: '0.45rem' }}>
                     {msg.sources.map((src, idx) => (
                       <button
                         key={idx}
@@ -119,16 +121,20 @@ export default function ChatMessagesPanel({
                           fontSize: '0.78rem',
                           color: '#e8dfc8',
                           cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
+                          display: 'grid',
+                          textAlign: 'left',
                           gap: '0.45rem',
                           transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.03) translateY(-1px)')}
                         onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                       >
-                        <span style={{ width: 14, height: 14, color: '#6abf8a' }}>{traditionIcons[src.tradition?.toLowerCase() || 'ayurveda']}</span>
-                        <span style={{ fontWeight: 500 }}>{src.source}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          <span style={{ width: 14, height: 14, color: '#6abf8a' }}>{traditionIcons[src.tradition?.toLowerCase() || 'ayurveda']}</span>
+                          <span style={{ fontWeight: 600 }}>{src.source}</span>
+                          <span style={{ marginLeft: 'auto', fontSize: '0.62rem', color: 'rgba(232,223,200,0.4)' }}>{src.tradition}</span>
+                        </div>
+                        <span style={{ fontSize: '0.68rem', color: 'rgba(232,223,200,0.55)' }}>{src.title}</span>
                       </button>
                     ))}
                   </div>
@@ -148,6 +154,20 @@ export default function ChatMessagesPanel({
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+              {msg.role === 'assistant' && (msg.providerUsed || msg.modelUsed) && (
+                <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                  {msg.providerUsed && (
+                    <span className="tradition-badge" style={{ fontSize: '0.6rem' }}>
+                      {msg.providerUsed === 'OpenRouter' ? '🧠 OpenRouter' : '⚡ Groq'}
+                    </span>
+                  )}
+                  {msg.modelUsed && (
+                    <span style={{ fontSize: '0.64rem', color: 'rgba(232,223,200,0.5)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 999, padding: '0.12rem 0.48rem' }}>
+                      {msg.modelUsed}
+                    </span>
+                  )}
                 </div>
               )}
             </div>

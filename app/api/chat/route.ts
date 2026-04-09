@@ -520,7 +520,14 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
           headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages], max_tokens: 3000, temperature: 0.6, stream: true }),
         })
-        if (fallback.ok) return new NextResponse(createStream(fallback, { sources: [...chunks, ...webChunks], agentTrace }), { headers: streamHeaders })
+        if (fallback.ok) {
+          return new NextResponse(createStream(fallback, {
+            sources: [...chunks, ...webChunks],
+            agentTrace,
+            modelUsed: 'llama-3.3-70b-versatile',
+            providerUsed: 'Groq',
+          }), { headers: streamHeaders })
+        }
       }
       return NextResponse.json({ error: 'AI service temporarily unavailable.', details }, { status: 500 })
     }
@@ -549,7 +556,14 @@ RESPONSE STYLE: concise, practical, 5-8 bullet points max unless user asks for d
       }
     }
 
-    return new NextResponse(createStream(response, { sources: [...chunks, ...webChunks], sessionId: activeSessionId, userId: clerkUser?.id, agentTrace }), { headers: streamHeaders })
+    return new NextResponse(createStream(response, {
+      sources: [...chunks, ...webChunks],
+      sessionId: activeSessionId,
+      userId: clerkUser?.id,
+      agentTrace,
+      modelUsed: model,
+      providerUsed: useOpenRouter ? 'OpenRouter' : 'Groq',
+    }), { headers: streamHeaders })
 
   } catch (err) {
     console.error('CHAT_API_CRASH:', err)
@@ -630,7 +644,14 @@ const streamHeaders = {
   'Connection': 'keep-alive',
 }
 
-function createStream(response: Response, metadata?: { sources?: KnowledgeChunkResult[], sessionId?: string, userId?: string, agentTrace?: AgentTraceItem[] }): ReadableStream {
+function createStream(response: Response, metadata?: {
+  sources?: KnowledgeChunkResult[]
+  sessionId?: string
+  userId?: string
+  agentTrace?: AgentTraceItem[]
+  modelUsed?: string
+  providerUsed?: 'OpenRouter' | 'Groq'
+}): ReadableStream {
   return new ReadableStream({
     async start(controller) {
       const reader = response.body?.getReader()
@@ -638,11 +659,13 @@ function createStream(response: Response, metadata?: { sources?: KnowledgeChunkR
       if (!reader) { controller.close(); return }
 
       // ── Send Metadata First ───────────────────────────────────────────────
-      if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace)) {
+      if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace || metadata.modelUsed || metadata.providerUsed)) {
         const metaStr = JSON.stringify({ 
           sources: metadata.sources || [], 
           sessionId: metadata.sessionId,
           agentTrace: metadata.agentTrace || [],
+          modelUsed: metadata.modelUsed || '',
+          providerUsed: metadata.providerUsed || '',
         })
         controller.enqueue(new TextEncoder().encode(`data: ${metaStr}\n\n`))
       }

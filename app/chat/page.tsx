@@ -12,8 +12,17 @@ import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
 import VedicOraclePanel from '@/components/vedic/VedicOraclePanel'
 
-interface Message { role: 'user' | 'assistant'; content: string; sources?: ChatSource[]; agentTrace?: AgentTrace[] }
+interface Message {
+  role: 'user' | 'assistant'
+  content: string
+  sources?: ChatSource[]
+  agentTrace?: AgentTrace[]
+  modelUsed?: string
+  providerUsed?: ProviderUsed
+}
 interface AgentTrace { id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }
+type ResponseMode = 'fast' | 'deep' | 'research'
+type ProviderUsed = 'OpenRouter' | 'Groq' | ''
 interface Attachment {
   id: string; type: 'image' | 'pdf' | 'link'
   name: string; content: string
@@ -29,6 +38,10 @@ interface ChatSource {
   content: string
   tradition: string
   source: string
+}
+interface ModelTrace {
+  modelUsed?: string
+  providerUsed?: ProviderUsed
 }
 
 const STORAGE_KEY = 'ayurahealth_v1'
@@ -203,6 +216,17 @@ export default function ChatPage() {
       return false
     }
   })
+  const [responseMode, setResponseMode] = useState<ResponseMode>(() => {
+    if (typeof window === 'undefined') return 'fast'
+    try {
+      const raw = localStorage.getItem(AI_PREF_KEY)
+      if (!raw) return 'fast'
+      const parsed = JSON.parse(raw) as { responseMode?: ResponseMode }
+      return parsed.responseMode ?? 'fast'
+    } catch {
+      return 'fast'
+    }
+  })
   const [vedicContext, setVedicContext] = useState<string | null>(null)
   const [vedicEnabled, setVedicEnabled] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
@@ -272,9 +296,10 @@ export default function ChatPage() {
       localStorage.setItem(AI_PREF_KEY, JSON.stringify({
         model: modelPreference,
         webSearch: webSearchEnabled,
+        responseMode,
       }))
     } catch {}
-  }, [modelPreference, webSearchEnabled])
+  }, [modelPreference, webSearchEnabled, responseMode])
 
   // Persist Vedic preferences
   useEffect(() => {
@@ -563,7 +588,8 @@ export default function ChatPage() {
           incognito,
           dosha,
           modelPreference,
-          webSearch: webSearchEnabled,
+          deepThink: responseMode === 'deep' || responseMode === 'research',
+          webSearch: responseMode === 'research' ? true : webSearchEnabled,
           lang: (typeof window !== 'undefined' ? localStorage.getItem('ayura_lang') || lang : lang),
           attachments: currentAttachments,
           vedicContext: vedicEnabled ? (vedicContext || undefined) : undefined,
@@ -582,7 +608,7 @@ export default function ChatPage() {
         }
         throw new Error(apiError)
       }
-      const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''; let currentSources: ChatSource[] = []; let currentAgentTrace: AgentTrace[] = []; let buffer = ''
+      const reader = res.body?.getReader(); const decoder = new TextDecoder(); let full = ''; let currentSources: ChatSource[] = []; let currentAgentTrace: AgentTrace[] = []; let currentModelTrace: ModelTrace = {}; let buffer = ''
       if (reader) {
         while (true) {
           const { done, value } = await reader.read(); if (done) break
@@ -601,6 +627,8 @@ export default function ChatPage() {
                 currentSources = d.sources 
               } else if (d.agentTrace) {
                 currentAgentTrace = d.agentTrace
+              } else if (d.modelUsed || d.providerUsed) {
+                currentModelTrace = { modelUsed: d.modelUsed, providerUsed: d.providerUsed }
               } else if (d.content) { 
                 full += d.content; setStreaming(full) 
               } 
@@ -610,7 +638,13 @@ export default function ChatPage() {
           }
         }
       }
-      setMessages(prev => [...prev, { role: 'assistant', content: full, sources: currentSources, agentTrace: currentAgentTrace }]); setStreaming('')
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: full,
+        sources: currentSources,
+        agentTrace: currentAgentTrace,
+        ...currentModelTrace,
+      }]); setStreaming('')
       
       if (newMessages.length <= 2 && activeUser && !incognito) {
         fetch('/api/chat-session', {
@@ -1328,6 +1362,20 @@ export default function ChatPage() {
                 <option value="gpt">ChatGPT</option>
                 <option value="gemini">Gemini</option>
               </select>
+              <div className="ios-segmented" style={{ padding: '0.18rem', borderRadius: 11 }}>
+                {(['fast', 'deep', 'research'] as ResponseMode[]).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setResponseMode(mode)}
+                    className={`ios-segmented-item ${responseMode === mode ? 'active' : ''}`}
+                    style={{ fontSize: '0.64rem', padding: '0.2rem 0.44rem' }}
+                    title={mode === 'fast' ? 'Fast response' : mode === 'deep' ? 'Deeper reasoning' : 'Deep + web research'}
+                  >
+                    {mode === 'fast' ? 'Fast' : mode === 'deep' ? 'Deep' : 'Research'}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={() => setWebSearchEnabled((v) => !v)}
@@ -1342,7 +1390,7 @@ export default function ChatPage() {
                 }}
                 title="Include live web sources"
               >
-                🌐 Web {webSearchEnabled ? 'On' : 'Off'}
+                🌐 Web {responseMode === 'research' ? 'Auto' : webSearchEnabled ? 'On' : 'Off'}
               </button>
               <button
                 type="button"
