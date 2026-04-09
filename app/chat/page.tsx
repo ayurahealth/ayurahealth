@@ -204,6 +204,7 @@ export default function ChatPage() {
   const [obsidianIncludeSources, setObsidianIncludeSources] = useState(true)
   const [obsidianSelectedOnly, setObsidianSelectedOnly] = useState(false)
   const [obsidianSelectedCount, setObsidianSelectedCount] = useState(10)
+  const [obsidianSetupNote, setObsidianSetupNote] = useState('')
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -694,6 +695,23 @@ export default function ChatPage() {
     URL.revokeObjectURL(url)
   }, [messages, dosha, selectedSystems, lang, vedicEnabled, vedicContext, obsidianSelectedCount, obsidianVault])
 
+  const testObsidianConnection = useCallback(() => {
+    const vaultParam = obsidianVault.trim() ? `&vault=${encodeURIComponent(obsidianVault.trim())}` : ''
+    const testContent = [
+      '# AyuraHealth x Obsidian Connected',
+      '',
+      `Connected at: ${new Date().toISOString()}`,
+      '',
+      'If you can see this note, direct Obsidian linking is working.',
+      '',
+      'Next: return to AyuraHealth chat and use "Send to Obsidian".',
+      '',
+    ].join('\n')
+    const testUrl = `obsidian://new?name=${encodeURIComponent('AyuraHealth Connection Test')}${vaultParam}&content=${encodeURIComponent(testContent)}`
+    window.location.href = testUrl
+    setObsidianSetupNote('Connection attempt sent to Obsidian. If no note appears, use "Download Markdown" and drag the file into your vault.')
+  }, [obsidianVault])
+
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
 
   return (
@@ -823,11 +841,42 @@ export default function ChatPage() {
                 <span style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.76rem' }}>Vault name (for direct open, optional)</span>
                 <input
                   value={obsidianVault}
-                  onChange={(e) => setObsidianVault(e.target.value)}
+                  onChange={(e) => {
+                    setObsidianVault(e.target.value)
+                    setObsidianSetupNote('')
+                  }}
                   placeholder="e.g. tech-brain"
                   style={{ background: 'rgba(255,255,255,0.03)', color: '#e8dfc8', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.55rem 0.65rem' }}
                 />
               </label>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={testObsidianConnection}
+                  className="ios-chip active"
+                  style={{ border: 'none', padding: '0.46rem 0.7rem', borderRadius: 11, color: '#6abf8a', cursor: 'pointer', fontSize: '0.74rem' }}
+                >
+                  🔗 Test Obsidian Connection
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText('1) Keep Obsidian app open\n2) In AyuraHealth click "Obsidian Export"\n3) Enter vault name exactly\n4) Click "Send to Obsidian"\n5) If blocked, click "Download Markdown" and drag file into vault')
+                    setObsidianSetupNote('Setup steps copied to clipboard.')
+                  }}
+                  className="ios-chip"
+                  style={{ border: 'none', padding: '0.46rem 0.7rem', borderRadius: 11, color: '#c9a84c', cursor: 'pointer', fontSize: '0.74rem' }}
+                >
+                  📋 Copy Setup Steps
+                </button>
+              </div>
+
+              {obsidianSetupNote && (
+                <div style={{ fontSize: '0.74rem', color: 'rgba(232,223,200,0.72)', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '0.5rem 0.65rem' }}>
+                  {obsidianSetupNote}
+                </div>
+              )}
 
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'rgba(232,223,200,0.75)', fontSize: '0.78rem' }}>
                 <input type="checkbox" checked={obsidianIncludeSources} onChange={(e) => setObsidianIncludeSources(e.target.checked)} />
