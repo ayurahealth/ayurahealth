@@ -116,6 +116,10 @@ function isValidUrl(str: string): boolean {
   catch { return false }
 }
 
+function sanitizeFilePart(input: string): string {
+  return input.toLowerCase().replace(/[^a-z0-9-_]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'chat'
+}
+
 export default function ChatPage() {
   const { user, isLoaded: clerkLoaded } = useUser()
   const clerk = useClerk()
@@ -545,6 +549,59 @@ export default function ChatPage() {
     })
   }
 
+  const exportChatToObsidian = useCallback(() => {
+    if (messages.length === 0) return
+
+    const now = new Date()
+    const iso = now.toISOString()
+    const datePart = iso.slice(0, 10)
+    const timePart = iso.slice(11, 16).replace(':', '-')
+    const doshaPart = dosha ? sanitizeFilePart(dosha) : 'general'
+    const fileName = `ayurahealth-${datePart}-${timePart}-${doshaPart}.md`
+
+    const frontmatter = [
+      '---',
+      `title: "AyuraHealth Consultation ${datePart} ${timePart}"`,
+      `created: "${iso}"`,
+      `source: "AyuraHealth"`,
+      `dosha: "${dosha ?? 'unknown'}"`,
+      `systems: [${selectedSystems.map(s => `"${s}"`).join(', ')}]`,
+      `language: "${lang}"`,
+      `vedic_context_used: ${Boolean(vedicEnabled && vedicContext)}`,
+      `message_count: ${messages.length}`,
+      'tags: ["ayurahealth","consultation","wellness-ai"]',
+      '---',
+      '',
+    ].join('\n')
+
+    const body = messages.map((m, idx) => {
+      const role = m.role === 'assistant' ? 'VAIDYA' : 'User'
+      const content = m.content.replace(/\r\n/g, '\n')
+      return `## ${idx + 1}. ${role}\n\n${content}\n`
+    }).join('\n')
+
+    const footer = [
+      '',
+      '---',
+      '',
+      '_Educational guidance only. Not medical advice._',
+      '',
+      `Exported from https://ayurahealth.com at ${iso}`,
+      '',
+    ].join('\n')
+
+    const markdown = `${frontmatter}${body}${footer}`
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [messages, dosha, selectedSystems, lang, vedicEnabled, vedicContext])
+
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
 
   return (
@@ -869,6 +926,24 @@ export default function ChatPage() {
                 <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
                 <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
               </div>
+              <button
+                type="button"
+                onClick={exportChatToObsidian}
+                disabled={messages.length === 0}
+                className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
+                style={{
+                  padding: '0.28rem 0.62rem',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
+                  opacity: messages.length > 0 ? 1 : 0.45,
+                  fontSize: '0.7rem',
+                  color: '#c9a84c'
+                }}
+                title="Export this consultation as Markdown for Obsidian"
+              >
+                ⬇ Export .md
+              </button>
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.5)', fontSize: '0.8rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
