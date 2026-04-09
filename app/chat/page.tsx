@@ -42,7 +42,7 @@ interface Attachment {
 }
 type Dosha = 'Vata' | 'Pitta' | 'Kapha'
 type Screen = 'landing' | 'welcome' | 'quiz' | 'result' | 'chat'
-type ModelPreference = 'auto' | 'claude' | 'gpt' | 'gemini'
+type ModelPreference = 'auto' | 'claude' | 'gpt' | 'gemini' | 'deepseek' | 'mistral' | 'llama' | 'groq'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SR = any
 interface ChatSource {
@@ -67,20 +67,12 @@ interface ModelTrace {
     forceDeepThink: boolean
   }
 }
-interface QualityHistoryItem {
-  ts: number
-  formatScore: number
-  completeness: number
-  latencyMs: number
-  repaired: boolean
-}
 
 const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
 const THEME_PREF_KEY = 'ayura_theme_pref_v1'
 const AI_PREF_KEY = 'ayura_ai_pref_v1'
-const QUALITY_HISTORY_KEY = 'ayura_quality_history_v1'
 const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
@@ -232,7 +224,8 @@ export default function ChatPage() {
       const raw = localStorage.getItem(AI_PREF_KEY)
       if (!raw) return 'auto'
       const parsed = JSON.parse(raw) as { model?: ModelPreference }
-      return parsed.model ?? 'auto'
+      const allowed: ModelPreference[] = ['auto', 'claude', 'gpt', 'gemini', 'deepseek', 'mistral', 'llama', 'groq']
+      return parsed.model && allowed.includes(parsed.model) ? parsed.model : 'auto'
     } catch {
       return 'auto'
     }
@@ -299,8 +292,6 @@ export default function ChatPage() {
   const [obsidianCategory, setObsidianCategory] = useState<(typeof OBSIDIAN_CATEGORIES)[number]>('Health')
   const [obsidianRelatedNotes, setObsidianRelatedNotes] = useState('')
   const [obsidianSetupNote, setObsidianSetupNote] = useState('')
-  const [showQualityConsole, setShowQualityConsole] = useState(false)
-  const [qualityHistory, setQualityHistory] = useState<QualityHistoryItem[]>([])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -335,22 +326,6 @@ export default function ChatPage() {
     } catch {}
   }, [modelPreference, webSearchEnabled, responseMode])
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const raw = localStorage.getItem(QUALITY_HISTORY_KEY)
-      if (!raw) return
-      const parsed = JSON.parse(raw) as QualityHistoryItem[]
-      if (Array.isArray(parsed)) setQualityHistory(parsed.slice(-200))
-    } catch {}
-  }, [])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      localStorage.setItem(QUALITY_HISTORY_KEY, JSON.stringify(qualityHistory.slice(-200)))
-    } catch {}
-  }, [qualityHistory])
 
   // Persist Vedic preferences
   useEffect(() => {
@@ -698,19 +673,15 @@ export default function ChatPage() {
       }]); setStreaming('')
 
       if (currentModelTrace.quality) {
-        const item: QualityHistoryItem = {
-          ts: Date.now(),
-          formatScore: currentModelTrace.quality.formatScore,
-          completeness: currentModelTrace.quality.completeness,
-          latencyMs: currentModelTrace.quality.latencyMs,
-          repaired: currentModelTrace.quality.repaired,
-        }
-        setQualityHistory((prev) => [...prev.slice(-199), item])
         fetch('/api/quality-event', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...item,
+            ts: Date.now(),
+            formatScore: currentModelTrace.quality.formatScore,
+            completeness: currentModelTrace.quality.completeness,
+            latencyMs: currentModelTrace.quality.latencyMs,
+            repaired: currentModelTrace.quality.repaired,
             modelUsed: currentModelTrace.modelUsed || '',
             providerUsed: currentModelTrace.providerUsed || '',
             responseMode,
@@ -959,38 +930,6 @@ export default function ChatPage() {
   }, [obsidianVault])
 
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
-  const qualityWindow = messages
-    .filter((m): m is Message & { quality: NonNullable<Message['quality']> } => m.role === 'assistant' && Boolean(m.quality))
-    .slice(-10)
-  const persistedWindow = qualityHistory.slice(-10)
-  const avgQualityScore = qualityWindow.length > 0
-    ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.formatScore || 0), 0) / qualityWindow.length)
-    : 0
-  const avgCompleteness = qualityWindow.length > 0
-    ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.completeness || 0), 0) / qualityWindow.length)
-    : 0
-  const avgLatency = qualityWindow.length > 0
-    ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.latencyMs || 0), 0) / qualityWindow.length)
-    : 0
-  const repairCount = qualityWindow.filter((m) => Boolean(m.quality?.repaired)).length
-  const persistedAvgScore = persistedWindow.length > 0
-    ? Math.round(persistedWindow.reduce((sum, q) => sum + q.formatScore, 0) / persistedWindow.length)
-    : 0
-  const persistedAvgLatency = persistedWindow.length > 0
-    ? Math.round(persistedWindow.reduce((sum, q) => sum + q.latencyMs, 0) / persistedWindow.length)
-    : 0
-  const qualityHealth: 'green' | 'yellow' | 'red' =
-    avgQualityScore >= 90 && avgCompleteness >= 90 && avgLatency <= 9000
-      ? 'green'
-      : avgQualityScore >= 75 && avgCompleteness >= 75 && avgLatency <= 14000
-        ? 'yellow'
-        : 'red'
-  const qualityHealthColor = qualityHealth === 'green' ? '#6abf8a' : qualityHealth === 'yellow' ? '#c9a84c' : '#e8835a'
-  const qualityActions: string[] = []
-  if (avgQualityScore < 85) qualityActions.push('Switch mode to Deep or Research for stronger format adherence.')
-  if (avgCompleteness < 85) qualityActions.push('Use one system only to reduce output drift and improve section completion.')
-  if (avgLatency > 12000) qualityActions.push('Turn Web Off unless needed to reduce response latency.')
-  if (repairCount > 2) qualityActions.push('Prefer Auto AI model for stability; provider switching can improve consistency.')
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--ios-bg)', fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--ios-text)', position: 'relative', overflow: 'hidden' }}>
@@ -1466,6 +1405,10 @@ export default function ChatPage() {
                 <option value="claude">Claude</option>
                 <option value="gpt">ChatGPT</option>
                 <option value="gemini">Gemini</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="mistral">Mistral</option>
+                <option value="llama">Llama</option>
+                <option value="groq">Groq Fast</option>
               </select>
               <div className="ios-segmented" style={{ padding: '0.18rem', borderRadius: 11 }}>
                 {(['fast', 'deep', 'research'] as ResponseMode[]).map((mode) => (
@@ -1531,112 +1474,9 @@ export default function ChatPage() {
               >
                 {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
               </button>
-              <button
-                type="button"
-                onClick={() => setShowQualityConsole((v) => !v)}
-                className={`ios-chip ${showQualityConsole ? 'active' : ''}`}
-                style={{
-                  padding: '0.24rem 0.56rem',
-                  borderRadius: 12,
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '0.66rem',
-                  color: qualityHealthColor
-                }}
-                title="Show response quality console"
-              >
-                📈 Quality {qualityWindow.length > 0 ? `${avgQualityScore}%` : 'N/A'} {qualityWindow.length > 0 ? `(${qualityHealth.toUpperCase()})` : ''}
-              </button>
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.74rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
-          {showQualityConsole && (
-            <div className="ios-surface" style={{ marginTop: '0.5rem', padding: '0.6rem 0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                <div style={{ color: '#c9a84c', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  Quality Console (Last {qualityWindow.length})
-                </div>
-                <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
-                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: qualityHealthColor, borderColor: `${qualityHealthColor}66` }}>
-                    Health {qualityHealth.toUpperCase()}
-                  </span>
-                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Score {avgQualityScore}%</span>
-                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Sections {avgCompleteness}%</span>
-                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Latency {avgLatency}ms</span>
-                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: repairCount > 0 ? '#c9a84c' : '#6abf8a' }}>Repairs {repairCount}</span>
-                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.75)' }}>History Score {persistedAvgScore || avgQualityScore}%</span>
-                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.75)' }}>History Latency {persistedAvgLatency || avgLatency}ms</span>
-                </div>
-              </div>
-              {qualityWindow.length > 0 && (
-                <div style={{ marginBottom: '0.55rem', borderRadius: 12, border: `1px solid ${qualityHealthColor}4d`, background: `${qualityHealthColor}14`, padding: '0.45rem 0.6rem' }}>
-                  <div style={{ fontSize: '0.67rem', color: qualityHealthColor, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
-                    Quality Advisor
-                  </div>
-                  {qualityActions.length > 0 ? (
-                    <div style={{ display: 'grid', gap: '0.22rem' }}>
-                      {qualityActions.slice(0, 3).map((tip, idx) => (
-                        <div key={idx} style={{ fontSize: '0.74rem', color: 'rgba(232,223,200,0.85)' }}>- {tip}</div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: '0.74rem', color: 'rgba(232,223,200,0.85)' }}>
-                      Quality is healthy. Keep current settings.
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
-                    <button
-                      type="button"
-                      onClick={() => setResponseMode('deep')}
-                      className="ios-chip"
-                      style={{ border: 'none', padding: '0.2rem 0.45rem', borderRadius: 10, fontSize: '0.65rem', color: '#c9a84c', cursor: 'pointer' }}
-                    >
-                      Use Deep Mode
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setResponseMode('research')}
-                      className="ios-chip"
-                      style={{ border: 'none', padding: '0.2rem 0.45rem', borderRadius: 10, fontSize: '0.65rem', color: '#6abf8a', cursor: 'pointer' }}
-                    >
-                      Use Research Mode
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setWebSearchEnabled(false)}
-                      className="ios-chip"
-                      style={{ border: 'none', padding: '0.2rem 0.45rem', borderRadius: 10, fontSize: '0.65rem', color: 'rgba(232,223,200,0.82)', cursor: 'pointer' }}
-                    >
-                      Turn Web Off
-                    </button>
-                  </div>
-                </div>
-              )}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: '0.25rem' }}>
-                {qualityWindow.map((m, idx) => {
-                  const score = m.quality?.formatScore || 0
-                  const color = score >= 90 ? '#6abf8a' : score >= 75 ? '#c9a84c' : '#e8835a'
-                  return (
-                    <div
-                      key={`${idx}-${score}-${m.quality?.latencyMs || 0}`}
-                      title={`Score ${score}% • Sections ${m.quality?.completeness || 0}% • ${m.quality?.latencyMs || 0}ms • repaired ${m.quality?.repaired ? 'yes' : 'no'}`}
-                      style={{
-                        height: 8,
-                        borderRadius: 999,
-                        background: `${color}66`,
-                        border: `1px solid ${color}`,
-                      }}
-                    />
-                  )
-                })}
-                {qualityWindow.length === 0 && (
-                  <div style={{ gridColumn: '1 / -1', color: 'rgba(232,223,200,0.45)', fontSize: '0.72rem' }}>
-                    Quality telemetry appears after assistant replies.
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
           <div className="chat-desktop-layout">
             {/* Left rail */}
             <ChatSidebar

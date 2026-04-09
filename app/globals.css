@@ -18,17 +18,17 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; height: 100%; }
 }
 
 :root[data-theme='light'] {
-  --ios-bg: #f4f8f3;
-  --ios-text: #153322;
-  --ios-muted: rgba(21, 51, 34, 0.68);
-  --ios-primary: #2f7a49;
-  --ios-accent: #9c7a22;
-  --ios-surface: rgba(255, 255, 255, 0.84);
-  --ios-surface-strong: rgba(255, 255, 255, 0.95);
-  --ios-stroke: rgba(21, 51, 34, 0.14);
-  --ios-stroke-strong: rgba(47, 122, 73, 0.32);
-  --ios-shadow-xl: 0 12px 32px rgba(16, 34, 22, 0.12);
-  --ios-shadow-md: 0 6px 16px rgba(16, 34, 22, 0.1);
+  --ios-bg: #edf5ee;
+  --ios-text: #1f3b2a;
+  --ios-muted: rgba(31, 59, 42, 0.7);
+  --ios-primary: #3f8a5f;
+  --ios-accent: #b08a2d;
+  --ios-surface: rgba(247, 244, 231, 0.9);
+  --ios-surface-strong: rgba(252, 248, 236, 0.97);
+  --ios-stroke: rgba(58, 96, 72, 0.18);
+  --ios-stroke-strong: rgba(79, 132, 97, 0.35);
+  --ios-shadow-xl: 0 12px 30px rgba(36, 62, 45, 0.14);
+  --ios-shadow-md: 0 6px 14px rgba(36, 62, 45, 0.1);
 }
 body { 
   margin: 0; 

@@ -26,7 +26,7 @@ const chatSchema = z.object({
     url: z.string().url().optional(),
   })).max(5).optional(),
   deepThink: z.boolean().optional(),
-  modelPreference: z.enum(['auto', 'claude', 'gpt', 'gemini']).optional(),
+  modelPreference: z.enum(['auto', 'claude', 'gpt', 'gemini', 'deepseek', 'mistral', 'llama', 'groq']).optional(),
   webSearch: z.boolean().optional(),
   sessionId: z.string().uuid().optional(),
   vedicContext: z.string().max(20000).optional(),
@@ -466,11 +466,14 @@ ${responseTemplate}${vedicSection}`
       claude: process.env.OPENROUTER_MODEL_CLAUDE || 'anthropic/claude-3.5-sonnet',
       gpt: process.env.OPENROUTER_MODEL_GPT || 'openai/gpt-4o-mini',
       gemini: process.env.OPENROUTER_MODEL_GEMINI || 'google/gemini-2.0-flash-001',
+      deepseek: process.env.OPENROUTER_MODEL_DEEPSEEK || 'deepseek/deepseek-chat-v3-0324',
+      mistral: process.env.OPENROUTER_MODEL_MISTRAL || 'mistralai/mistral-small-3.2-24b-instruct',
+      llama: process.env.OPENROUTER_MODEL_LLAMA || 'meta-llama/llama-3.3-70b-instruct',
       auto: process.env.OPENROUTER_MODEL || 'anthropic/claude-3-haiku',
     } as const
 
     const shouldUseOpenRouter = hasOpenRouter && (
-      preferredModel !== 'auto' || prefersNemotron
+      (preferredModel !== 'auto' && preferredModel !== 'groq') || prefersNemotron
     )
     const useOpenRouter = shouldUseOpenRouter
 
@@ -479,7 +482,7 @@ ${responseTemplate}${vedicSection}`
       : 'https://api.groq.com/openai/v1/chat/completions'
 
     const model = useOpenRouter
-      ? openRouterModelMap[preferredModel]
+      ? openRouterModelMap[preferredModel === 'groq' ? 'auto' : preferredModel]
       : hasImages
         ? 'meta-llama/llama-4-scout-17b-16e-instruct'
         : 'llama-3.3-70b-versatile'
