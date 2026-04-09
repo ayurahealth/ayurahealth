@@ -2,7 +2,7 @@
 
 AyuraHealth is a personal holistic health companion that combines **Ayurveda, Traditional Chinese Medicine (TCM), and 6 other healing traditions** with modern NVIDIA-powered AI to provide personalized wellness guidance.
 
-![AyuraHealth Logo](https://ayurahealth.com/logo.png)
+![AyuraHealth Logo](./public/favicon.svg)
 
 ## 🌟 Key Features
 
@@ -36,7 +36,7 @@ AyuraHealth is a personal holistic health companion that combines **Ayurveda, Tr
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/abhishek0333x/ayurahealth.git
+   git clone https://github.com/ayurahealth/ayurahealth.git
    cd ayurahealth
    ```
 

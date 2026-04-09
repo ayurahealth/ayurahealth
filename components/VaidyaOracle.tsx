@@ -11,6 +11,7 @@ interface OracleProps {
 
 const OrbCore = ({ state = 'idle' }: OracleProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
+  const shell = useRef<THREE.Mesh>(null!);
   
   const config = useMemo(() => {
     switch (state) {
@@ -27,21 +28,40 @@ const OrbCore = ({ state = 'idle' }: OracleProps) => {
       mesh.current.rotation.x = Math.cos(time / 4) * 0.2;
       mesh.current.rotation.y = Math.sin(time / 2) * 0.2;
     }
+    if (shell.current) {
+      shell.current.rotation.y = -time * 0.22;
+      shell.current.rotation.x = Math.cos(time / 5) * 0.06;
+      const pulse = 1 + Math.sin(time * (state === 'thinking' ? 2.4 : 1.6)) * 0.025;
+      shell.current.scale.setScalar(pulse);
+    }
   });
 
   return (
-    <Sphere ref={mesh} args={[1, 64, 64]} scale={1.2}>
-      <MeshDistortMaterial
-        color={config.color}
-        attach="material"
-        distort={config.distort}
-        speed={config.speed}
-        roughness={0}
-        metalness={1}
-        emissive={config.emissive}
-        emissiveIntensity={state === 'thinking' ? 1.2 : 0.5}
-      />
-    </Sphere>
+    <group>
+      <Sphere ref={mesh} args={[1, 64, 64]} scale={1.2}>
+        <MeshDistortMaterial
+          color={config.color}
+          attach="material"
+          distort={config.distort}
+          speed={config.speed}
+          roughness={0}
+          metalness={1}
+          emissive={config.emissive}
+          emissiveIntensity={state === 'thinking' ? 1.25 : 0.55}
+        />
+      </Sphere>
+      <Sphere ref={shell} args={[1.04, 64, 64]} scale={1.2}>
+        <meshPhysicalMaterial
+          transparent
+          opacity={0.13}
+          roughness={0}
+          metalness={0.4}
+          clearcoat={1}
+          clearcoatRoughness={0}
+          color={state === 'thinking' ? '#f4d17f' : '#9ed6b2'}
+        />
+      </Sphere>
+    </group>
   );
 };
 
@@ -112,6 +132,17 @@ export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
         background: 'linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))',
         backdropFilter: 'blur(16px)',
       }} />
+      <div
+        style={{
+          position: 'absolute',
+          inset: '4% 10%',
+          borderRadius: 22,
+          border: '1px solid rgba(201,168,76,0.16)',
+          background: 'linear-gradient(145deg, rgba(201,168,76,0.08), rgba(106,191,138,0.04))',
+          filter: 'blur(0.2px)',
+          pointerEvents: 'none',
+        }}
+      />
       <div style={{
         position: 'absolute',
         inset: '16% 18%',
@@ -129,6 +160,7 @@ export default function VaidyaOracle({ state = 'idle' }: OracleProps) {
         <ambientLight intensity={0.62} />
         <pointLight position={[8, 8, 8]} intensity={1.1} />
         <pointLight position={[-6, -6, -6]} intensity={0.35} color="#6abf8a" />
+        <pointLight position={[0, 4, -4]} intensity={0.45} color="#f7cd6d" />
         <Float speed={state === 'thinking' ? 5 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
           <OrbCore state={state} />
           <Particles state={state} />
