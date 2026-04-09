@@ -279,6 +279,7 @@ export default function ChatPage() {
   const [obsidianCategory, setObsidianCategory] = useState<(typeof OBSIDIAN_CATEGORIES)[number]>('Health')
   const [obsidianRelatedNotes, setObsidianRelatedNotes] = useState('')
   const [obsidianSetupNote, setObsidianSetupNote] = useState('')
+  const [showQualityConsole, setShowQualityConsole] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -898,6 +899,19 @@ export default function ChatPage() {
   }, [obsidianVault])
 
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
+  const qualityWindow = messages
+    .filter((m): m is Message & { quality: NonNullable<Message['quality']> } => m.role === 'assistant' && Boolean(m.quality))
+    .slice(-10)
+  const avgQualityScore = qualityWindow.length > 0
+    ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.formatScore || 0), 0) / qualityWindow.length)
+    : 0
+  const avgCompleteness = qualityWindow.length > 0
+    ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.completeness || 0), 0) / qualityWindow.length)
+    : 0
+  const avgLatency = qualityWindow.length > 0
+    ? Math.round(qualityWindow.reduce((sum, m) => sum + (m.quality?.latencyMs || 0), 0) / qualityWindow.length)
+    : 0
+  const repairCount = qualityWindow.filter((m) => Boolean(m.quality?.repaired)).length
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--ios-bg)', fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--ios-text)', position: 'relative', overflow: 'hidden' }}>
@@ -1438,9 +1452,63 @@ export default function ChatPage() {
               >
                 {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
               </button>
+              <button
+                type="button"
+                onClick={() => setShowQualityConsole((v) => !v)}
+                className={`ios-chip ${showQualityConsole ? 'active' : ''}`}
+                style={{
+                  padding: '0.24rem 0.56rem',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.66rem',
+                  color: avgQualityScore >= 90 ? '#6abf8a' : '#c9a84c'
+                }}
+                title="Show response quality console"
+              >
+                📈 Quality {qualityWindow.length > 0 ? `${avgQualityScore}%` : 'N/A'}
+              </button>
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.74rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
+          {showQualityConsole && (
+            <div className="ios-surface" style={{ marginTop: '0.5rem', padding: '0.6rem 0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                <div style={{ color: '#c9a84c', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  Quality Console (Last {qualityWindow.length})
+                </div>
+                <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Score {avgQualityScore}%</span>
+                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Sections {avgCompleteness}%</span>
+                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: 'rgba(232,223,200,0.85)' }}>Latency {avgLatency}ms</span>
+                  <span className="ios-chip" style={{ padding: '0.15rem 0.45rem', fontSize: '0.65rem', color: repairCount > 0 ? '#c9a84c' : '#6abf8a' }}>Repairs {repairCount}</span>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: '0.25rem' }}>
+                {qualityWindow.map((m, idx) => {
+                  const score = m.quality?.formatScore || 0
+                  const color = score >= 90 ? '#6abf8a' : score >= 75 ? '#c9a84c' : '#e8835a'
+                  return (
+                    <div
+                      key={`${idx}-${score}-${m.quality?.latencyMs || 0}`}
+                      title={`Score ${score}% • Sections ${m.quality?.completeness || 0}% • ${m.quality?.latencyMs || 0}ms • repaired ${m.quality?.repaired ? 'yes' : 'no'}`}
+                      style={{
+                        height: 8,
+                        borderRadius: 999,
+                        background: `${color}66`,
+                        border: `1px solid ${color}`,
+                      }}
+                    />
+                  )
+                })}
+                {qualityWindow.length === 0 && (
+                  <div style={{ gridColumn: '1 / -1', color: 'rgba(232,223,200,0.45)', fontSize: '0.72rem' }}>
+                    Quality telemetry appears after assistant replies.
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           <div className="chat-desktop-layout">
             {/* Left rail */}
             <ChatSidebar
