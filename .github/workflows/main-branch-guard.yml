@@ -1,0 +1,41 @@
+name: Main Branch Guard
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  guard-main:
+    name: Guard direct pushes to main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain policy
+        run: |
+          echo "Main branch guard is active."
+          echo "Preferred flow: feature branch -> PR -> merge commit."
+          echo "This workflow allows:"
+          echo "1) Standard merge commits from PRs ('Merge pull request ...')"
+          echo "2) Emergency overrides with [main-ok] in commit message"
+
+      - name: Validate push type
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          echo "Head commit message: $COMMIT_MESSAGE"
+          if [[ "$COMMIT_MESSAGE" == Merge\ pull\ request* ]]; then
+            echo "Detected PR merge commit. Guard passed."
+            exit 0
+          fi
+
+          if [[ "$COMMIT_MESSAGE" == *"[main-ok]"* ]]; then
+            echo "Emergency override tag found ([main-ok]). Guard passed."
+            exit 0
+          fi
+
+          echo "::error::Direct push to main detected. Use a PR merge flow. For emergencies only, include [main-ok] in commit message."
+          exit 1
+
