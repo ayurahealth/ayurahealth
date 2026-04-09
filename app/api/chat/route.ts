@@ -73,6 +73,13 @@ interface ChatMessage {
   content: string | ChatPart[]
 }
 
+interface ResponseQuality {
+  formatScore: number
+  completeness: number
+  latencyMs: number
+  repaired: boolean
+}
+
 interface PrismaChatClient {
   chatSession: {
     create(args: { data: { userId: string; topic: string; summary: string } }): Promise<ChatSessionRecord>
@@ -517,6 +524,7 @@ ${responseTemplate}${vedicSection}`
     ]
     const maxTokens = deepThink ? 4000 : 2500
     const temperature = deepThink ? 0.6 : 0.7
+    const requestStartedAt = Date.now()
     let completionText = await fetchCompletionText({
       apiUrl,
       headers: fetchHeaders,
@@ -536,11 +544,13 @@ ${responseTemplate}${vedicSection}`
         temperature: 0.6,
       })
       if (completionText) {
+        const fallbackQuality = scoreResponseQuality(completionText, false, Date.now() - requestStartedAt)
         return new NextResponse(createTextStream(completionText, {
           sources: [...chunks, ...webChunks],
           agentTrace,
           modelUsed: 'llama-3.3-70b-versatile',
           providerUsed: 'Groq',
+          quality: fallbackQuality,
         }), { headers: streamHeaders })
       }
       return NextResponse.json({ error: 'AI service temporarily unavailable.', details: 'Primary and fallback providers failed.' }, { status: 500 })
@@ -550,6 +560,7 @@ ${responseTemplate}${vedicSection}`
       return NextResponse.json({ error: 'AI service temporarily unavailable.', details: 'No completion returned.' }, { status: 500 })
     }
 
+    let wasRepaired = false
     if (!hasStructuredSections(completionText)) {
       const retryMessages: ChatMessage[] = [
         ...completionMessages,
@@ -558,7 +569,7 @@ ${responseTemplate}${vedicSection}`
           content: 'FORMAT REPAIR: Re-write the previous answer using exactly these markdown headings: ### Answer, ### Key Points, ### Sources, ### Follow-ups. Keep same meaning, concise, no extra headings.',
         },
       ]
-      const repaired = await fetchCompletionText({
+      const repairedText = await fetchCompletionText({
         apiUrl,
         headers: fetchHeaders,
         model,
@@ -566,10 +577,12 @@ ${responseTemplate}${vedicSection}`
         maxTokens,
         temperature: 0.3,
       })
-      if (repaired) {
-        completionText = repaired
+      if (repairedText) {
+        completionText = repairedText
+        wasRepaired = true
       }
     }
+    const quality = scoreResponseQuality(completionText, wasRepaired, Date.now() - requestStartedAt)
 
     // ── Save User Message ──
     const userMsg = lastMsg.content
@@ -602,6 +615,7 @@ ${responseTemplate}${vedicSection}`
       agentTrace,
       modelUsed: model,
       providerUsed: useOpenRouter ? 'OpenRouter' : 'Groq',
+      quality,
     }), { headers: streamHeaders })
 
   } catch (err) {
@@ -690,17 +704,19 @@ function createTextStream(text: string, metadata?: {
   agentTrace?: AgentTraceItem[]
   modelUsed?: string
   providerUsed?: 'OpenRouter' | 'Groq'
+  quality?: ResponseQuality
 }): ReadableStream {
   return new ReadableStream({
     async start(controller) {
       // ── Send Metadata First ───────────────────────────────────────────────
-      if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace || metadata.modelUsed || metadata.providerUsed)) {
+      if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace || metadata.modelUsed || metadata.providerUsed || metadata.quality)) {
         const metaStr = JSON.stringify({ 
           sources: metadata.sources || [], 
           sessionId: metadata.sessionId,
           agentTrace: metadata.agentTrace || [],
           modelUsed: metadata.modelUsed || '',
           providerUsed: metadata.providerUsed || '',
+          quality: metadata.quality || null,
         })
         controller.enqueue(new TextEncoder().encode(`data: ${metaStr}\n\n`))
       }
@@ -742,6 +758,25 @@ function hasStructuredSections(text: string): boolean {
     && normalized.includes('### key points')
     && normalized.includes('### sources')
     && normalized.includes('### follow-ups')
+}
+
+function scoreResponseQuality(text: string, repaired: boolean, latencyMs: number): ResponseQuality {
+  const normalized = text.toLowerCase()
+  const checks = [
+    normalized.includes('### answer'),
+    normalized.includes('### key points'),
+    normalized.includes('### sources'),
+    normalized.includes('### follow-ups'),
+  ]
+  const hitCount = checks.filter(Boolean).length
+  const completeness = Math.round((hitCount / checks.length) * 100)
+  const formatScore = Math.round((completeness * 0.75) + (repaired ? 15 : 25))
+  return {
+    formatScore: Math.min(100, formatScore),
+    completeness,
+    latencyMs: Math.max(0, Math.round(latencyMs)),
+    repaired,
+  }
 }
 
 async function fetchCompletionText(args: {

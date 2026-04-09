@@ -20,6 +20,12 @@ interface Message {
   agentTrace?: Array<{ id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }>
   modelUsed?: string
   providerUsed?: 'OpenRouter' | 'Groq' | ''
+  quality?: {
+    formatScore: number
+    completeness: number
+    latencyMs: number
+    repaired: boolean
+  }
 }
 
 interface ChatMessagesPanelProps {
@@ -289,6 +295,20 @@ export default function ChatMessagesPanel({
                   {msg.modelUsed && (
                     <span style={{ fontSize: '0.64rem', color: 'rgba(232,223,200,0.5)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 999, padding: '0.12rem 0.48rem' }}>
                       {msg.modelUsed}
+                    </span>
+                  )}
+                  {msg.quality && (
+                    <span
+                      style={{
+                        fontSize: '0.62rem',
+                        color: msg.quality.formatScore >= 90 ? '#6abf8a' : '#c9a84c',
+                        border: `1px solid ${msg.quality.formatScore >= 90 ? 'rgba(106,191,138,0.35)' : 'rgba(201,168,76,0.35)'}`,
+                        borderRadius: 999,
+                        padding: '0.12rem 0.48rem',
+                      }}
+                      title={`Completeness ${msg.quality.completeness}% • ${msg.quality.latencyMs}ms • repaired ${msg.quality.repaired ? 'yes' : 'no'}`}
+                    >
+                      Quality {msg.quality.formatScore}%
                     </span>
                   )}
                 </div>

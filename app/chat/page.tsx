@@ -19,6 +19,12 @@ interface Message {
   agentTrace?: AgentTrace[]
   modelUsed?: string
   providerUsed?: ProviderUsed
+  quality?: {
+    formatScore: number
+    completeness: number
+    latencyMs: number
+    repaired: boolean
+  }
 }
 interface AgentTrace { id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }
 type ResponseMode = 'fast' | 'deep' | 'research'
@@ -42,6 +48,12 @@ interface ChatSource {
 interface ModelTrace {
   modelUsed?: string
   providerUsed?: ProviderUsed
+  quality?: {
+    formatScore: number
+    completeness: number
+    latencyMs: number
+    repaired: boolean
+  }
 }
 
 const STORAGE_KEY = 'ayurahealth_v1'
@@ -628,7 +640,7 @@ export default function ChatPage() {
               } else if (d.agentTrace) {
                 currentAgentTrace = d.agentTrace
               } else if (d.modelUsed || d.providerUsed) {
-                currentModelTrace = { modelUsed: d.modelUsed, providerUsed: d.providerUsed }
+                currentModelTrace = { modelUsed: d.modelUsed, providerUsed: d.providerUsed, quality: d.quality }
               } else if (d.content) { 
                 full += d.content; setStreaming(full) 
               } 
