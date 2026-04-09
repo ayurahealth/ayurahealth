@@ -164,7 +164,7 @@ export default function LandingPage() {
         body { background: #05100a !important; color: #e8dfc8; -webkit-font-smoothing: antialiased; }
 
         /* ── Scroll progress ── */
-        .scroll-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #2d7a45, #6abf8a, #c9a84c); transform-origin: 0%; z-index: 999; }
+        .scroll-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #0077b6, #00b4d8, #90e0ef); transform-origin: 0%; z-index: 999; }
 
         /* ── Hero ── */
         .hero-tagline {
@@ -320,9 +320,9 @@ export default function LandingPage() {
       ══════════════════════════════════════════════════════ */}
       <section ref={heroRef} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '8rem 2rem 5rem', position: 'relative', overflow: 'hidden' }}>
         {/* Ambient glows */}
-        <div className="glow" style={{ top: '-15%', left: '50%', transform: 'translateX(-50%)', width: 1200, height: 900, background: 'radial-gradient(ellipse, rgba(15, 25, 45, 0.6) 0%, rgba(0, 229, 255, 0.05) 40%, transparent 65%)' }} />
-        <div className="glow" style={{ top: '30%', right: '-20%', width: 600, height: 600, background: 'radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%)' }} />
-        <div className="glow" style={{ bottom: '5%', left: '-15%', width: 500, height: 500, background: 'radial-gradient(ellipse, rgba(0, 229, 255, 0.07) 0%, transparent 70%)' }} />
+        <div className="glow" style={{ top: '-15%', left: '50%', transform: 'translateX(-50%)', width: 1200, height: 900, background: 'radial-gradient(ellipse, rgba(0,119,182,0.15) 0%, rgba(0,180,216,0.05) 40%, transparent 65%)' }} />
+        <div className="glow" style={{ top: '30%', right: '-20%', width: 600, height: 600, background: 'radial-gradient(ellipse, rgba(0,150,199,0.06) 0%, transparent 70%)' }} />
+        <div className="glow" style={{ bottom: '5%', left: '-15%', width: 500, height: 500, background: 'radial-gradient(ellipse, rgba(0,180,216,0.07) 0%, transparent 70%)' }} />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -332,8 +332,8 @@ export default function LandingPage() {
         >
           {/* Live badge */}
           <div className="badge" style={{ marginBottom: '2rem' }}>
-            <span className="live-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#6abf8a', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-            <span style={{ fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(106,191,138,0.85)', fontFamily: '-apple-system, sans-serif' }}>
+            <span className="live-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#00b4d8', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+            <span style={{ fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(0,180,216,0.85)', fontFamily: '-apple-system, sans-serif' }}>
               {t.free}
             </span>
           </div>
