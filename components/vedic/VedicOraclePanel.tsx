@@ -8,10 +8,11 @@ import HolographicLabMap from '../diagnostics/HolographicLabMap'
 
 interface Props {
   initialDosha?: string
+  labResults?: any[]
   onContextReady?: (context: string) => void
 }
 
-export default function VedicOraclePanel({ initialDosha = 'Vata', onContextReady }: Props) {
+export default function VedicOraclePanel({ initialDosha = 'Vata', labResults = [], onContextReady }: Props) {
   const [oracleData, setOracleData] = useState<VedicOracleResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -542,7 +543,7 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', onContextReady
             <p style={{ color: 'rgba(232,223,200,0.5)', fontSize: '0.78rem', marginBottom: '1.2rem', lineHeight: 1.5 }}>
               Visualizing modern biomarkers through the lens of Pancha Bhuta (Elemental) and Dhatu (Tissue) systems.
             </p>
-            <HolographicLabMap />
+            <HolographicLabMap results={labResults} />
           </div>
         )}
 

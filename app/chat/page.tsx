@@ -215,6 +215,7 @@ export default function ChatPage() {
   const [selectedSource, setSelectedSource] = useState<ChatSource | null>(null)
   const [isSharing, setIsSharing] = useState(false)
   const [shareSuccess, setShareSuccess] = useState(false)
+  const [labResults, setLabResults] = useState<any[]>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [attachLoading, setAttachLoading] = useState(false)
   const [linkInput, setLinkInput] = useState('')
@@ -683,7 +684,12 @@ export default function ChatPage() {
         ...currentModelTrace,
       }]); 
       setStreaming('');
-      // Auto-speak removed per user feedback
+      // Reactive Diagnostic Feed: Extract biomarkers from AI analysis
+      if (full.includes('BIO_MARKER:')) {
+        const matches = [...full.matchAll(/BIO_MARKER: ([\w\- ]+) \| VALUE: ([\w\- \/\.>]+) \| STATUS: (\w+)/g)];
+        const extracted = matches.map(m => ({ id: m[1].toLowerCase().slice(0,3), value: m[2], status: m[3].toLowerCase() }));
+        if (extracted.length > 0) setLabResults(extracted);
+      }
       setIsSpeaking(false);
 
 
