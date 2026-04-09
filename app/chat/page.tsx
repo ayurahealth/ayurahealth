@@ -32,6 +32,7 @@ interface ChatSource {
 const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
+const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
   try {
@@ -204,6 +205,8 @@ export default function ChatPage() {
   const [obsidianIncludeSources, setObsidianIncludeSources] = useState(true)
   const [obsidianSelectedOnly, setObsidianSelectedOnly] = useState(false)
   const [obsidianSelectedCount, setObsidianSelectedCount] = useState(10)
+  const [obsidianCategory, setObsidianCategory] = useState<(typeof OBSIDIAN_CATEGORIES)[number]>('Health')
+  const [obsidianRelatedNotes, setObsidianRelatedNotes] = useState('')
   const [obsidianSetupNote, setObsidianSetupNote] = useState('')
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -231,9 +234,28 @@ export default function ChatPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return
     try {
-      localStorage.setItem(OBSIDIAN_PREF_KEY, JSON.stringify({ vault: obsidianVault }))
+      localStorage.setItem(OBSIDIAN_PREF_KEY, JSON.stringify({
+        vault: obsidianVault,
+        category: obsidianCategory,
+        relatedNotes: obsidianRelatedNotes,
+      }))
     } catch {}
-  }, [obsidianVault])
+  }, [obsidianVault, obsidianCategory, obsidianRelatedNotes])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = localStorage.getItem(OBSIDIAN_PREF_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw) as { category?: string; relatedNotes?: string }
+      if (parsed.category && OBSIDIAN_CATEGORIES.includes(parsed.category as (typeof OBSIDIAN_CATEGORIES)[number])) {
+        setObsidianCategory(parsed.category as (typeof OBSIDIAN_CATEGORIES)[number])
+      }
+      if (typeof parsed.relatedNotes === 'string') {
+        setObsidianRelatedNotes(parsed.relatedNotes)
+      }
+    } catch {}
+  }, [])
 
   const doshaColor = dosha ? DOSHA_META[dosha].color : '#6abf8a'
   const tx = t[lang]
@@ -577,7 +599,13 @@ export default function ChatPage() {
     })
   }
 
-  const exportChatToObsidian = useCallback((options?: { includeSources?: boolean; selectedOnly?: boolean; method?: 'download' | 'uri' }) => {
+  const exportChatToObsidian = useCallback((options?: {
+    includeSources?: boolean
+    selectedOnly?: boolean
+    method?: 'download' | 'uri'
+    category?: (typeof OBSIDIAN_CATEGORIES)[number]
+    relatedNotes?: string
+  }) => {
     if (messages.length === 0) return
 
     const includeSources = Boolean(options?.includeSources)
@@ -594,8 +622,17 @@ export default function ChatPage() {
     const datePart = iso.slice(0, 10)
     const timePart = iso.slice(11, 16).replace(':', '-')
     const doshaPart = dosha ? sanitizeFilePart(dosha) : 'general'
-    const fileName = `AyuraHealth/Consultations/ayurahealth-${datePart}-${timePart}-${doshaPart}${includeSources ? '-sources' : ''}.md`
+    const chosenCategory = options?.category ?? obsidianCategory
+    const categorySlug = sanitizeFilePart(chosenCategory)
+    const relatedNotes = (options?.relatedNotes ?? obsidianRelatedNotes)
+      .split(',')
+      .map((n) => toWikiName(n.trim()))
+      .filter(Boolean)
+      .slice(0, 20)
+    const fileName = `Brain/${categorySlug}/AyuraHealth/ayurahealth-${datePart}-${timePart}-${doshaPart}${includeSources ? '-sources' : ''}.md`
     const sessionWiki = toWikiName(`AyuraHealth ${datePart} ${timePart} ${dosha ?? 'General'}`)
+    const brainHome = 'Brain Home'
+    const categoryHub = `${chosenCategory} Hub`
 
     const frontmatter = [
       '---',
@@ -603,14 +640,18 @@ export default function ChatPage() {
       `created: "${iso}"`,
       `source: "AyuraHealth"`,
       `dosha: "${dosha ?? 'unknown'}"`,
+      `category: "${chosenCategory}"`,
       `systems: [${selectedSystems.map(s => `"${s}"`).join(', ')}]`,
       `language: "${lang}"`,
       `vedic_context_used: ${Boolean(vedicEnabled && vedicContext)}`,
       `message_count: ${exportMessages.length}`,
+      `related_notes: [${relatedNotes.map((n) => `"${n}"`).join(', ')}]`,
       'tags: ["ayurahealth","consultation","wellness-ai"]',
       '---',
       '',
-      '[[AyuraHealth Index]]',
+      `[[${brainHome}]]`,
+      '',
+      `[[${categoryHub}]]`,
       '',
       `Related: [[Dosha/${dosha ?? 'General'}]]`,
       '',
@@ -637,6 +678,12 @@ export default function ChatPage() {
 
     const footer = [
       '',
+      '## Brain Links',
+      '',
+      `- Category hub: [[${categoryHub}]]`,
+      `- Master hub: [[${brainHome}]]`,
+      ...relatedNotes.map((n) => `- Existing note: [[${n}]]`),
+      '',
       sourcesBlock ? '## Sources & Citations\n' : '',
       sourcesBlock,
       sourcesBlock ? '' : '',
@@ -655,6 +702,33 @@ export default function ChatPage() {
       `- Latest consultation: [[${sessionWiki}]]`,
       `- Dosha: [[Dosha/${dosha ?? 'General'}]]`,
       `- Systems: ${selectedSystems.map(s => `[[System/${s}]]`).join(', ')}`,
+      `- Category: [[${categoryHub}]]`,
+      '',
+      `Updated: ${iso}`,
+      '',
+    ].join('\n')
+
+    const brainHomeNote = [
+      '# Brain Home',
+      '',
+      '- Health: [[Health Hub]]',
+      '- Business: [[Business Hub]]',
+      '- Research: [[Research Hub]]',
+      '- Ideas: [[Ideas Hub]]',
+      '- Personal: [[Personal Hub]]',
+      '',
+      `Latest imported: [[${sessionWiki}]]`,
+      '',
+      `Updated: ${iso}`,
+      '',
+    ].join('\n')
+
+    const categoryHubNote = [
+      `# ${categoryHub}`,
+      '',
+      `- Latest imported session: [[${sessionWiki}]]`,
+      '- Source app: AyuraHealth',
+      `- Related notes: ${relatedNotes.length ? relatedNotes.map((n) => `[[${n}]]`).join(', ') : 'None added yet'}`,
       '',
       `Updated: ${iso}`,
       '',
@@ -675,12 +749,20 @@ export default function ChatPage() {
         return
       }
       const vaultParam = obsidianVault.trim() ? `&vault=${encodeURIComponent(obsidianVault.trim())}` : ''
+      const brainHomeUrl = `obsidian://new?name=${encodeURIComponent(brainHome)}${vaultParam}&content=${encodeURIComponent(brainHomeNote)}`
+      const categoryHubUrl = `obsidian://new?name=${encodeURIComponent(categoryHub)}${vaultParam}&content=${encodeURIComponent(categoryHubNote)}`
       const indexUrl = `obsidian://new?name=${encodeURIComponent('AyuraHealth Index')}${vaultParam}&content=${encodeURIComponent(indexNote)}`
       const sessionUrl = `obsidian://new?name=${encodeURIComponent(sessionWiki)}${vaultParam}&content=${encodeURIComponent(markdown)}`
-      window.location.href = indexUrl
+      window.location.href = brainHomeUrl
+      setTimeout(() => {
+        window.location.href = categoryHubUrl
+      }, 300)
+      setTimeout(() => {
+        window.location.href = indexUrl
+      }, 650)
       setTimeout(() => {
         window.location.href = sessionUrl
-      }, 450)
+      }, 980)
       return
     }
 
@@ -693,7 +775,7 @@ export default function ChatPage() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  }, [messages, dosha, selectedSystems, lang, vedicEnabled, vedicContext, obsidianSelectedCount, obsidianVault])
+  }, [messages, dosha, selectedSystems, lang, vedicEnabled, vedicContext, obsidianSelectedCount, obsidianVault, obsidianCategory, obsidianRelatedNotes])
 
   const testObsidianConnection = useCallback(() => {
     const vaultParam = obsidianVault.trim() ? `&vault=${encodeURIComponent(obsidianVault.trim())}` : ''
@@ -850,6 +932,31 @@ export default function ChatPage() {
                 />
               </label>
 
+              <label style={{ display: 'grid', gap: '0.25rem' }}>
+                <span style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.76rem' }}>Brain category</span>
+                <select
+                  value={obsidianCategory}
+                  onChange={(e) => setObsidianCategory(e.target.value as (typeof OBSIDIAN_CATEGORIES)[number])}
+                  style={{ background: 'rgba(255,255,255,0.03)', color: '#e8dfc8', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.55rem 0.65rem' }}
+                >
+                  {OBSIDIAN_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat} style={{ background: '#0b1a11', color: '#e8dfc8' }}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label style={{ display: 'grid', gap: '0.25rem' }}>
+                <span style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.76rem' }}>Link existing notes (comma separated)</span>
+                <input
+                  value={obsidianRelatedNotes}
+                  onChange={(e) => setObsidianRelatedNotes(e.target.value)}
+                  placeholder="e.g. Founder OS, Product Roadmap, Daily Journal"
+                  style={{ background: 'rgba(255,255,255,0.03)', color: '#e8dfc8', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.55rem 0.65rem' }}
+                />
+              </label>
+
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <button
                   type="button"
@@ -905,7 +1012,13 @@ export default function ChatPage() {
               <button
                 type="button"
                 onClick={() => {
-                  exportChatToObsidian({ includeSources: obsidianIncludeSources, selectedOnly: obsidianSelectedOnly, method: 'download' })
+                  exportChatToObsidian({
+                    includeSources: obsidianIncludeSources,
+                    selectedOnly: obsidianSelectedOnly,
+                    method: 'download',
+                    category: obsidianCategory,
+                    relatedNotes: obsidianRelatedNotes,
+                  })
                   setShowObsidianModal(false)
                 }}
                 className="ios-chip active"
@@ -916,7 +1029,13 @@ export default function ChatPage() {
               <button
                 type="button"
                 onClick={() => {
-                  exportChatToObsidian({ includeSources: obsidianIncludeSources, selectedOnly: obsidianSelectedOnly, method: 'uri' })
+                  exportChatToObsidian({
+                    includeSources: obsidianIncludeSources,
+                    selectedOnly: obsidianSelectedOnly,
+                    method: 'uri',
+                    category: obsidianCategory,
+                    relatedNotes: obsidianRelatedNotes,
+                  })
                   setShowObsidianModal(false)
                 }}
                 className="ios-chip active"
