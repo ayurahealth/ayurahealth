@@ -62,6 +62,17 @@ interface MessageCreateInput {
   content: string
 }
 
+interface ChatPart {
+  type: 'text' | 'image_url'
+  text?: string
+  image_url?: { url: string }
+}
+
+interface ChatMessage {
+  role: 'user' | 'assistant' | 'system'
+  content: string | ChatPart[]
+}
+
 interface PrismaChatClient {
   chatSession: {
     create(args: { data: { userId: string; topic: string; summary: string } }): Promise<ChatSessionRecord>
@@ -392,17 +403,6 @@ ${responseTemplate}${vedicSection}`
 
     const hasImages = safeAttachments.some(a => a.type === 'image')
 
-    interface ChatPart {
-      type: 'text' | 'image_url';
-      text?: string;
-      image_url?: { url: string };
-    }
-
-    interface ChatMessage {
-      role: 'user' | 'assistant' | 'system';
-      content: string | ChatPart[];
-    }
-
     const formattedMessages: ChatMessage[] = []
     for (let i = 0; i < messages.length - 1; i++) {
       formattedMessages.push({ role: messages[i].role as 'user' | 'assistant', content: messages[i].content })
@@ -511,39 +511,64 @@ ${responseTemplate}${vedicSection}`
       })
     }
 
-    const response = await fetch(apiUrl, {
-      method: 'POST',
+    const completionMessages: ChatMessage[] = [
+      { role: 'system', content: `${systemPrompt}${synthesizedAgentContext}` },
+      ...formattedMessages,
+    ]
+    const maxTokens = deepThink ? 4000 : 2500
+    const temperature = deepThink ? 0.6 : 0.7
+    let completionText = await fetchCompletionText({
+      apiUrl,
       headers: fetchHeaders,
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'system', content: `${systemPrompt}${synthesizedAgentContext}` }, ...formattedMessages],
-        max_tokens: deepThink ? 4000 : 2500,
-        temperature: deepThink ? 0.6 : 0.7,
-        stream: true,
-      }),
+      model,
+      messages: completionMessages,
+      maxTokens,
+      temperature,
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      const details = errorData.error?.message || response.statusText
-      console.error('VAIDYA_AI_ERROR:', { status: response.status, details, model, provider: useOpenRouter ? 'OpenRouter' : 'Groq' })
-      
-      if (useOpenRouter && hasGroq) {
-        const fallback = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, ...formattedMessages], max_tokens: 3000, temperature: 0.6, stream: true }),
-        })
-        if (fallback.ok) {
-          return new NextResponse(createStream(fallback, {
-            sources: [...chunks, ...webChunks],
-            agentTrace,
-            modelUsed: 'llama-3.3-70b-versatile',
-            providerUsed: 'Groq',
-          }), { headers: streamHeaders })
-        }
+    if (!completionText && useOpenRouter && hasGroq) {
+      completionText = await fetchCompletionText({
+        apiUrl: 'https://api.groq.com/openai/v1/chat/completions',
+        headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'system', content: `${systemPrompt}${synthesizedAgentContext}` }, ...formattedMessages],
+        maxTokens: 3000,
+        temperature: 0.6,
+      })
+      if (completionText) {
+        return new NextResponse(createTextStream(completionText, {
+          sources: [...chunks, ...webChunks],
+          agentTrace,
+          modelUsed: 'llama-3.3-70b-versatile',
+          providerUsed: 'Groq',
+        }), { headers: streamHeaders })
       }
-      return NextResponse.json({ error: 'AI service temporarily unavailable.', details }, { status: 500 })
+      return NextResponse.json({ error: 'AI service temporarily unavailable.', details: 'Primary and fallback providers failed.' }, { status: 500 })
+    }
+
+    if (!completionText) {
+      return NextResponse.json({ error: 'AI service temporarily unavailable.', details: 'No completion returned.' }, { status: 500 })
+    }
+
+    if (!hasStructuredSections(completionText)) {
+      const retryMessages: ChatMessage[] = [
+        ...completionMessages,
+        {
+          role: 'system',
+          content: 'FORMAT REPAIR: Re-write the previous answer using exactly these markdown headings: ### Answer, ### Key Points, ### Sources, ### Follow-ups. Keep same meaning, concise, no extra headings.',
+        },
+      ]
+      const repaired = await fetchCompletionText({
+        apiUrl,
+        headers: fetchHeaders,
+        model,
+        messages: retryMessages,
+        maxTokens,
+        temperature: 0.3,
+      })
+      if (repaired) {
+        completionText = repaired
+      }
     }
 
     // ── Save User Message ──
@@ -570,7 +595,7 @@ ${responseTemplate}${vedicSection}`
       }
     }
 
-    return new NextResponse(createStream(response, {
+    return new NextResponse(createTextStream(completionText, {
       sources: [...chunks, ...webChunks],
       sessionId: activeSessionId,
       userId: clerkUser?.id,
@@ -658,7 +683,7 @@ const streamHeaders = {
   'Connection': 'keep-alive',
 }
 
-function createStream(response: Response, metadata?: {
+function createTextStream(text: string, metadata?: {
   sources?: KnowledgeChunkResult[]
   sessionId?: string
   userId?: string
@@ -668,10 +693,6 @@ function createStream(response: Response, metadata?: {
 }): ReadableStream {
   return new ReadableStream({
     async start(controller) {
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-      if (!reader) { controller.close(); return }
-
       // ── Send Metadata First ───────────────────────────────────────────────
       if (metadata && (metadata.sources || metadata.sessionId || metadata.agentTrace || metadata.modelUsed || metadata.providerUsed)) {
         const metaStr = JSON.stringify({ 
@@ -684,41 +705,17 @@ function createStream(response: Response, metadata?: {
         controller.enqueue(new TextEncoder().encode(`data: ${metaStr}\n\n`))
       }
 
-      let assistantResponse = ''
-      let lineBuffer = ''
-
       try {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-
-          lineBuffer += decoder.decode(value, { stream: true })
-          const lines = lineBuffer.split('\n')
-          lineBuffer = lines.pop() || '' // Keep the last partial line in the buffer
-
-          for (const line of lines) {
-            const trimmed = line.trim()
-            if (!trimmed || trimmed === 'data: [DONE]') continue
-            
-            if (trimmed.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(trimmed.slice(6))
-                const content = data.choices?.[0]?.delta?.content
-                if (content) {
-                  assistantResponse += content
-                  controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
-                }
-              } catch (e) {
-                console.error('SSE_PARSE_ERROR:', e, 'Line:', trimmed)
-              }
-            }
-          }
+        const chunkSize = 120
+        for (let i = 0; i < text.length; i += chunkSize) {
+          const content = text.slice(i, i + chunkSize)
+          controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`))
         }
       } catch (err) {
-        console.error('STREAM_READ_ERROR:', err)
+        console.error('TEXT_STREAM_ERROR:', err)
       } finally {
         // Enforce save on close
-        if (metadata?.sessionId && assistantResponse) {
+        if (metadata?.sessionId && text) {
           try {
             const prismaMod = await import('../../../lib/prisma')
             const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
@@ -726,7 +723,7 @@ function createStream(response: Response, metadata?: {
               data: { 
                 sessionId: metadata.sessionId, 
                 role: 'assistant', 
-                content: assistantResponse 
+                content: text 
               }
             })
           } catch (err) {
@@ -737,4 +734,41 @@ function createStream(response: Response, metadata?: {
       }
     },
   })
+}
+
+function hasStructuredSections(text: string): boolean {
+  const normalized = text.toLowerCase()
+  return normalized.includes('### answer')
+    && normalized.includes('### key points')
+    && normalized.includes('### sources')
+    && normalized.includes('### follow-ups')
+}
+
+async function fetchCompletionText(args: {
+  apiUrl: string
+  headers: Record<string, string>
+  model: string
+  messages: ChatMessage[]
+  maxTokens: number
+  temperature: number
+}): Promise<string> {
+  const response = await fetch(args.apiUrl, {
+    method: 'POST',
+    headers: args.headers,
+    body: JSON.stringify({
+      model: args.model,
+      messages: args.messages,
+      max_tokens: args.maxTokens,
+      temperature: args.temperature,
+      stream: false,
+    }),
+  })
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    const details = errorData.error?.message || response.statusText
+    console.error('VAIDYA_AI_ERROR:', { status: response.status, details, model: args.model })
+    return ''
+  }
+  const json = await response.json().catch(() => null) as { choices?: Array<{ message?: { content?: string } }> } | null
+  return json?.choices?.[0]?.message?.content?.trim() || ''
 }
