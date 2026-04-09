@@ -51,16 +51,16 @@ export default function ChatMessagesPanel({
   return (
     <div className="native-scroll chat-message-scroll" style={{ flex: 1, overflowY: 'auto', padding: '1.5rem clamp(1rem, 2.5vw, 2.25rem) 0.5rem' }}>
       {messages.length === 0 && !loading && (
-        <div style={{ textAlign: 'center', marginTop: '2rem', padding: '0 2rem' }}>
+        <div style={{ textAlign: 'center', marginTop: '1.2rem', padding: '0 2rem' }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5 }}
-            style={{ width: '100%', maxWidth: 200, margin: '0 auto' }}
+            style={{ width: '100%', maxWidth: 230, margin: '0 auto' }}
           >
             <VaidyaOracle state="idle" />
           </motion.div>
-          <div style={{ marginTop: '-2rem', opacity: 0.5 }}>
+          <div style={{ marginTop: '-1.25rem', opacity: 0.56 }}>
             <p style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.2rem', color: '#c9a84c' }}>VAIDYA is ready.</p>
             <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Ask your first health question below...</p>
           </div>

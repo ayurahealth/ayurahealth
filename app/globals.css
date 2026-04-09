@@ -179,6 +179,13 @@ img { max-width: 100%; }
 }
 
 @media (min-width: 1024px) {
+  .chat-topbar {
+    border-radius: 16px;
+    min-height: 46px;
+  }
+  .chat-disclaimer-chip {
+    opacity: 0.92;
+  }
   .chat-shell {
     padding: 0 1rem 1rem;
   }
@@ -216,6 +223,9 @@ img { max-width: 100%; }
 }
 
 @media (max-width: 1023px) {
+  .chat-disclaimer-chip {
+    display: none !important;
+  }
   .chat-desktop-layout {
     display: flex;
     flex-direction: column;

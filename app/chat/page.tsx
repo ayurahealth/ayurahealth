@@ -1125,10 +1125,10 @@ export default function ChatPage() {
 
       {screen === 'chat' && (
         <div className="chat-shell" style={{ position: 'relative', zIndex: 1, maxWidth: 1180, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
-          <div className="liquid-glass ios-surface" style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Logo size={26} showText={true} href="/" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <div className="ios-chip active" style={{ padding: '0.25rem 0.6rem', borderRadius: 12, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div className="liquid-glass ios-surface chat-topbar" style={{ padding: '0.48rem 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Logo size={24} showText={true} href="/" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <div className="ios-chip active chat-disclaimer-chip" style={{ padding: '0.2rem 0.5rem', borderRadius: 11, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
                 <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
               </div>
@@ -1138,19 +1138,19 @@ export default function ChatPage() {
                 disabled={messages.length === 0}
                 className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
                 style={{
-                  padding: '0.28rem 0.62rem',
+                  padding: '0.24rem 0.56rem',
                   borderRadius: 12,
                   border: 'none',
                   cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
                   opacity: messages.length > 0 ? 1 : 0.45,
-                  fontSize: '0.7rem',
+                  fontSize: '0.66rem',
                   color: '#c9a84c'
                 }}
                 title="Open premium Obsidian export options"
               >
                 🧠 Obsidian Export
               </button>
-              <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.5)', fontSize: '0.8rem', cursor: 'pointer' }}>Exit</button>
+              <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.74rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
           <div className="chat-desktop-layout">
