@@ -223,7 +223,14 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', onContextReady
       </div>
 
       {/* Tab Content */}
-      <div style={{ padding: '1.2rem 1.5rem' }}>
+      <div
+        className="native-scroll"
+        style={{
+          padding: '1.2rem 1.5rem',
+          maxHeight: 'min(56vh, 620px)',
+          overflowY: 'auto'
+        }}
+      >
 
         {/* BIRTH CHART TAB */}
         {activeTab === 'chart' && (

@@ -32,6 +32,7 @@ interface ChatSource {
 const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
+const THEME_PREF_KEY = 'ayura_theme_pref_v1'
 const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
@@ -168,6 +169,15 @@ export default function ChatPage() {
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
   const [showObsidianModal, setShowObsidianModal] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window === 'undefined') return 'dark'
+    try {
+      const saved = localStorage.getItem(THEME_PREF_KEY)
+      return saved === 'light' ? 'light' : 'dark'
+    } catch {
+      return 'dark'
+    }
+  })
   const [vedicContext, setVedicContext] = useState<string | null>(null)
   const [vedicEnabled, setVedicEnabled] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
@@ -222,6 +232,14 @@ export default function ChatPage() {
       localStorage.setItem('ayura_lang', lang)
     }
   }, [lang])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(THEME_PREF_KEY, theme)
+    } catch {}
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   // Persist Vedic preferences
   useEffect(() => {
@@ -797,7 +815,7 @@ export default function ChatPage() {
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
 
   return (
-    <main style={{ minHeight: '100vh', background: '#05100a', fontFamily: '"DM Sans", system-ui, sans-serif', color: '#e8dfc8', position: 'relative', overflow: 'hidden' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--ios-bg)', fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--ios-text)', position: 'relative', overflow: 'hidden' }}>
 
       {/* Source Detail Modal */}
       {selectedSource && (
@@ -1268,6 +1286,22 @@ export default function ChatPage() {
                 title="Open premium Obsidian export options"
               >
                 🧠 Obsidian Export
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+                className="ios-chip"
+                style={{
+                  padding: '0.24rem 0.56rem',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.66rem',
+                  color: 'rgba(232,223,200,0.8)'
+                }}
+                title="Toggle light/dark mode"
+              >
+                {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
               </button>
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.74rem', cursor: 'pointer' }}>Exit</button>
             </div>

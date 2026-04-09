@@ -41,6 +41,40 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
   const [lng, setLng] = useState(0)
   const [tz, setTz] = useState(5.5)
   const [showCustom, setShowCustom] = useState(false)
+  const [dateError, setDateError] = useState('')
+
+  function getLocalIsoDate(): string {
+    const now = new Date()
+    const tzOffsetMs = now.getTimezoneOffset() * 60_000
+    return new Date(now.getTime() - tzOffsetMs).toISOString().slice(0, 10)
+  }
+
+  function normalizeDateInput(raw: string): string {
+    const trimmed = raw.trim()
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed
+
+    const slashParts = trimmed.split('/')
+    if (slashParts.length === 3) {
+      // Supports DD/MM/YYYY and YYYY/MM/DD
+      if (slashParts[0]?.length === 4) {
+        const [y, m, d] = slashParts
+        return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+      }
+      const [d, m, y] = slashParts
+      if (y?.length === 4) {
+        return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+      }
+    }
+    return trimmed
+  }
+
+  function isValidIsoDate(input: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) return false
+    const parsed = new Date(`${input}T00:00:00`)
+    if (Number.isNaN(parsed.getTime())) return false
+    const normalized = parsed.toISOString().slice(0, 10)
+    return normalized === input && input <= getLocalIsoDate()
+  }
 
   function handleCitySelect(cityName: string) {
     setCity(cityName)
@@ -56,19 +90,29 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
   }
 
   function handleSubmit() {
-    if (!date) return
+    const safeDate = normalizeDateInput(date)
+    if (!isValidIsoDate(safeDate)) {
+      setDateError('Enter a valid date in YYYY-MM-DD (or DD/MM/YYYY).')
+      return
+    }
+    setDate(safeDate)
+    setDateError('')
+
     const placeOfBirth = showCustom ? customCity : (city || 'Unknown')
+    const safeLat = Number.isFinite(lat) ? lat : 20
+    const safeLng = Number.isFinite(lng) ? lng : 77
+    const safeTz = Number.isFinite(tz) ? tz : 5.5
     onSubmit({
-      dateOfBirth: date,
+      dateOfBirth: safeDate,
       timeOfBirth: time || '12:00',
       placeOfBirth,
-      latitude: lat || 20,
-      longitude: lng || 77,
-      timezone: tz
+      latitude: safeLat || 20,
+      longitude: safeLng || 77,
+      timezone: safeTz
     })
   }
 
-  const isValid = date.length === 10 && (city || (showCustom && customCity))
+  const isValid = isValidIsoDate(normalizeDateInput(date)) && Boolean(city || (showCustom && customCity))
 
   return (
     <div style={{ maxWidth: 400, margin: '0 auto' }}>
@@ -79,8 +123,20 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
         <input
           type="date"
           value={date}
-          onChange={e => setDate(e.target.value)}
-          max={new Date().toISOString().split('T')[0]}
+          onChange={e => {
+            setDate(e.target.value)
+            if (dateError) setDateError('')
+          }}
+          onBlur={e => {
+            const normalized = normalizeDateInput(e.target.value)
+            setDate(normalized)
+            if (normalized && !isValidIsoDate(normalized)) {
+              setDateError('Enter a valid date in YYYY-MM-DD (or DD/MM/YYYY).')
+            } else {
+              setDateError('')
+            }
+          }}
+          max={getLocalIsoDate()}
           style={{
             width: '100%', padding: '0.7rem 0.8rem',
             background: 'rgba(255,255,255,0.04)',
@@ -91,6 +147,11 @@ export default function BirthChartInput({ onSubmit, loading }: Props) {
             colorScheme: 'dark'
           }}
         />
+        {dateError && (
+          <p style={{ color: '#ff8080', fontSize: '0.72rem', marginTop: '0.35rem' }}>
+            {dateError}
+          </p>
+        )}
       </div>
 
       <div style={{ marginBottom: '1rem' }}>
