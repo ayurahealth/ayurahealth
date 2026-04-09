@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     const csp = [
       "default-src 'self'",
       // scripts: self + inline/eval (Next.js needs these) + payment SDKs + analytics + Clerk
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.razorpay.com https://*.clerk.accounts.dev https://*.clerk.accounts.com https://www.googletagmanager.com https://fonts.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.razorpay.com https://*.clerk.accounts.dev https://*.clerk.accounts.com https://clerk.ayurahealth.com https://*.clerk.ayurahealth.com https://www.googletagmanager.com https://fonts.googleapis.com",
       // styles: self + inline + Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // fonts
@@ -36,6 +36,8 @@ const nextConfig: NextConfig = {
         "https://lumberjack.razorpay.com",      // Razorpay analytics
         "https://*.clerk.accounts.dev",           // Clerk auth (dev)
         "https://*.clerk.accounts.com",           // Clerk auth (prod)
+        "https://clerk.ayurahealth.com",          // Clerk auth (custom domain)
+        "https://*.clerk.ayurahealth.com",
         "https://formspree.io",                // Contact form
         "https://www.google-analytics.com",    // GA
         "https://vitals.vercel-insights.com",  // Vercel analytics
