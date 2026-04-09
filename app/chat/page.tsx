@@ -31,6 +31,7 @@ interface ChatSource {
 
 const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
+const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
   try {
@@ -120,6 +121,10 @@ function sanitizeFilePart(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9-_]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'chat'
 }
 
+function toWikiName(input: string): string {
+  return input.replace(/[^a-zA-Z0-9\s/-]+/g, '').trim() || 'AyuraHealth Note'
+}
+
 export default function ChatPage() {
   const { user, isLoaded: clerkLoaded } = useUser()
   const clerk = useClerk()
@@ -161,6 +166,7 @@ export default function ChatPage() {
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
+  const [showObsidianModal, setShowObsidianModal] = useState(false)
   const [vedicContext, setVedicContext] = useState<string | null>(null)
   const [vedicEnabled, setVedicEnabled] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
@@ -184,6 +190,20 @@ export default function ChatPage() {
       return false
     }
   })
+  const [obsidianVault, setObsidianVault] = useState<string>(() => {
+    if (typeof window === 'undefined') return ''
+    try {
+      const raw = localStorage.getItem(OBSIDIAN_PREF_KEY)
+      if (!raw) return ''
+      const parsed = JSON.parse(raw) as { vault?: string }
+      return typeof parsed.vault === 'string' ? parsed.vault : ''
+    } catch {
+      return ''
+    }
+  })
+  const [obsidianIncludeSources, setObsidianIncludeSources] = useState(true)
+  const [obsidianSelectedOnly, setObsidianSelectedOnly] = useState(false)
+  const [obsidianSelectedCount, setObsidianSelectedCount] = useState(10)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -206,6 +226,13 @@ export default function ChatPage() {
       localStorage.setItem(VEDIC_PREF_KEY, JSON.stringify({ enabled: vedicEnabled, open: vedicPanelOpen }))
     } catch {}
   }, [vedicEnabled, vedicPanelOpen])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(OBSIDIAN_PREF_KEY, JSON.stringify({ vault: obsidianVault }))
+    } catch {}
+  }, [obsidianVault])
 
   const doshaColor = dosha ? DOSHA_META[dosha].color : '#6abf8a'
   const tx = t[lang]
@@ -549,21 +576,15 @@ export default function ChatPage() {
     })
   }
 
-  const exportChatToObsidian = useCallback((options?: { includeSources?: boolean; selectedOnly?: boolean }) => {
+  const exportChatToObsidian = useCallback((options?: { includeSources?: boolean; selectedOnly?: boolean; method?: 'download' | 'uri' }) => {
     if (messages.length === 0) return
 
     const includeSources = Boolean(options?.includeSources)
+    const method = options?.method || 'download'
     let exportMessages = messages
 
     if (options?.selectedOnly) {
-      const input = window.prompt(
-        `Export last how many messages? (1-${messages.length})`,
-        String(Math.min(10, messages.length))
-      )
-      if (!input) return
-      const count = Number.parseInt(input, 10)
-      if (!Number.isFinite(count) || count < 1) return
-      const safeCount = Math.min(messages.length, count)
+      const safeCount = Math.min(messages.length, Math.max(1, obsidianSelectedCount))
       exportMessages = messages.slice(-safeCount)
     }
 
@@ -573,10 +594,11 @@ export default function ChatPage() {
     const timePart = iso.slice(11, 16).replace(':', '-')
     const doshaPart = dosha ? sanitizeFilePart(dosha) : 'general'
     const fileName = `AyuraHealth/Consultations/ayurahealth-${datePart}-${timePart}-${doshaPart}${includeSources ? '-sources' : ''}.md`
+    const sessionWiki = toWikiName(`AyuraHealth ${datePart} ${timePart} ${dosha ?? 'General'}`)
 
     const frontmatter = [
       '---',
-      `title: "AyuraHealth Consultation ${datePart} ${timePart}"`,
+      `title: "${sessionWiki}"`,
       `created: "${iso}"`,
       `source: "AyuraHealth"`,
       `dosha: "${dosha ?? 'unknown'}"`,
@@ -586,6 +608,10 @@ export default function ChatPage() {
       `message_count: ${exportMessages.length}`,
       'tags: ["ayurahealth","consultation","wellness-ai"]',
       '---',
+      '',
+      '[[AyuraHealth Index]]',
+      '',
+      `Related: [[Dosha/${dosha ?? 'General'}]]`,
       '',
     ].join('\n')
 
@@ -622,6 +648,41 @@ export default function ChatPage() {
     ].join('\n')
 
     const markdown = `${frontmatter}${body}${footer}`
+    const indexNote = [
+      '# AyuraHealth Index',
+      '',
+      `- Latest consultation: [[${sessionWiki}]]`,
+      `- Dosha: [[Dosha/${dosha ?? 'General'}]]`,
+      `- Systems: ${selectedSystems.map(s => `[[System/${s}]]`).join(', ')}`,
+      '',
+      `Updated: ${iso}`,
+      '',
+    ].join('\n')
+
+    if (method === 'uri') {
+      if (markdown.length > 7000) {
+        // Obsidian URI payloads can fail if too large. Fall back to file download.
+        const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = fileName
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        return
+      }
+      const vaultParam = obsidianVault.trim() ? `&vault=${encodeURIComponent(obsidianVault.trim())}` : ''
+      const indexUrl = `obsidian://new?name=${encodeURIComponent('AyuraHealth Index')}${vaultParam}&content=${encodeURIComponent(indexNote)}`
+      const sessionUrl = `obsidian://new?name=${encodeURIComponent(sessionWiki)}${vaultParam}&content=${encodeURIComponent(markdown)}`
+      window.location.href = indexUrl
+      setTimeout(() => {
+        window.location.href = sessionUrl
+      }, 450)
+      return
+    }
+
     const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -631,7 +692,7 @@ export default function ChatPage() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  }, [messages, dosha, selectedSystems, lang, vedicEnabled, vedicContext])
+  }, [messages, dosha, selectedSystems, lang, vedicEnabled, vedicContext, obsidianSelectedCount, obsidianVault])
 
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
 
@@ -742,6 +803,79 @@ export default function ChatPage() {
             >
               Maybe later
             </button>
+          </div>
+        </div>
+      )}
+
+      {showObsidianModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', zIndex: 520, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div className="ios-surface" style={{ width: '100%', maxWidth: 560, borderRadius: 20, padding: '1rem 1rem 0.9rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', marginBottom: '0.8rem' }}>
+              <div>
+                <div style={{ color: '#c9a84c', fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700 }}>Obsidian Brain Export</div>
+                <div style={{ color: 'rgba(232,223,200,0.55)', fontSize: '0.78rem' }}>Premium export for graph-ready notes and vault linking</div>
+              </div>
+              <button type="button" onClick={() => setShowObsidianModal(false)} style={{ background: 'transparent', border: 'none', color: 'rgba(232,223,200,0.7)', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+            </div>
+
+            <div style={{ display: 'grid', gap: '0.65rem' }}>
+              <label style={{ display: 'grid', gap: '0.25rem' }}>
+                <span style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.76rem' }}>Vault name (for direct open, optional)</span>
+                <input
+                  value={obsidianVault}
+                  onChange={(e) => setObsidianVault(e.target.value)}
+                  placeholder="e.g. tech-brain"
+                  style={{ background: 'rgba(255,255,255,0.03)', color: '#e8dfc8', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.55rem 0.65rem' }}
+                />
+              </label>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'rgba(232,223,200,0.75)', fontSize: '0.78rem' }}>
+                <input type="checkbox" checked={obsidianIncludeSources} onChange={(e) => setObsidianIncludeSources(e.target.checked)} />
+                Include sources & citations section
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'rgba(232,223,200,0.75)', fontSize: '0.78rem' }}>
+                <input type="checkbox" checked={obsidianSelectedOnly} onChange={(e) => setObsidianSelectedOnly(e.target.checked)} />
+                Export only recent messages
+              </label>
+              {obsidianSelectedOnly && (
+                <label style={{ display: 'grid', gap: '0.25rem' }}>
+                  <span style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.76rem' }}>Recent message count</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={messages.length}
+                    value={obsidianSelectedCount}
+                    onChange={(e) => setObsidianSelectedCount(Math.max(1, Math.min(messages.length, Number.parseInt(e.target.value || '1', 10))))}
+                    style={{ background: 'rgba(255,255,255,0.03)', color: '#e8dfc8', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.55rem 0.65rem', width: 140 }}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.55rem', marginTop: '0.95rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  exportChatToObsidian({ includeSources: obsidianIncludeSources, selectedOnly: obsidianSelectedOnly, method: 'download' })
+                  setShowObsidianModal(false)
+                }}
+                className="ios-chip active"
+                style={{ border: 'none', padding: '0.5rem 0.75rem', borderRadius: 12, color: '#c9a84c', cursor: 'pointer' }}
+              >
+                ⬇ Download Markdown
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  exportChatToObsidian({ includeSources: obsidianIncludeSources, selectedOnly: obsidianSelectedOnly, method: 'uri' })
+                  setShowObsidianModal(false)
+                }}
+                className="ios-chip active"
+                style={{ border: 'none', padding: '0.5rem 0.75rem', borderRadius: 12, color: '#6abf8a', cursor: 'pointer' }}
+              >
+                🧠 Send to Obsidian
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -959,7 +1093,7 @@ export default function ChatPage() {
               </div>
               <button
                 type="button"
-                onClick={() => exportChatToObsidian()}
+                onClick={() => setShowObsidianModal(true)}
                 disabled={messages.length === 0}
                 className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
                 style={{
@@ -971,45 +1105,9 @@ export default function ChatPage() {
                   fontSize: '0.7rem',
                   color: '#c9a84c'
                 }}
-                title="Export this consultation as Markdown for Obsidian"
+                title="Open premium Obsidian export options"
               >
-                ⬇ Export .md
-              </button>
-              <button
-                type="button"
-                onClick={() => exportChatToObsidian({ includeSources: true })}
-                disabled={messages.length === 0}
-                className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
-                style={{
-                  padding: '0.28rem 0.62rem',
-                  borderRadius: 12,
-                  border: 'none',
-                  cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
-                  opacity: messages.length > 0 ? 1 : 0.45,
-                  fontSize: '0.7rem',
-                  color: '#c9a84c'
-                }}
-                title="Export consultation + sources/citations for Obsidian"
-              >
-                📚 Export + Sources
-              </button>
-              <button
-                type="button"
-                onClick={() => exportChatToObsidian({ selectedOnly: true })}
-                disabled={messages.length === 0}
-                className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
-                style={{
-                  padding: '0.28rem 0.62rem',
-                  borderRadius: 12,
-                  border: 'none',
-                  cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
-                  opacity: messages.length > 0 ? 1 : 0.45,
-                  fontSize: '0.7rem',
-                  color: '#c9a84c'
-                }}
-                title="Export only the most recent N messages"
-              >
-                ✂️ Export Selected
+                🧠 Obsidian Export
               </button>
               <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.5)', fontSize: '0.8rem', cursor: 'pointer' }}>Exit</button>
             </div>
