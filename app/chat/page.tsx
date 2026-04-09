@@ -11,6 +11,7 @@ import ChatSidebar from '../../components/chat/ChatSidebar'
 import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
 import VedicOraclePanel from '@/components/vedic/VedicOraclePanel'
+import { vaidyaVoice } from '../../lib/vaidyaVoice'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -581,14 +582,10 @@ export default function ChatPage() {
   }
 
   const speakText = useCallback((text: string) => {
-    if (!voiceSupported || typeof window === 'undefined') return
-    window.speechSynthesis.cancel()
-    const clean = text.replace(/\*\*?|#{1,3}|[📚🌿☯️💊🏔️⚡✦]/g, '').substring(0, 800)
-    const utterance = new SpeechSynthesisUtterance(clean)
-    utterance.lang = lang === 'ja' ? 'ja-JP' : lang === 'hi' ? 'hi-IN' : 'en-US'
-    utterance.rate = 0.9; utterance.onstart = () => setIsSpeaking(true); utterance.onend = () => setIsSpeaking(false)
-    window.speechSynthesis.speak(utterance)
-  }, [lang, voiceSupported])
+    if (typeof window === 'undefined') return
+    vaidyaVoice.speak(text, () => setIsSpeaking(false))
+    setIsSpeaking(true)
+  }, [])
 
   const startListening = useCallback(() => {
     if (typeof window === 'undefined') return
@@ -684,7 +681,12 @@ export default function ChatPage() {
         sources: currentSources,
         agentTrace: currentAgentTrace,
         ...currentModelTrace,
-      }]); setStreaming('')
+      }]); 
+      setStreaming('');
+      // Auto-speak JARVIS response
+      vaidyaVoice.speak(full, () => setIsSpeaking(false));
+      setIsSpeaking(true);
+
 
       if (currentModelTrace.quality) {
         fetch('/api/quality-event', {
