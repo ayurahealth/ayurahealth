@@ -1,5 +1,4 @@
 'use client'
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef, useEffect } from 'react'
 
 interface VoiceInputProps {
@@ -12,16 +11,33 @@ interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
 }
 
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onstart: (event: Event) => void;
+  onend: (event: Event) => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: Event) => void;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+interface SpeechRecognitionStatic {
+  new (): SpeechRecognition;
+}
+
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition?: SpeechRecognitionStatic;
+    webkitSpeechRecognition?: SpeechRecognitionStatic;
   }
 }
 
-const getSpeechRecognition = (): any => {
+const getSpeechRecognition = (): SpeechRecognitionStatic | null => {
   if (typeof window !== 'undefined') {
-    return window.SpeechRecognition || window.webkitSpeechRecognition
+    return window.SpeechRecognition || window.webkitSpeechRecognition || null
   }
   return null
 }
@@ -30,7 +46,7 @@ export default function VoiceInput({ onTranscript, language }: VoiceInputProps) 
   const [isRecording, setIsRecording] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [isSupported] = useState(() => !!getSpeechRecognition())
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && isSupported) {

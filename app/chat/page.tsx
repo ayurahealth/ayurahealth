@@ -46,8 +46,12 @@ type Dosha = 'Vata' | 'Pitta' | 'Kapha'
 type Screen = 'landing' | 'welcome' | 'quiz' | 'result' | 'chat'
 type ModelPreference = 'auto' | 'claude' | 'gpt' | 'gemini' | 'deepseek' | 'mistral' | 'llama' | 'groq'
 type ThemeName = 'green' | 'gold' | 'forest' | 'ocean' | 'plum' | 'sunset' | 'slate' | 'rose'
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SR = any
+interface StructuredResponse {
+  answer?: string
+  keyPoints: string[]
+  sources: string[]
+  followUps: string[]
+}
 interface ChatSource {
   title: string
   content: string
@@ -107,14 +111,14 @@ const DOSHA_META = {
 }
 
 const MEDICINE_SYSTEMS = [
-  { id: 'ayurveda', label: 'Ayurveda', icon: 'ayurveda' }, 
-  { id: 'tcm', label: 'TCM', icon: 'tcm' },
-  { id: 'western', label: 'Western', icon: 'western' }, 
-  { id: 'homeopathy', label: 'Homeopathy', icon: 'homeopathy' },
-  { id: 'naturopathy', label: 'Naturo', icon: 'naturopathy' }, 
-  { id: 'unani', label: 'Unani', icon: 'unani' },
-  { id: 'siddha', label: 'Siddha', icon: 'siddha' }, 
-  { id: 'tibetan', label: 'Tibetan', icon: 'tibetan' },
+  { id: 'ayurveda', label: 'Ayurveda', icon: 'ayurveda', origin: 'India · 5,000 BCE' }, 
+  { id: 'tcm', label: 'TCM', icon: 'tcm', origin: 'China · 2,500 BCE' },
+  { id: 'western', label: 'Western', icon: 'western', origin: 'Greece/Global · 2,400 Years' }, 
+  { id: 'homeopathy', label: 'Homeopathy', icon: 'homeopathy', origin: 'Germany · 1796' },
+  { id: 'naturopathy', label: 'Naturo', icon: 'naturopathy', origin: 'Europe · 19th Century' }, 
+  { id: 'unani', label: 'Unani', icon: 'unani', origin: 'Persia/Greece · 1025 CE' },
+  { id: 'siddha', label: 'Siddha', icon: 'siddha', origin: 'India · 10,000 BCE' }, 
+  { id: 'tibetan', label: 'Tibetan', icon: 'tibetan', origin: 'Tibet · 7th Century' },
 ]
 
 const SYSTEM_DETAIL: Record<string, string> = {
