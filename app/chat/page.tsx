@@ -46,12 +46,6 @@ type Dosha = 'Vata' | 'Pitta' | 'Kapha'
 type Screen = 'landing' | 'welcome' | 'quiz' | 'result' | 'chat'
 type ModelPreference = 'auto' | 'claude' | 'gpt' | 'gemini' | 'deepseek' | 'mistral' | 'llama' | 'groq'
 type ThemeName = 'green' | 'gold' | 'forest' | 'ocean' | 'plum' | 'sunset' | 'slate' | 'rose'
-interface StructuredResponse {
-  answer?: string
-  keyPoints: string[]
-  sources: string[]
-  followUps: string[]
-}
 interface ChatSource {
   title: string
   content: string
