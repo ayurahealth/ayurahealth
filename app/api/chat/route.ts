@@ -103,12 +103,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
   }
 
-  // 2. Rate limiting
+  // 2. Rate limiting + CEO Bypass
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
-  const { allowed } = await checkRateLimit(ip)
+  const ceoToken = req.cookies.get('ayura_ceo_token')?.value
+  const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
+  const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
+
+  const { allowed } = await checkRateLimit(ip, isCeo)
   if (!allowed) {
     return NextResponse.json({ error: 'Too many requests. Please wait a minute.' }, { status: 429 })
   }
+  if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
 
   // 3. Auth + Paywall
   const clerkUser = await currentUser()

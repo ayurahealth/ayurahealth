@@ -66,7 +66,9 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
 /**
  * Universal Rate Limit Check
  */
-export async function checkRateLimit(ip: string): Promise<{ allowed: boolean; remaining: number }> {
+export async function checkRateLimit(ip: string, isCeo: boolean = false): Promise<{ allowed: boolean; remaining: number }> {
+  if (isCeo) return { allowed: true, remaining: 9999 }
+  
   if (chatRatelimit) {
     try {
       const { success, remaining } = await chatRatelimit.limit(ip)
@@ -78,7 +80,9 @@ export async function checkRateLimit(ip: string): Promise<{ allowed: boolean; re
   return inMemoryLimit(chatStore, ip, 20, 60_000)
 }
 
-export async function checkPaymentRateLimit(ip: string): Promise<{ allowed: boolean; remaining: number }> {
+export async function checkPaymentRateLimit(ip: string, isCeo: boolean = false): Promise<{ allowed: boolean; remaining: number }> {
+  if (isCeo) return { allowed: true, remaining: 9999 }
+  
   if (paymentRatelimit) {
     try {
       const { success, remaining } = await paymentRatelimit.limit(ip)
