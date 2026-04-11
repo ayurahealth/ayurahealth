@@ -188,13 +188,16 @@ export class HuggingFaceProvider implements LLMProvider {
               const chunk = JSON.parse(payload) as HFChatResponse
               const delta = chunk.choices?.[0]?.delta
               const content = delta?.content || ''
-              const toolCalls = delta?.tool_calls?.map(tc => ({
-                id: tc.id,
-                function: tc.function
-              }))
+              const toolCall = delta?.tool_calls && delta.tool_calls.length > 0 ? {
+                id: delta.tool_calls[0].id,
+                type: 'function' as const,
+                function: delta.tool_calls[0].function
+              } : undefined
 
-              if (content || toolCalls) {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content, toolCalls })}\n\n`))
+              if (content || toolCall) {
+                const chunk: any = { content }
+                if (toolCall) chunk.toolCall = toolCall
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`))
               }
             } catch {
               // Skip malformed chunks

@@ -50,8 +50,11 @@ export const VAIDYA_TOOLS: ToolDefinition[] = [
 
 export interface ToolCall {
   id: string
-  name: string
-  arguments: string // JSON string
+  type: 'function'
+  function: {
+    name: string
+    arguments: string // JSON string
+  }
 }
 
 export interface ToolResult {
@@ -63,7 +66,8 @@ export interface ToolResult {
  * Execute a tool call and return the result as a string.
  */
 export async function executeToolCall(call: ToolCall): Promise<ToolResult> {
-  const { name, arguments: argsJson, id } = call
+  const { name, arguments: argsJson } = call.function
+  const { id } = call
   log.info('TOOL_CALL_EXECUTING', { name, id })
 
   try {

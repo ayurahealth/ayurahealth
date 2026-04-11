@@ -265,9 +265,10 @@ export async function POST(req: NextRequest) {
             log.info('LLM_REQUESTED_TOOLS', { count: check.toolCalls.length })
             for (const tool of check.toolCalls) {
               const result = await executeToolCall(tool)
-              currentMessages.push({ role: 'assistant', content: `[CALLING_TOOL: ${tool.name}]` })
-              currentMessages.push({ role: 'system', content: `TOOL_RESULT [${tool.name}]: ${result.output}` })
-              toolTrace.push({ id: tool.id, name: tool.name, args: tool.arguments, output: result.output })
+              const toolName = tool.function.name
+              currentMessages.push({ role: 'assistant', content: `[CALLING_TOOL: ${toolName}]` })
+              currentMessages.push({ role: 'system', content: `TOOL_RESULT [${toolName}]: ${result.output}` })
+              toolTrace.push({ id: tool.id, name: toolName, args: tool.function.arguments, output: result.output })
             }
             continue // Check again if LLM needs more tools
           }

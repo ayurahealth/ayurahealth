@@ -103,8 +103,8 @@ export class GroqProvider implements LLMProvider {
       tokensUsed: json.usage?.total_tokens,
       toolCalls: json.choices?.[0]?.message?.tool_calls?.map(tc => ({
         id: tc.id,
-        name: tc.function.name,
-        arguments: tc.function.arguments,
+        type: 'function' as const,
+        function: tc.function,
       })),
     }
   }
@@ -165,8 +165,8 @@ export class GroqProvider implements LLMProvider {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                   toolCall: {
                     id: toolCalls[0].id,
-                    name: toolCalls[0].function.name,
-                    arguments: toolCalls[0].function.arguments,
+                    type: 'function',
+                    function: toolCalls[0].function,
                   }
                 })}\n\n`))
               }

@@ -33,7 +33,7 @@ export interface CompletionResponse {
 
 export interface StreamChunk {
   content?: string
-  toolCall?: { id: string; name: string; arguments: string }
+  toolCall?: { id: string; type: 'function'; function: { name: string; arguments: string } }
   done: boolean
 }
 
