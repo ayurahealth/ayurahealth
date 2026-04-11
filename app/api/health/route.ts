@@ -3,11 +3,6 @@ import { getDeepChecks, getVaidyaCheck } from '../../../lib/healthChecks'
 
 export const dynamic = 'force-dynamic'
 
-/**
- * GET /api/health
- * - Default: liveness + non-sensitive VAIDYA env presence (booleans only).
- * - ?deep=1 + Authorization: Bearer <HEALTH_CHECK_SECRET>: full integration checklist (still no secret values).
- */
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -29,24 +24,15 @@ export async function GET(req: NextRequest) {
 
     if (!wantsDeep) {
       return NextResponse.json(
-        {
-          ...base,
-          checks: {
-            vaidya,
-            summary,
-          },
-        },
-        { status: 200 }
+        { ...base, checks: { vaidya, summary } },
+        { status: 200, headers: { 'Cache-Control': 'no-store' } }
       )
     }
 
     if (!secret || token !== secret) {
       return NextResponse.json(
-        {
-          error: 'Unauthorized',
-          hint: 'Set HEALTH_CHECK_SECRET in the deployment environment and send Authorization: Bearer <secret> with ?deep=1',
-        },
-        { status: 401 }
+        { error: 'Unauthorized', hint: 'Set HEALTH_CHECK_SECRET in the deployment environment' },
+        { status: 401, headers: { 'Cache-Control': 'no-store' } }
       )
     }
 
@@ -60,22 +46,13 @@ export async function GET(req: NextRequest) {
         : ('degraded' as const)
 
     return NextResponse.json(
-      {
-        ...base,
-        checks: {
-          ...deep,
-          summary: deepSummary,
-        },
-      },
-      { status: 200 }
+      { ...base, checks: { ...deep, summary: deepSummary } },
+      { status: 200, headers: { 'Cache-Control': 'no-store' } }
     )
   } catch (error) {
     return NextResponse.json(
-      {
-        status: 'unhealthy',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+      { status: 'unhealthy', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500, headers: { 'Cache-Control': 'no-store' } }
     )
   }
 }
