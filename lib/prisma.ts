@@ -1,13 +1,30 @@
 import { PrismaClient } from '@prisma/client'
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+const prismaClientSingleton = () => {
+  const dbUrl =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['error'] : [],
-  })
+  // Support Vercel Postgres/Supabase env naming
+  if (!process.env.DATABASE_URL && dbUrl) {
+    process.env.DATABASE_URL = dbUrl
+  }
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+  // Prisma 7 strictly REQUIRES an adapter. 
+  // We provide a dummy pool if the URL is missing during Vercel's build step.
+  const pool = dbUrl ? new Pool({ connectionString: dbUrl }) : new Pool()
+  const adapter = new PrismaPg(pool)
 
-export default prisma
+  return new PrismaClient({ adapter })
+}
+
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
+
+export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+
+if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
