@@ -116,7 +116,6 @@ export default function ChatMessagesPanel({
   messages,
   loading,
   streaming,
-  oracleState,
   doshaColor,
   renderMarkdown,
   voiceSupported,

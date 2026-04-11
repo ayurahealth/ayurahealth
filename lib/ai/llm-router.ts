@@ -135,7 +135,6 @@ export async function executeCompletion(
   config: RoutingConfig,
 ): Promise<CompletionResponse> {
   const { provider, model, fallbackChain } = routeRequest(config)
-  const requestWithModel = { ...request, model }
 
   // Try primary provider
   try {

@@ -86,25 +86,11 @@ interface PrismaChatClient {
   }
 }
 
-interface TraceItem {
-  id: 'planner' | 'researcher' | 'synthesizer'
-  label: string
-  summary: string
-}
-
 interface ToolTraceItem {
   id: string
   name: string
   args: string
   output: string
-}
-
-interface KnowledgeSource {
-  title: string
-  content: string
-  tradition: string
-  source: string
-  similarity: number
 }
 
 // ── Stream Headers ──────────────────────────────────────────────────────────
@@ -116,7 +102,6 @@ const STREAM_HEADERS = {
 
 // ── Main Handler ────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const requestStartedAt = Date.now()
 
   // 1. Size guard
   const contentLength = req.headers.get('content-length')
@@ -267,8 +252,8 @@ export async function POST(req: NextRequest) {
     ))
 
     // 13. Agentic Tool Execution Loop (up to 3 iterations)
-    let currentMessages: ChatMessage[] = [...completionMessages]
-    let toolTrace: ToolTraceItem[] = []
+    const currentMessages: ChatMessage[] = [...completionMessages]
+    const toolTrace: ToolTraceItem[] = []
     
     // Only use tools if Deep Think or specific tags are present, or in Researcher mode
     const useTools = effectiveWebSearch || effectiveDeepThink || userQuery.toLowerCase().includes('search') || userQuery.toLowerCase().includes('profile')
