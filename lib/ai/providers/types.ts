@@ -20,6 +20,7 @@ export interface CompletionRequest {
   temperature: number
   stream?: boolean
   tools?: ToolDefinition[]
+  signal?: AbortSignal
 }
 
 export interface CompletionResponse {

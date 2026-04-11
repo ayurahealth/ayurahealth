@@ -120,6 +120,7 @@ export class HuggingFaceProvider implements LLMProvider {
         temperature: request.temperature,
         stream: false,
       }),
+      signal: request.signal,
     })
 
     if (!response.ok) {
@@ -168,6 +169,7 @@ export class HuggingFaceProvider implements LLMProvider {
         temperature: request.temperature,
         stream: true,
       }),
+      signal: request.signal,
     })
 
     if (!response.ok || !response.body) {
