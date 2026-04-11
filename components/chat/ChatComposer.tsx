@@ -75,7 +75,13 @@ export default function ChatComposer({
   }
 
   return (
-    <div className="liquid-glass chat-input-shell" style={{ padding: '1rem', paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
+    <div className="premium-glass chat-input-shell" style={{ 
+      margin: '0.75rem', 
+      borderRadius: 'var(--ios-radius-xl)', 
+      padding: '1.25rem', 
+      paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))',
+      boxShadow: '0 -8px 32px -12px rgba(0,0,0,0.4), var(--ios-shadow-xl)' 
+    }}>
       {attachments.length > 0 && (
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.6rem', padding: '0.5rem 0' }}>
           {attachments.map((att) => (
@@ -140,9 +146,52 @@ export default function ChatComposer({
           onKeyDown={onInputKeyDown}
           placeholder={placeholder}
           rows={1}
-          style={{ flex: 1, padding: '0.75rem 1rem', borderRadius: 22, border: '1px solid rgba(106,191,138,0.15)', background: 'rgba(255,255,255,0.04)', color: '#e8dfc8', fontSize: '0.9rem', resize: 'none', outline: 'none', lineHeight: 1.5, maxHeight: 140, overflowY: 'auto', fontFamily: '"DM Sans", system-ui, sans-serif' }}
+          style={{ 
+            flex: 1, 
+            padding: '0.85rem 1.15rem', 
+            borderRadius: 24, 
+            border: '1px solid hsla(var(--sage-accent), 0.2)', 
+            background: 'hsla(0, 0%, 100%, 0.04)', 
+            color: 'hsl(var(--gold-pale))', 
+            fontSize: '0.92rem', 
+            resize: 'none', 
+            outline: 'none', 
+            lineHeight: 1.5, 
+            maxHeight: 160, 
+            overflowY: 'auto', 
+            fontFamily: 'var(--font-dm-sans), sans-serif',
+            transition: 'border-color 0.3s var(--ios-ease-standard)'
+          }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = 'hsla(var(--sage-accent), 0.5)')}
+          onBlur={(e) => (e.currentTarget.style.borderColor = 'hsla(var(--sage-accent), 0.2)')}
         />
-        <button onClick={onSendMessage} disabled={loading || (!input.trim() && attachments.length === 0)} style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, background: loading || (!input.trim() && attachments.length === 0) ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #2d5a1b, #4a9e6a)', border: 'none', color: loading || (!input.trim() && attachments.length === 0) ? 'rgba(255,255,255,0.2)' : '#fff', cursor: loading || (!input.trim() && attachments.length === 0) ? 'not-allowed' : 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↑</button>
+        <button 
+          onClick={onSendMessage} 
+          disabled={loading || (!input.trim() && attachments.length === 0)} 
+          className="send-button-premium"
+          style={{ 
+            width: 48, 
+            height: 48, 
+            borderRadius: '50%', 
+            flexShrink: 0, 
+            background: loading || (!input.trim() && attachments.length === 0) 
+              ? 'hsla(0, 0%, 100%, 0.06)' 
+              : 'linear-gradient(135deg, hsl(var(--sage-deep)), hsl(var(--sage-accent)))', 
+            border: 'none', 
+            color: '#fff', 
+            cursor: loading || (!input.trim() && attachments.length === 0) ? 'not-allowed' : 'pointer', 
+            fontSize: '1.25rem', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            boxShadow: loading || (!input.trim() && attachments.length === 0) ? 'none' : '0 8px 20px -6px hsla(var(--sage-accent), 0.4)',
+            transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          }}
+          onMouseEnter={(e) => { if(!loading) e.currentTarget.style.transform = 'scale(1.1) rotate(-5deg)' }}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          {loading ? '⏳' : '↑'}
+        </button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '0.35rem' }}>
         <span style={{ color: 'rgba(200,200,200,0.18)', fontSize: '0.6rem' }}>📎 reports & photos</span>

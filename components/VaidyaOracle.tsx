@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useMemo, useEffect, useState } from 'react';
+import type { JSX as ReactJSX } from 'react';
 import { Canvas, useFrame, extend } from '@react-three/fiber';
 import { Float, shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
@@ -62,11 +63,16 @@ const PlasmaMaterial = shaderMaterial(
 
 extend({ PlasmaMaterial });
 
-// Declaration for TS
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      plasmaMaterial: any;
+// Declaration for TS — using module augmentation instead of namespace
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    plasmaMaterial: ReactJSX.IntrinsicElements['meshBasicMaterial'] & {
+      ref?: React.Ref<THREE.ShaderMaterial>
+      uTime?: number
+      uColor?: THREE.Color
+      uIntensity?: number
+      uState?: number
+      transparent?: boolean
     }
   }
 }
@@ -112,19 +118,29 @@ const DNAHelix = ({ color }: { color: string }) => {
   );
 };
 
+// Pre-computed particle positions (deterministic seed to avoid impure render)
+function generateParticlePositions(): Float32Array {
+  const p = new Float32Array(50 * 3);
+  // Use a simple seeded pseudo-random for deterministic positions
+  let seed = 42;
+  const seededRandom = () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
+  for (let i = 0; i < 50; i++) {
+    const theta = seededRandom() * Math.PI * 2;
+    const phi = Math.acos(2 * seededRandom() - 1);
+    const r = 1.2 + seededRandom() * 0.4;
+    p[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    p[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    p[i * 3 + 2] = r * Math.cos(phi);
+  }
+  return p;
+}
+const PARTICLE_POSITIONS = generateParticlePositions();
+
 const QuantumParticles = ({ color }: { color: string }) => {
-  const points = useMemo(() => {
-    const p = new Float32Array(50 * 3);
-    for (let i = 0; i < 50; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 1.2 + Math.random() * 0.4;
-      p[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      p[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      p[i * 3 + 2] = r * Math.cos(phi);
-    }
-    return p;
-  }, []);
+  const points = useMemo(() => PARTICLE_POSITIONS, []);
 
   const ref = useRef<THREE.Points>(null!);
   useFrame(({ clock }) => {
@@ -139,9 +155,7 @@ const QuantumParticles = ({ color }: { color: string }) => {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={points.length / 3}
-          array={points}
-          itemSize={3}
+          args={[points, 3]}
         />
       </bufferGeometry>
       <pointsMaterial size={0.03} color={color} transparent opacity={0.6} />
@@ -150,13 +164,13 @@ const QuantumParticles = ({ color }: { color: string }) => {
 };
 
 const ArcReactorHologram = ({ state = 'idle' }: { state: string }) => {
-  const materialRef = useRef<any>(null!);
+  const materialRef = useRef<THREE.ShaderMaterial & { uTime: number; uColor: THREE.Color; uIntensity: number }>(null!);
   
   const colors = {
-    idle: new THREE.Color('#0096c7'),
-    listening: new THREE.Color('#00f5ff'),
-    thinking: new THREE.Color('#ffaa00'),
-    responding: new THREE.Color('#72efdd')
+    idle: new THREE.Color('#1a4d2e'),        // Sage Deep
+    listening: new THREE.Color('#6abf8a'),   // Sage Accent
+    thinking: new THREE.Color('#c9a84c'),    // Gold Accent
+    responding: new THREE.Color('#e8dfc8'),  // Gold Pale
   };
 
   const activeColor = colors[state as keyof typeof colors] || colors.idle;
@@ -208,7 +222,7 @@ const HudOverlay = ({ state = 'idle' }: { state: string }) => {
     return () => clearInterval(i);
   }, []);
 
-  const color = state === 'thinking' ? '#ffaa00' : '#00e5ff';
+  const color = state === 'thinking' ? '#c9a84c' : '#6abf8a';
 
   return (
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 10 }}>
@@ -239,11 +253,11 @@ const HudOverlay = ({ state = 'idle' }: { state: string }) => {
    MAIN EXPORT
 ────────────────────────────────────────────────────────────── */
 
-export default function VaidyaOracle({ state = 'idle', framed = false }: { state?: any; framed?: boolean }) {
-  const accentColor = state === 'thinking' ? '#ffaa00' : '#00e5ff';
+export default function VaidyaOracle({ state = 'idle', framed = false }: { state?: 'idle' | 'listening' | 'thinking' | 'responding'; framed?: boolean }) {
+  const accentColor = state === 'thinking' ? '#c9a84c' : '#6abf8a';
 
   return (
-    <div style={{ width: '100%', height: '400px', position: 'relative', overflow: 'hidden' }}>
+    <div className="vedic-glow" style={{ width: '100%', height: '400px', position: 'relative', overflow: 'hidden' }}>
       {framed && (
         <div style={{
           position: 'absolute', inset: 0,
@@ -264,15 +278,20 @@ export default function VaidyaOracle({ state = 'idle', framed = false }: { state
       </Canvas>
 
       <div style={{
-        position: 'absolute', bottom: '10%', left: '50%', transform: 'translateX(-50%)',
+        position: 'absolute', bottom: '12%', left: '50%', transform: 'translateX(-50%)',
         textAlign: 'center', pointerEvents: 'none'
       }}>
         <h2 style={{
-          color: accentColor, fontFamily: 'monospace', fontSize: '1.4rem',
-          letterSpacing: '0.4em', margin: 0, textShadow: `0 0 15px ${accentColor}`
+          color: accentColor, 
+          fontFamily: 'var(--font-cormorant), serif', 
+          fontSize: '1.8rem',
+          fontWeight: 700,
+          letterSpacing: '0.45em', 
+          margin: 0, 
+          textShadow: `0 0 25px ${accentColor}66`
         }}>VAIDYA</h2>
-        <div style={{ color: `${accentColor}aa`, fontSize: '0.6rem', marginTop: '5px', letterSpacing: '0.2em' }}>
-          NEURAL V-ORACLE SYNTHESIS
+        <div style={{ color: `${accentColor}88`, fontSize: '0.62rem', fontWeight: 600, marginTop: '8px', letterSpacing: '0.25em', textTransform: 'uppercase' }}>
+          Ancient Wisdom • Neural Synthesis
         </div>
       </div>
     </div>

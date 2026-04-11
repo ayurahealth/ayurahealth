@@ -1,20 +1,25 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; height: 100%; }
 :root {
+  /* Premium Ayurvedic Palette (HSL for harmony) */
+  --sage-accent: 142 45% 58%;    /* #6abf8a */
+  --sage-deep: 145 49% 21%;      /* #1a4d2e */
+  --gold-accent: 44 53% 54%;     /* #c9a84c */
+  --gold-pale: 44 47% 85%;       /* #e8dfc8 */
+  
   --ios-bg: #05100a;
-  --ios-text: #e8dfc8;
-  --ios-muted: rgba(232,223,200,0.62);
-  --ios-primary: #6abf8a;
-  --ios-accent: #c9a84c;
-  --ios-surface: rgba(12, 28, 18, 0.72);
-  --ios-surface-strong: rgba(16, 34, 22, 0.82);
-  --ios-stroke: rgba(255,255,255,0.1);
-  --ios-stroke-strong: rgba(106,191,138,0.34);
-  --ios-radius-xl: 20px;
-  --ios-radius-lg: 16px;
-  --ios-shadow-xl: 0 16px 44px rgba(0,0,0,0.52);
-  --ios-shadow-md: 0 8px 24px rgba(0,0,0,0.34);
-  --ios-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ios-text: hsl(var(--gold-pale));
+  --ios-muted: hsla(var(--gold-pale), 0.62);
+  --ios-primary: hsl(var(--sage-accent));
+  --ios-accent: hsl(var(--gold-accent));
+  --ios-surface: hsla(145, 40%, 8%, 0.72);
+  --ios-stroke: hsla(0, 0%, 100%, 0.08);
+  --ios-stroke-strong: hsla(var(--sage-accent), 0.34);
+  --ios-radius-xl: 24px;
+  --ios-radius-lg: 18px;
+  --ios-shadow-xl: 0 20px 50px -12px rgba(0,0,0,0.7);
+  --ios-shadow-md: 0 10px 30px -8px rgba(0,0,0,0.5);
+  --ios-ease-standard: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 :root[data-theme='gold'] {
@@ -117,26 +122,53 @@ body {
 }
 
 .liquid-glass {
-  background: rgba(10, 26, 15, 0.75);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  background: hsla(145, 40%, 5%, 0.8);
+  backdrop-filter: blur(40px) saturate(210%);
+  -webkit-backdrop-filter: blur(40px) saturate(210%);
+  border: 1px solid hsla(0, 0%, 100%, 0.12);
+  border-top-color: hsla(0, 0%, 100%, 0.22);
+  box-shadow: 
+    var(--ios-shadow-xl),
+    inset 0 1px 1px hsla(0, 0%, 100%, 0.15);
+}
+
+.premium-glass {
+  background: hsla(145, 40%, 10%, 0.45);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid hsla(0, 0%, 100%, 0.1);
+  box-shadow: 
+    0 12px 32px -8px rgba(0,0,0,0.5),
+    inset 0 1px 0.5px hsla(0, 0%, 100%, 0.1);
+  transition: all 0.4s var(--ios-ease-standard);
+}
+
+.premium-glass:hover {
+  background: hsla(145, 40%, 12%, 0.55);
+  border-color: hsla(var(--sage-accent), 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 48px -12px rgba(0,0,0,0.6);
 }
 
 .glass-card {
-  background: rgba(15, 35, 22, 0.4);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: hsla(145, 40%, 12%, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid hsla(0, 0%, 100%, 0.05);
+  border-radius: var(--ios-radius-lg);
+  transition: all 0.3s var(--ios-ease-standard);
 }
 
-.glass-card:hover {
-  background: rgba(20, 45, 28, 0.5);
-  border-color: rgba(106, 191, 138, 0.2);
-  transform: translateY(-2px);
+.vedic-glow {
+  position: relative;
+}
+
+.vedic-glow::after {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle at center, hsla(var(--gold-accent), 0.15), transparent 70%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .ios-surface {
@@ -227,8 +259,9 @@ body {
 }
 
 .markdown-content strong {
-  font-weight: 600;
-  color: #6abf8a;
+  font-weight: 700;
+  color: hsl(var(--sage-accent));
+  text-shadow: 0 0 12px hsla(var(--sage-accent), 0.2);
 }
 
 .markdown-content br + br {

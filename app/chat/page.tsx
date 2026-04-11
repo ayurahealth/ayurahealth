@@ -12,6 +12,7 @@ import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
 import VedicOraclePanel from '@/components/vedic/VedicOraclePanel'
 import { vaidyaVoice } from '../../lib/vaidyaVoice'
+import { calculateHealthScores, loadProfile } from '../../lib/healthProfile'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -215,7 +216,7 @@ export default function ChatPage() {
   const [selectedSource, setSelectedSource] = useState<ChatSource | null>(null)
   const [isSharing, setIsSharing] = useState(false)
   const [shareSuccess, setShareSuccess] = useState(false)
-  const [labResults, setLabResults] = useState<any[]>([])
+  const [labResults, setLabResults] = useState<Array<{ id: string; value: string; status: 'optimal' | 'low' | 'high' }>>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [attachLoading, setAttachLoading] = useState(false)
   const [linkInput, setLinkInput] = useState('')
@@ -269,6 +270,12 @@ export default function ChatPage() {
     }
   })
   const [vedicContext, setVedicContext] = useState<string | null>(null)
+  const [healthScores, setHealthScores] = useState<{ healthScore: number; doshaBalance: number; dashaInfluence: number; sentimentScore: number }>({
+    healthScore: 72,
+    doshaBalance: 80,
+    dashaInfluence: 65,
+    sentimentScore: 70
+  })
   const [vedicEnabled, setVedicEnabled] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
     try {
@@ -434,6 +441,14 @@ export default function ChatPage() {
     const interval = setInterval(() => setThinkingDots(d => d.length >= 3 ? '.' : d + '.'), 500)
     return () => clearInterval(interval)
   }, [loading])
+
+  // Calculate health scores from conversation messages
+  useEffect(() => {
+    if (messages.length === 0) return
+    const profile = loadProfile()
+    const scores = calculateHealthScores(messages, profile)
+    setHealthScores(scores)
+  }, [messages])
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -687,7 +702,7 @@ export default function ChatPage() {
       // Reactive Diagnostic Feed: Extract biomarkers from AI analysis
       if (full.includes('BIO_MARKER:')) {
         const matches = [...full.matchAll(/BIO_MARKER: ([\w\- ]+) \| VALUE: ([\w\- \/\.>]+) \| STATUS: (\w+)/g)];
-        const extracted = matches.map(m => ({ id: m[1].toLowerCase().slice(0,3), value: m[2], status: m[3].toLowerCase() }));
+        const extracted = matches.map(m => ({ id: m[1].toLowerCase().slice(0,3), value: m[2], status: m[3].toLowerCase() as 'optimal' | 'low' | 'high' }));
         if (extracted.length > 0) setLabResults(extracted);
       }
       setIsSpeaking(false);
@@ -1511,6 +1526,10 @@ export default function ChatPage() {
               systemDetail={SYSTEM_DETAIL}
               messagesCount={messages.length}
               incognito={incognito}
+              healthScore={healthScores.healthScore}
+              doshaBalance={healthScores.doshaBalance}
+              dashaInfluence={healthScores.dashaInfluence}
+              sentimentScore={healthScores.sentimentScore}
             />
 
             {/* Right conversation area */}
@@ -1561,6 +1580,7 @@ export default function ChatPage() {
               {vedicPanelOpen && (
                 <VedicOraclePanel
                   initialDosha={dosha ?? 'Vata'}
+                  labResults={labResults}
                   onContextReady={(context) => setVedicContext(context)}
                 />
               )}

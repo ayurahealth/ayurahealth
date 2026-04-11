@@ -5,10 +5,10 @@ const nextConfig: NextConfig = {
   // Prevent Next.js from inferring tracing root from parent lockfiles.
   outputFileTracingRoot: path.join(__dirname),
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   skipTrailingSlashRedirect: true,
   experimental: {
@@ -30,6 +30,9 @@ const nextConfig: NextConfig = {
         "connect-src 'self'",
         "https://api.groq.com",
         "https://openrouter.ai",               // VAIDYA Deep Mind
+        "https://router.huggingface.co",        // HuggingFace Router
+        "https://api-inference.huggingface.co", // HuggingFace Inference
+        "http://localhost:11434",               // Ollama local inference
         "https://checkout.razorpay.com",        // Razorpay checkout
         "https://api.razorpay.com",             // Razorpay API
         "https://cdn.razorpay.com",             // Razorpay CDN

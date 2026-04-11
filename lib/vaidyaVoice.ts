@@ -31,7 +31,8 @@ class VaidyaVoice {
   private initAudioContext() {
     if (typeof window === 'undefined') return;
     try {
-      this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      this.audioCtx = new AudioContextClass();
     } catch (e) {
       console.warn('Web Audio API not supported', e);
     }
@@ -80,7 +81,7 @@ class VaidyaVoice {
       utterance.voice = this.voice;
     }
 
-    utterance.pitch = 0.92; // Slightly lower for Jarvis
+    utterance.pitch = 0.92; // Optimized for V-Oracle authoritative tone
     utterance.rate = 1.05;  // Slightly faster for intelligence feel
     utterance.volume = 1.0;
 

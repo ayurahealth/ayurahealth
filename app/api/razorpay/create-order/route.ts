@@ -81,13 +81,13 @@ export async function POST(request: NextRequest) {
 
   // ── Rate limiting (payment-specific: 5/min) ──────────────────────────────
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
-  const { allowed } = checkPaymentRateLimit(ip)
+  const { allowed } = await checkPaymentRateLimit(ip)
   if (!allowed) {
     return NextResponse.json({ error: 'Too many requests. Please wait.' }, { status: 429 })
   }
 
   // ── General rate limit ───────────────────────────────────────────────────
-  const generalCheck = checkRateLimit(ip)
+  const generalCheck = await checkRateLimit(ip)
   if (!generalCheck.allowed) {
     return NextResponse.json({ error: 'Too many requests.' }, { status: 429 })
   }

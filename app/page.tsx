@@ -168,13 +168,13 @@ export default function LandingPage() {
 
         /* ── Hero ── */
         .hero-tagline {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: var(--font-cormorant), serif;
           font-size: clamp(2.6rem, 7vw, 6.2rem);
           font-weight: 700;
           line-height: 1.02;
           letter-spacing: -0.035em;
           white-space: pre-line;
-          background: linear-gradient(135deg, #e8dfc8 0%, #c9a84c 30%, #6abf8a 70%, #2d7a45 100%);
+          background: linear-gradient(135deg, hsl(var(--gold-pale)) 0%, hsl(var(--gold-accent)) 30%, hsl(var(--sage-accent)) 70%, hsl(var(--sage-deep)) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -194,12 +194,12 @@ export default function LandingPage() {
         /* ── Buttons ── */
         .btn-primary {
           display: inline-flex; align-items: center; gap: 0.5rem;
-          background: linear-gradient(135deg, #1a4d2e 0%, #2d7a45 50%, #3a9455 100%);
-          color: #e8dfc8; padding: 0.95rem 2.4rem; border-radius: 980px;
-          font-size: 1rem; font-weight: 600; text-decoration: none;
+          background: linear-gradient(135deg, hsla(var(--sage-deep), 0.9) 0%, hsla(var(--sage-accent), 0.8) 100%);
+          color: hsl(var(--gold-pale)); padding: 0.95rem 2.4rem; border-radius: 980px;
+          font-size: 1rem; font-weight: 700; text-decoration: none;
           transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-          box-shadow: 0 4px 28px rgba(45,122,69,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-          border: 1px solid rgba(106,191,138,0.35);
+          box-shadow: 0 4px 28px hsla(var(--sage-accent), 0.4), inset 0 1px 0 hsla(0, 0%, 100%, 0.1);
+          border: 1px solid hsla(var(--sage-accent), 0.35);
           position: relative; overflow: hidden;
         }
         .btn-primary::before {
@@ -230,12 +230,13 @@ export default function LandingPage() {
 
         /* ── Feature cards (glassmorphism) ── */
         .feat-card {
-          background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(106,191,138,0.03) 100%);
-          border: 1px solid rgba(106,191,138,0.1);
-          border-radius: 20px; padding: 1.8rem;
-          transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+          composes: premium-glass;
+          background: hsla(145, 40%, 12%, 0.4);
+          backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid hsla(0, 0%, 100%, 0.08);
+          border-radius: 24px; padding: 2.2rem;
+          transition: all 0.4s var(--ios-ease-standard);
           position: relative; overflow: hidden;
-          backdrop-filter: blur(4px);
         }
         .feat-card::before {
           content: ''; position: absolute; inset: 0;

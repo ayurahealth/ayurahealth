@@ -24,8 +24,8 @@ export default function VedicHealthScore({
 }: VedicHealthScoreProps) {
   
   const statusColor = useMemo(() => {
-    if (score > 85) return '#6abf8a' // Balanced
-    if (score > 60) return '#c9a84c' // Moderate
+    if (score > 85) return 'hsl(var(--sage-accent))' // Balanced
+    if (score > 60) return 'hsl(var(--gold-accent))' // Moderate
     return '#ff6b6b'                // Imbalanced
   }, [score])
 
@@ -36,16 +36,14 @@ export default function VedicHealthScore({
   }, [score])
 
   return (
-    <div style={{
-      background: 'linear-gradient(135deg, rgba(15, 25, 20, 0.95) 0%, rgba(5, 15, 10, 0.98) 100%)',
-      borderRadius: '24px',
+    <div className="premium-glass" style={{
+      borderRadius: 'var(--ios-radius-xl)',
       padding: '1.5rem',
-      border: `1px solid ${statusColor}33`,
-      boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 0 20px ${statusColor}11`,
       position: 'relative',
       overflow: 'hidden',
-      color: '#e8dfc8',
-      minWidth: '280px'
+      color: 'hsl(var(--gold-pale))',
+      minWidth: '280px',
+      border: `1px solid ${statusColor}44`
     }}>
       {/* Background Pulse */}
       <div style={{
@@ -110,7 +108,7 @@ export default function VedicHealthScore({
                 fill="url(#lotusGradient)"
                 transform={`rotate(${angle} 50 50) translate(0, -15)`}
                 style={{
-                  opacity: 0.6 + Math.sin(Date.now()/1000 + i) * 0.2,
+                  opacity: 0.7,
                   animation: `petal-pulse ${3 + i*0.2}s infinite ease-in-out`
                 }}
               />
@@ -128,14 +126,14 @@ export default function VedicHealthScore({
         </div>
 
         <div style={{ 
-          marginTop: '1.2rem', 
+          marginTop: '1.25rem', 
           paddingTop: '1rem', 
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-          fontSize: '0.72rem',
-          lineHeight: 1.5,
-          color: 'rgba(232,223,200,0.6)'
+          borderTop: '1px solid hsla(0, 0%, 100%, 0.05)',
+          fontSize: '0.74rem',
+          lineHeight: 1.6,
+          color: 'var(--ios-muted)'
         }}>
-          <span style={{ color: statusColor }}>💡 Guidance:</span> {
+          <span style={{ color: statusColor, fontWeight: 700 }}>💡 Guidance:</span> {
             score > 85 ? 'System is in peak harmony. Maintain current Dinacharya.' :
             score > 60 ? 'Minor instability detected. Focus on grounding foods and warm liquids.' :
             'Significant Vitiation. Consult VAIDYA for a corrective Panchakarma plan.'

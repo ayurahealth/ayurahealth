@@ -8,7 +8,7 @@ import HolographicLabMap from '../diagnostics/HolographicLabMap'
 
 interface Props {
   initialDosha?: string
-  labResults?: any[]
+  labResults?: Array<{ id: string; value: string; status: 'optimal' | 'low' | 'high' }>
   onContextReady?: (context: string) => void
 }
 
@@ -67,24 +67,24 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', labResults = [
 
   if (!birthDataEntered) {
     return (
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(5,16,10,0.95), rgba(10,25,15,0.98))',
-        borderRadius: 24,
-        border: '1px solid rgba(201,168,76,0.3)',
-        padding: '2rem',
-        marginBottom: '1.5rem'
+      <div className="premium-glass" style={{
+        borderRadius: 'var(--ios-radius-xl)',
+        padding: '2.5rem',
+        marginBottom: '1.75rem',
+        textAlign: 'center'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔭</div>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🔭</div>
           <h2 style={{
-            fontFamily: 'Georgia, serif',
-            fontSize: '1.4rem',
-            color: '#c9a84c',
-            marginBottom: '0.5rem'
+            fontFamily: 'var(--font-cormorant), serif',
+            fontSize: '1.85rem',
+            color: 'hsl(var(--gold-accent))',
+            marginBottom: '0.6rem',
+            letterSpacing: '0.05em'
           }}>
             Vedic Intelligence Oracle
           </h2>
-          <p style={{ color: 'rgba(232,223,200,0.6)', fontSize: '0.88rem', lineHeight: 1.6 }}>
+          <p style={{ color: 'var(--ios-muted)', fontSize: '0.92rem', lineHeight: 1.6, maxWidth: 600, margin: '0 auto 1.5rem' }}>
             Enter your birth details to unlock Jyotish (Vedic Astrology), Pancha Bhuta (Five Elements),
             and Vedic Mathematics analysis — powering deeper VAIDYA health insights.
           </p>
@@ -124,10 +124,8 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', labResults = [
   const { birthChart, panchaBhuta, vedicMathInsights, remedies, dailyVedicGuidance, vedicHealthScore, pranaProfile } = oracleData
 
   return (
-    <div style={{
-      background: 'linear-gradient(135deg, rgba(5,16,10,0.95), rgba(10,25,15,0.98))',
-      borderRadius: 24,
-      border: '1px solid rgba(201,168,76,0.3)',
+    <div className="liquid-glass" style={{
+      borderRadius: 'var(--ios-radius-xl)',
       overflow: 'hidden',
       marginBottom: '1.5rem'
     }}>
@@ -143,10 +141,11 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', labResults = [
       }}>
         <div>
           <h2 style={{
-            fontFamily: 'Georgia, serif',
-            fontSize: '1.1rem',
-            color: '#c9a84c',
-            margin: 0
+            fontFamily: 'var(--font-cormorant), serif',
+            fontSize: '1.25rem',
+            color: 'hsl(var(--gold-accent))',
+            margin: 0,
+            letterSpacing: '0.02em'
           }}>
             🔭 Vedic Intelligence Oracle
           </h2>
@@ -209,15 +208,16 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', labResults = [
             style={{
               flex: 1,
               minWidth: 70,
-              padding: '0.7rem 0.5rem',
+              padding: '0.85rem 0.6rem',
               background: 'none',
               border: 'none',
-              borderBottom: activeTab === tab.id ? '2px solid #c9a84c' : '2px solid transparent',
-              color: activeTab === tab.id ? '#c9a84c' : 'rgba(232,223,200,0.4)',
-              fontSize: '0.72rem',
+              borderBottom: activeTab === tab.id ? '2px solid hsl(var(--gold-accent))' : '2px solid transparent',
+              color: activeTab === tab.id ? 'hsl(var(--gold-accent))' : 'var(--ios-muted)',
+              fontSize: '0.74rem',
+              fontWeight: activeTab === tab.id ? 700 : 400,
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              transition: 'all 0.2s'
+              transition: 'all 0.3s var(--ios-ease-standard)'
             }}
           >
             {tab.emoji} {tab.label.split(' ')[1] || tab.label}

@@ -12,17 +12,17 @@ export default function SystemCard({ label, icon, active, onClick, style }: Syst
   return (
     <button
       onClick={onClick}
-      className={`ios-chip${active ? ' active' : ''}`}
+      className={`ios-chip${active ? ' active premium-glass' : ''}`}
       style={{
-        padding: '0.55rem 0.45rem',
-        borderRadius: 12,
+        padding: '0.65rem 0.5rem',
+        borderRadius: 'var(--ios-radius-lg)',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '0.28rem',
-        minHeight: 62,
-        boxShadow: active ? 'var(--ios-shadow-md)' : 'none',
+        gap: '0.35rem',
+        minHeight: 68,
+        transition: 'all 0.3s var(--ios-ease-standard)',
         ...style,
       }}
     >

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   // ── Rate limit to prevent spam ──────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
-  const { allowed } = checkRateLimit(ip)
+  const { allowed } = await checkRateLimit(ip)
   if (!allowed) {
     return NextResponse.json({ error: 'Too many submissions. Please wait.' }, { status: 429 })
   }

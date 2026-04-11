@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { RefObject } from 'react'
 import VaidyaOracle from '../VaidyaOracle'
 import { ChatSkeleton } from '../BoneyardLoaders'
@@ -146,21 +146,19 @@ export default function ChatMessagesPanel({
       )}
 
       {loading && !streaming && (
-        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(5,16,10,0.8)', backdropFilter: 'blur(8px)', margin: '0 -1rem 1.5rem', padding: '1rem' }}>
-          <div style={{ width: 120, height: 120, margin: '0 auto' }}>
-            <VaidyaOracle state={oracleState} />
-          </div>
         </div>
       )}
 
-      {messages.map((msg, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 10, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-          style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '0.75rem' }}
-        >
+      <AnimatePresence initial={false}>
+        {messages.map((msg, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+            style={{ marginBottom: '1.75rem', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '0.85rem' }}
+          >
           {msg.role === 'assistant' && (
             <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', border: '1px solid rgba(106,191,138,0.2)' }}>
               🌿
@@ -176,14 +174,14 @@ export default function ChatMessagesPanel({
 
               return (
             <div
-              className={`${msg.role === 'user' ? 'chat-user-bubble' : 'glass-card chat-assistant-bubble'}`}
+              className={`${msg.role === 'user' ? 'chat-user-bubble' : 'premium-glass chat-assistant-bubble'}`}
               style={{
-                padding: msg.role === 'user' ? '0.85rem 1.25rem' : '1.25rem 1.5rem',
-                borderRadius: msg.role === 'user' ? '24px 24px 4px 24px' : '4px 24px 24px 24px',
-                background: msg.role === 'user' ? 'linear-gradient(135deg, #1a4d2e, #2d7a45)' : undefined,
-                border: msg.role === 'user' ? '1px solid rgba(106,191,138,0.3)' : undefined,
-                color: msg.role === 'user' ? '#f0e6c8' : 'rgba(232,223,200,0.9)',
-                boxShadow: msg.role === 'user' ? '0 8px 24px rgba(0,0,0,0.2)' : undefined,
+                padding: msg.role === 'user' ? '0.95rem 1.35rem' : '1.35rem 1.6rem',
+                borderRadius: msg.role === 'user' ? '26px 26px 6px 26px' : '6px 26px 26px 26px',
+                background: msg.role === 'user' ? 'linear-gradient(135deg, hsla(var(--sage-deep), 0.9), hsla(var(--sage-accent), 0.7))' : undefined,
+                border: msg.role === 'user' ? '1px solid hsla(var(--sage-accent), 0.3)' : undefined,
+                color: msg.role === 'user' ? 'hsl(var(--gold-pale))' : 'hsla(var(--gold-pale), 0.92)',
+                boxShadow: msg.role === 'user' ? 'var(--ios-shadow-md)' : undefined,
               }}
             >
               {msg.role === 'assistant' && hasStructuredSections && structured ? (
@@ -344,6 +342,7 @@ export default function ChatMessagesPanel({
           </div>
         </motion.div>
       ))}
+      </AnimatePresence>
       {loading && !streaming && <ChatSkeleton />}
 
       {streaming && (
