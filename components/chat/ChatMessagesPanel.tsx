@@ -145,9 +145,6 @@ export default function ChatMessagesPanel({
         </div>
       )}
 
-      {loading && !streaming && (
-        </div>
-      )}
 
       <AnimatePresence initial={false}>
         {messages.map((msg, i) => (

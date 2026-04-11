@@ -17,6 +17,7 @@ function getApiKey(): string {
   return process.env.GROQ_API_KEY || ''
 }
 
+interface GroqChoice {
   message?: { 
     content?: string
     tool_calls?: Array<{ id: string; type: 'function'; function: { name: string; arguments: string } }>
