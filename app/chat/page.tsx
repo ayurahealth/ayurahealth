@@ -544,36 +544,39 @@ export default function ChatPage() {
 
   const removeAttachment = (id: string) => setAttachments(prev => prev.filter(a => a.id !== id))
 
-  const calcDosha = (ans: string[]): Dosha => {
+  const calcDosha = useCallback((ans: string[]): Dosha => {
     const counts: Record<string, number> = { Vata: 0, Pitta: 0, Kapha: 0 }
     ans.forEach(a => { counts[a] = (counts[a] || 0) + 1 })
     return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] as Dosha
-  }
+  }, [])
 
-  const handleAnswer = (d: string) => {
-    const newAnswers = [...answers, d]
-    setAnswers(newAnswers)
-    if (currentQ < QUESTIONS(lang).length - 1) setCurrentQ(currentQ + 1)
-    else { 
-      const resultDosha = calcDosha(newAnswers)
-      setDosha(resultDosha)
-      setScreen('result')
+  const handleAnswer = useCallback((d: string) => {
+    setAnswers(prev => {
+      const newAnswers = [...prev, d]
+      if (currentQ < QUESTIONS(lang).length - 1) {
+        setCurrentQ(prevQ => prevQ + 1)
+      } else { 
+        const resultDosha = calcDosha(newAnswers)
+        setDosha(resultDosha)
+        setScreen('result')
 
-      // Save to Database if user is signed in
-      if (user) {
-        fetch('/api/user-profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            primaryDosha: resultDosha,
-            vataScore: newAnswers.filter(a => a === 'Vata').length * 20,
-            pittaScore: newAnswers.filter(a => a === 'Pitta').length * 20,
-            kaphaScore: newAnswers.filter(a => a === 'Kapha').length * 20
-          })
-        }).catch(err => console.error('Failed to save profile:', err))
+        // Save to Database if user is signed in
+        if (user) {
+          fetch('/api/user-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              primaryDosha: resultDosha,
+              vataScore: newAnswers.filter(a => a === 'Vata').length * 20,
+              pittaScore: newAnswers.filter(a => a === 'Pitta').length * 20,
+              kaphaScore: newAnswers.filter(a => a === 'Kapha').length * 20
+            })
+          }).catch(err => console.error('Failed to save profile:', err))
+        }
       }
-    }
-  }
+      return newAnswers
+    })
+  }, [currentQ, lang, user, calcDosha])
 
   const startChat = useCallback((d?: Dosha | null) => {
     const activeDosha = d ?? dosha

@@ -130,6 +130,7 @@ export class OpenRouterProvider implements LLMProvider {
         temperature: request.temperature,
         stream: false,
       }),
+      signal: request.signal,
     })
 
     if (!response.ok) {
@@ -176,6 +177,7 @@ export class OpenRouterProvider implements LLMProvider {
         temperature: request.temperature,
         stream: true,
       }),
+      signal: request.signal,
     })
 
     if (!response.ok || !response.body) {

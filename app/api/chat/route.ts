@@ -260,8 +260,12 @@ export async function POST(req: NextRequest) {
     const useTools = effectiveWebSearch || effectiveDeepThink || userQuery.toLowerCase().includes('search') || userQuery.toLowerCase().includes('profile')
 
     if (useTools) {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 5; i++) { // Increased to 5 for complex reasoning, but with strict safety break
         log.info('TOOL_CHECK_ITERATION', { iteration: i, provider: preferredModel })
+        if (i === 4) {
+          log.warn('MAX_TOOL_ITERATIONS_REACHED', { sessionId })
+          break
+        }
         try {
           const check = await executeCompletion(
             { model: '', messages: currentMessages, maxTokens: 1000, temperature: 0.1, tools: VAIDYA_TOOLS },
@@ -280,7 +284,7 @@ export async function POST(req: NextRequest) {
             continue // Check again if LLM needs more tools
           }
         } catch (err) {
-          log.error('TOOL_LOOP_FAILED', { error: String(err) })
+          log.error('TOOL_LOOP_FAILED', { error: 'Internal tool execution error' })
           break
         }
         break // No tool calls, proceed to stream
@@ -398,7 +402,7 @@ function createCompositeStream(args: {
           }
         }
       } catch (err) {
-        log.error('LLM_STREAM_ERROR', { error: String(err) })
+        log.error('LLM_STREAM_ERROR', { error: 'Stream interrupted' })
       } finally {
         if (activeSessionId && fullText) {
           const sanitizedText = sanitizeAIResponse(fullText)
