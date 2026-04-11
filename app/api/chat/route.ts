@@ -38,6 +38,8 @@ import {
   fetchKnowledgeContext,
   fetchWebContext,
   orchestrateAgents,
+  type KnowledgeChunkResult,
+  type AgentTraceItem,
 } from '../../../lib/ai/context-engine'
 import { executeCompletion, executeStreamingCompletion, routeRequest } from '../../../lib/ai/llm-router'
 import type { ModelPreference } from '../../../lib/ai/llm-router'
@@ -305,7 +307,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         sources: allChunks,
         sessionId,
-        agentTrace: [...agentTrace, ...toolTrace.map(t => ({ id: 'researcher', label: `Executed ${t.name}`, summary: t.output.slice(0, 100) }))],
+        agentTrace: [...agentTrace, ...toolTrace.map(t => ({ id: 'researcher' as const, label: `Executed ${t.name}`, summary: t.output.slice(0, 100) }))],
         modelUsed: streamResult.model,
         providerUsed: streamResult.provider,
         policy: autoRecoveryPolicy,
@@ -323,9 +325,9 @@ export async function POST(req: NextRequest) {
 function createCompositeStream(args: {
   llmStream: ReadableStream<Uint8Array>
   metadata: {
-    sources: KnowledgeSource[]
+    sources: KnowledgeChunkResult[]
     sessionId?: string
-    agentTrace: TraceItem[]
+    agentTrace: AgentTraceItem[]
     modelUsed: string
     providerUsed: string
     policy: AutoRecoveryPolicy
@@ -342,7 +344,6 @@ function createCompositeStream(args: {
 
   return new ReadableStream({
     async start(controller) {
-      // 1. Resolve Session ID Logic ... (truncated for brevity)
       if (args.clerkUserId && !activeSessionId) {
         try {
           const prismaMod = await import('../../../lib/prisma')
@@ -428,3 +429,15 @@ function createCompositeStream(args: {
     },
   })
 }
+
+function createTextStream(content: string, metadata: unknown): ReadableStream {
+  const encoder = new TextEncoder()
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify(metadata)}\n\n`))
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
+      controller.close()
+    }
+  })
+}
+

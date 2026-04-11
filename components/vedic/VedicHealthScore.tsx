@@ -26,7 +26,7 @@ export default function VedicHealthScore({
   const statusColor = useMemo(() => {
     if (score > 85) return 'hsl(var(--sage-accent))' // Balanced
     if (score > 60) return 'hsl(var(--gold-accent))' // Moderate
-    return '#ff6b6b'                // Imbalanced
+    return 'hsl(var(--gold-accent))'                // Imbalanced (using baseline gold)
   }, [score])
 
   const statusLabel = useMemo(() => {
@@ -65,7 +65,7 @@ export default function VedicHealthScore({
               fontSize: '0.75rem', 
               textTransform: 'uppercase', 
               letterSpacing: '0.15em', 
-              color: 'rgba(232,223,200,0.5)',
+              color: 'hsla(var(--gold-pale-h), var(--gold-pale-s), var(--gold-pale-l), 0.5)',
               margin: 0
             }}>Holistic Wellness Score</h3>
             <p style={{ 
@@ -120,18 +120,18 @@ export default function VedicHealthScore({
 
         {/* Breakdown Bars */}
         <div style={{ display: 'grid', gap: '0.8rem' }}>
-          <ScoreBar label="Physical (Dosha)" value={doshaBalance} color="#6abf8a" />
-          <ScoreBar label="Temporal (Dasha)" value={dashaInfluence} color="#c9a84c" />
-          <ScoreBar label="Emotional (Prana)" value={sentimentScore} color="#5bc0eb" />
+          <ScoreBar label="Physical (Dosha)" value={doshaBalance} color="hsl(var(--sage-accent))" />
+          <ScoreBar label="Temporal (Dasha)" value={dashaInfluence} color="hsl(var(--gold-accent))" />
+          <ScoreBar label="Emotional (Prana)" value={sentimentScore} color="hsl(var(--gold-pale))" />
         </div>
 
         <div style={{ 
           marginTop: '1.25rem', 
           paddingTop: '1rem', 
-          borderTop: '1px solid hsla(0, 0%, 100%, 0.05)',
+          borderTop: '1px solid hsla(var(--gold-pale-h), var(--gold-pale-s), var(--gold-pale-l), 0.1)',
           fontSize: '0.74rem',
           lineHeight: 1.6,
-          color: 'var(--ios-muted)'
+          color: 'hsla(var(--gold-pale-h), var(--gold-pale-s), var(--gold-pale-l), 0.6)'
         }}>
           <span style={{ color: statusColor, fontWeight: 700 }}>💡 Guidance:</span> {
             score > 85 ? 'System is in peak harmony. Maintain current Dinacharya.' :
@@ -159,12 +159,12 @@ function ScoreBar({ label, value, color }: { label: string, value: number, color
   return (
     <div style={{ flex: 1 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-        <span style={{ fontSize: '0.68rem', color: 'rgba(232,223,200,0.5)' }}>{label}</span>
+        <span style={{ fontSize: '0.68rem', color: 'hsla(var(--gold-pale-h), var(--gold-pale-s), var(--gold-pale-l), 0.5)' }}>{label}</span>
         <span style={{ fontSize: '0.68rem', color: color, fontWeight: 600 }}>{value}%</span>
       </div>
       <div style={{ 
         height: '4px', 
-        background: 'rgba(255,255,255,0.05)', 
+        background: 'hsla(var(--gold-pale-h), var(--gold-pale-s), var(--gold-pale-l), 0.1)', 
         borderRadius: '2px',
         overflow: 'hidden'
       }}>

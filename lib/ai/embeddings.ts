@@ -18,6 +18,9 @@ export async function getEmbedding(text: string): Promise<number[]> {
   const hfKey = process.env.HUGGINGFACE_API_KEY
   if (hfKey || process.env.NODE_ENV === 'production') {
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+
       const response = await fetch(
         'https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2',
         {
@@ -26,9 +29,11 @@ export async function getEmbedding(text: string): Promise<number[]> {
             'Authorization': `Bearer ${hfKey || ''}`,
             'Content-Type': 'application/json' 
           },
-          body: JSON.stringify({ inputs: text })
+          body: JSON.stringify({ inputs: text }),
+          signal: controller.signal
         }
       )
+      clearTimeout(timeoutId)
       if (response.ok) {
         const result = await response.json()
         if (Array.isArray(result)) return result
@@ -41,7 +46,8 @@ export async function getEmbedding(text: string): Promise<number[]> {
   // ── Legacy Mode: Local Transformers.js ─────────────────────────────────────
   try {
     const extract = await getExtractor();
-    const output = await extract(text, { pooling: 'mean', normalize: true }) as { data: Float32Array };
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    const output = await extract(text, { pooling: 'mean', normalize: true } as any) as { data: Float32Array };
     
     // The extractor returns a Tensor which has a 'data' property of type Float32Array
     return Array.from(output.data);

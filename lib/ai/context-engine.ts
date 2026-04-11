@@ -10,7 +10,7 @@
 
 import { log } from '../logger'
 
-interface KnowledgeChunkResult {
+export interface KnowledgeChunkResult {
   title: string
   content: string
   tradition: string
@@ -24,7 +24,7 @@ interface WebSearchResult {
   content: string
 }
 
-interface AgentTraceItem {
+export interface AgentTraceItem {
   id: 'planner' | 'researcher' | 'synthesizer'
   label: string
   summary: string

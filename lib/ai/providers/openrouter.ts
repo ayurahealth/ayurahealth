@@ -119,8 +119,12 @@ export class OpenRouterProvider implements LLMProvider {
         model: request.model,
         messages: this.formatMessages(request.messages),
         tools: request.tools?.map(t => ({
-          type: 'function',
-          function: t.function
+          type: 'function' as const,
+          function: {
+            name: t.name,
+            description: t.description,
+            parameters: t.parameters
+          }
         })),
         max_tokens: request.maxTokens,
         temperature: request.temperature,
@@ -161,8 +165,12 @@ export class OpenRouterProvider implements LLMProvider {
         model: request.model,
         messages: this.formatMessages(request.messages),
         tools: request.tools?.map(t => ({
-          type: 'function',
-          function: t.function
+          type: 'function' as const,
+          function: {
+            name: t.name,
+            description: t.description,
+            parameters: t.parameters
+          }
         })),
         max_tokens: request.maxTokens,
         temperature: request.temperature,

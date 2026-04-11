@@ -88,10 +88,10 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .nav-root.scrolled { 
-          background: rgba(5, 16, 10, 0.75); 
+          background: hsla(var(--sage-deep), 0.75); 
           backdrop-filter: blur(20px) saturate(180%); 
           -webkit-backdrop-filter: blur(20px) saturate(180%); 
-          border-bottom: 1px solid rgba(106, 191, 138, 0.08); 
+          border-bottom: 1px solid hsla(var(--sage-accent), 0.08); 
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); 
           height: 58px;
         }
@@ -111,9 +111,9 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
           font-weight: 500;
         }
         .nav-pill:hover { 
-          color: #e8dfc8; 
-          border-color: rgba(106, 191, 138, 0.4); 
-          background: rgba(106, 191, 138, 0.08); 
+          color: var(--ios-text); 
+          border-color: hsla(var(--sage-accent), 0.4); 
+          background: hsla(var(--sage-accent), 0.08); 
           transform: translateY(-1px);
         }
         
@@ -133,18 +133,18 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
           font-family: inherit; 
         }
         .lang-trigger:hover { 
-          border-color: rgba(106, 191, 138, 0.4); 
-          color: #e8dfc8; 
-          background: rgba(106, 191, 138, 0.08); 
+          border-color: hsla(var(--sage-accent), 0.4); 
+          color: var(--ios-text); 
+          background: hsla(var(--sage-accent), 0.08); 
         }
         
         /* Bottom Tab Bar for Mobile */
         .bottom-tab-bar { 
           display: none; position: fixed; bottom: 0; left: 0; right: 0; 
-          z-index: 199; background: rgba(5, 16, 10, 0.82); 
+          z-index: 199; background: hsla(var(--sage-deep), 0.82); 
           backdrop-filter: blur(20px) saturate(180%); 
           -webkit-backdrop-filter: blur(20px) saturate(180%); 
-          border-top: 1px solid rgba(106, 191, 138, 0.1); 
+          border-top: 1px solid hsla(var(--sage-accent), 0.1); 
           padding-bottom: env(safe-area-inset-bottom); 
           padding-top: 0.6rem; justify-content: space-around; align-items: center; 
           box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
@@ -222,7 +222,7 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
                 <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
               ) : (
                 <SignInButton mode="modal">
-                  <button className="nav-pill" style={{ background: '#6abf8a', color: '#05100a', border: 'none', fontWeight: 600, cursor: 'pointer' }}>Sign In</button>
+                  <button className="nav-pill" style={{ background: 'hsl(var(--sage-accent))', color: 'hsl(var(--sage-deep))', border: 'none', fontWeight: 600, cursor: 'pointer' }}>Sign In</button>
                 </SignInButton>
               )
             ) : null}
@@ -271,12 +271,12 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
                   onClick={() => selectLang(l.code)}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
-                    <span style={{ fontSize: '0.85rem', color: '#e8dfc8' }}>{l.native}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--ios-text)' }}>{l.native}</span>
                     {l.native !== l.name && (
-                      <span style={{ fontSize: '0.7rem', color: 'rgba(232,223,200,0.35)' }}>{l.name}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--ios-muted)' }}>{l.name}</span>
                     )}
                   </div>
-                  {l.code === lang && <span style={{ color: '#6abf8a', fontSize: '0.85rem' }}>✓</span>}
+                  {l.code === lang && <span style={{ color: 'hsl(var(--sage-accent))', fontSize: '0.85rem' }}>✓</span>}
                 </div>
               ))}
             </div>

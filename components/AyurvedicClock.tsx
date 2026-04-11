@@ -17,12 +17,12 @@ interface ClockSegment {
 }
 
 const SEGMENTS: ClockSegment[] = [
-  { dosha: 'Kapha', start: 6, end: 10, label: 'Early Morning', recommendation: 'Wake before sunrise. Exercise to break stagnation.', ritual: 'Abhyanga (Self-Massage)', color: '#6abf8a', gradient: 'linear-gradient(135deg, #1a4d2e, #6abf8a)' },
-  { dosha: 'Pitta', start: 10, end: 14, label: 'Midday', recommendation: 'Strongest digestion. Have your largest meal now.', ritual: 'Principal Meal', color: '#c9a84c', gradient: 'linear-gradient(135deg, #8a6d1a, #c9a84c)' },
-  { dosha: 'Vata', start: 14, end: 18, label: 'Afternoon', recommendation: 'High creativity. Light snack, avoid over-stimulation.', ritual: 'Creative Work', color: '#4a8a6a', gradient: 'linear-gradient(135deg, #0d2b1a, #4a8a6a)' },
-  { dosha: 'Kapha', start: 18, end: 22, label: 'Evening', recommendation: 'Wind down. Light dinner, early sleep.', ritual: 'Evening Reflection', color: '#1a4d2e', gradient: 'linear-gradient(135deg, #05100a, #1a4d2e)' },
-  { dosha: 'Pitta', start: 22, end: 2, label: 'Night', recommendation: 'Internal cleansing. Deep sleep is essential.', ritual: 'Deep Rest', color: '#8a6d1a', gradient: 'linear-gradient(135deg, #2b210a, #8a6d1a)' },
-  { dosha: 'Vata', start: 2, end: 6, label: 'Pre-Dawn', recommendation: 'Subtle awareness. Best time for meditation.', ritual: 'Brahma Muhurta', color: '#0d2b1a', gradient: 'linear-gradient(135deg, #000000, #0d2b1a)' },
+  { dosha: 'Kapha', start: 6, end: 10, label: 'Early Morning', recommendation: 'Wake before sunrise. Exercise to break stagnation.', ritual: 'Abhyanga (Self-Massage)', color: 'hsl(var(--sage-accent))', gradient: 'linear-gradient(135deg, hsl(var(--sage-deep)), hsl(var(--sage-accent)))' },
+  { dosha: 'Pitta', start: 10, end: 14, label: 'Midday', recommendation: 'Strongest digestion. Have your largest meal now.', ritual: 'Principal Meal', color: 'hsl(var(--gold-accent))', gradient: 'linear-gradient(135deg, hsla(var(--gold-accent), 0.6), hsl(var(--gold-accent)))' },
+  { dosha: 'Vata', start: 14, end: 18, label: 'Afternoon', recommendation: 'High creativity. Light snack, avoid over-stimulation.', ritual: 'Creative Work', color: 'hsl(var(--sage-accent))', gradient: 'linear-gradient(135deg, hsl(var(--sage-deep)), hsl(var(--sage-accent)))' },
+  { dosha: 'Kapha', start: 18, end: 22, label: 'Evening', recommendation: 'Wind down. Light dinner, early sleep.', ritual: 'Evening Reflection', color: 'hsl(var(--sage-deep))', gradient: 'linear-gradient(135deg, #05100a, hsl(var(--sage-deep)))' },
+  { dosha: 'Pitta', start: 22, end: 2, label: 'Night', recommendation: 'Internal cleansing. Deep sleep is essential.', ritual: 'Deep Rest', color: 'hsl(var(--gold-accent))', gradient: 'linear-gradient(135deg, #2b210a, hsl(var(--gold-accent)))' },
+  { dosha: 'Vata', start: 2, end: 6, label: 'Pre-Dawn', recommendation: 'Subtle awareness. Best time for meditation.', ritual: 'Brahma Muhurta', color: 'hsl(var(--sage-deep))', gradient: 'linear-gradient(135deg, #000000, hsl(var(--sage-deep)))' },
 ];
 
 export default function AyurvedicClock() {
@@ -50,14 +50,14 @@ export default function AyurvedicClock() {
     <div style={{
       width: '100%',
       maxWidth: '320px',
-      background: 'rgba(5, 16, 10, 0.8)',
+      background: 'var(--ios-surface)',
       padding: '2rem',
       borderRadius: '32px',
-      border: '1px solid rgba(201, 168, 76, 0.2)',
+      border: '1px solid var(--ios-stroke)',
       backdropFilter: 'blur(20px)',
       boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
       textAlign: 'center',
-      color: '#e8dfc8',
+      color: 'var(--ios-text)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -65,7 +65,7 @@ export default function AyurvedicClock() {
       margin: '0 auto'
     }}>
       <div style={{ pointerEvents: 'none' }}>
-        <h4 style={{ margin: 0, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c9a84c' }}>Ayurvedic Rhythms</h4>
+        <h4 style={{ margin: 0, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'hsl(var(--gold-accent))' }}>Ayurvedic Rhythms</h4>
         <p style={{ margin: '0.2rem 0', fontSize: '1.2rem', fontFamily: '"Cormorant Garamond", serif', fontWeight: 600 }}>{currentSegment.dosha} Era</p>
       </div>
 
@@ -98,11 +98,11 @@ export default function AyurvedicClock() {
             x1="50" y1="50"
             x2={50 + 38 * Math.cos(((rotation - 90) * Math.PI) / 180)}
             y2={50 + 38 * Math.sin(((rotation - 90) * Math.PI) / 180)}
-            stroke="#c9a84c"
+            stroke="hsl(var(--gold-accent))"
             strokeWidth="1.5"
             strokeLinecap="round"
           />
-          <circle cx="50" cy="50" r="2.5" fill="#c9a84c" />
+          <circle cx="50" cy="50" r="2.5" fill="hsl(var(--gold-accent))" />
         </svg>
 
         <div style={{
@@ -120,12 +120,12 @@ export default function AyurvedicClock() {
       </div>
 
       <div style={{ textAlign: 'left', width: '100%', padding: '0 0.5rem' }}>
-        <p style={{ margin: 0, fontSize: '0.75rem', color: '#c9a84c', fontWeight: 600 }}>🌟 Wisdom</p>
+        <p style={{ margin: 0, fontSize: '0.75rem', color: 'hsl(var(--gold-accent))', fontWeight: 600 }}>🌟 Wisdom</p>
         <p style={{ margin: '0.3rem 0 0.8rem', fontSize: '0.8rem', opacity: 0.8, lineHeight: 1.4 }}>{currentSegment.recommendation}</p>
         
         <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.6rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <p style={{ margin: 0, fontSize: '0.55rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Ritual</p>
-          <p style={{ margin: '0.1rem 0 0', fontSize: '0.8rem', color: '#6abf8a', fontWeight: 600 }}>{currentSegment.ritual}</p>
+          <p style={{ margin: '0.1rem 0 0', fontSize: '0.8rem', color: 'hsl(var(--sage-accent))', fontWeight: 600 }}>{currentSegment.ritual}</p>
         </div>
       </div>
     </div>

@@ -64,7 +64,11 @@ export default function ChatComposer({
   onSendMessage,
 }: ChatComposerProps) {
   const attachmentIconMap = { image: '🖼️', pdf: '📄', link: '🔗' }
-  const attachmentColorMap = { image: '#7aafd4', pdf: '#e8835a', link: '#c9a84c' }
+  const attachmentColorMap = { 
+    image: 'hsl(204, 53%, 65%)', // #7aafd4
+    pdf: 'hsl(18, 77%, 66%)',    // #e8835a
+    link: 'hsl(var(--gold-accent))' 
+  }
   const isValidUrl = (str: string): boolean => {
     try {
       const u = new URL(str)
@@ -118,10 +122,10 @@ export default function ChatComposer({
               if (e.key === 'Escape') onCancelLinkInput()
             }}
             placeholder="Paste a health article URL..."
-            style={{ flex: 1, padding: '0.6rem 0.9rem', borderRadius: 12, border: '1px solid rgba(201,168,76,0.3)', background: 'rgba(255,255,255,0.04)', color: '#e8dfc8', fontSize: '0.85rem', outline: 'none', fontFamily: '"DM Sans", system-ui, sans-serif' }}
+            style={{ flex: 1, padding: '0.6rem 0.9rem', borderRadius: 12, border: '1px solid hsla(var(--gold-accent), 0.3)', background: 'hsla(var(--ios-bg), 0.04)', color: 'var(--ios-text)', fontSize: '0.85rem', outline: 'none', fontFamily: '"DM Sans", system-ui, sans-serif' }}
             autoFocus
           />
-          <button onClick={onAddLink} disabled={!isValidUrl(linkInput)} style={{ padding: '0.6rem 1rem', background: isValidUrl(linkInput) ? 'rgba(201,168,76,0.15)' : 'transparent', border: `1px solid ${isValidUrl(linkInput) ? 'rgba(201,168,76,0.4)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 12, color: isValidUrl(linkInput) ? '#c9a84c' : 'rgba(200,200,200,0.3)', fontSize: '0.85rem', cursor: isValidUrl(linkInput) ? 'pointer' : 'not-allowed', fontWeight: 600, whiteSpace: 'nowrap' }}>Add →</button>
+          <button onClick={onAddLink} disabled={!isValidUrl(linkInput)} style={{ padding: '0.6rem 1rem', background: isValidUrl(linkInput) ? 'hsla(var(--gold-accent), 0.15)' : 'transparent', border: `1px solid ${isValidUrl(linkInput) ? 'hsla(var(--gold-accent), 0.4)' : 'var(--ios-stroke)'}`, borderRadius: 12, color: isValidUrl(linkInput) ? 'hsl(var(--gold-accent))' : 'var(--ios-muted)', fontSize: '0.85rem', cursor: isValidUrl(linkInput) ? 'pointer' : 'not-allowed', fontWeight: 600, whiteSpace: 'nowrap' }}>Add →</button>
           <button onClick={onCancelLinkInput} style={{ padding: '0.6rem 0.75rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: 'rgba(200,200,200,0.35)', fontSize: '0.85rem', cursor: 'pointer' }}>✕</button>
         </div>
       )}
@@ -131,7 +135,7 @@ export default function ChatComposer({
         <button onClick={() => fileInputRef.current?.click()} disabled={attachments.length >= 4} title="Attach image or PDF" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: attachments.length > 0 ? 'rgba(122,175,212,0.12)' : 'rgba(106,191,138,0.06)', border: `1px solid ${attachments.length > 0 ? 'rgba(122,175,212,0.4)' : 'rgba(106,191,138,0.15)'}`, color: attachments.length > 0 ? '#7aafd4' : 'rgba(200,200,200,0.4)', cursor: attachments.length >= 4 ? 'not-allowed' : 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
           📎
         </button>
-        <button onClick={onToggleLinkInput} title="Add a link" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: showLinkInput ? 'rgba(201,168,76,0.12)' : 'rgba(106,191,138,0.06)', border: `1px solid ${showLinkInput ? 'rgba(201,168,76,0.4)' : 'rgba(106,191,138,0.15)'}`, color: showLinkInput ? '#c9a84c' : 'rgba(200,200,200,0.4)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
+        <button onClick={onToggleLinkInput} title="Add a link" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: showLinkInput ? 'hsla(var(--gold-accent), 0.12)' : 'hsla(var(--sage-accent), 0.06)', border: `1px solid ${showLinkInput ? 'hsla(var(--gold-accent), 0.4)' : 'hsla(var(--sage-accent), 0.15)'}`, color: showLinkInput ? 'hsl(var(--gold-accent))' : 'var(--ios-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
           🔗
         </button>
         {voiceSupported && (
