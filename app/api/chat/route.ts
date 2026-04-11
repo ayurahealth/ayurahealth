@@ -283,7 +283,7 @@ export async function POST(req: NextRequest) {
             }
             continue // Check again if LLM needs more tools
           }
-        } catch (err) {
+        } catch {
           log.error('TOOL_LOOP_FAILED', { error: 'Internal tool execution error' })
           break
         }
@@ -401,7 +401,7 @@ function createCompositeStream(args: {
             } catch {}
           }
         }
-      } catch (err) {
+      } catch {
         log.error('LLM_STREAM_ERROR', { error: 'Stream interrupted' })
       } finally {
         if (activeSessionId && fullText) {
