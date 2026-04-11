@@ -18,7 +18,10 @@ const prismaClientSingleton = () => {
   const pool = dbUrl ? new Pool({ connectionString: dbUrl }) : new Pool()
   const adapter = new PrismaPg(pool)
 
-  return new PrismaClient({ adapter })
+  return new PrismaClient({ 
+    adapter,
+    log: process.env.NODE_ENV === 'development' ? ['error'] : [],
+  })
 }
 
 declare const globalThis: {
