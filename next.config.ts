@@ -4,16 +4,8 @@ import path from 'path'
 const nextConfig: NextConfig = {
   // Prevent Next.js from inferring tracing root from parent lockfiles.
   outputFileTracingRoot: path.join(__dirname),
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-  typescript: {
-    ignoreBuildErrors: false,
-  },
   skipTrailingSlashRedirect: true,
-  experimental: {
-    preloadEntriesOnStart: false,
-  },
+  experimental: {},
   async headers() {
     const csp = [
       "default-src 'self'",
