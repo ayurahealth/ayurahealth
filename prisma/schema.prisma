@@ -10,19 +10,19 @@ datasource db {
 }
 
 model UserProfile {
-  id             String   @id
+  id             String   @id // Maps to Clerk User ID
   email          String   @unique
-  primaryDosha   String?
-  vataScore      Int?
+  primaryDosha   String?  // e.g. "Vata-Pitta"
+  vataScore      Int?     // e.g. 45
   pittaScore     Int?
   kaphaScore     Int?
   age            Int?
   gender         String?
   healthGoal     String?
   conditions     String[] @default([])
-  subscriptionTier   String?
-  subscriptionStatus String   @default("free")
-  subscriptionId     String?  @unique
+  subscriptionTier   String?  // e.g. "premium", "premium-plus"
+  subscriptionStatus String   @default("free") // "free", "active", "cancelled", "expired"
+  subscriptionId     String?  @unique // Razorpay ID
   subscriptionExpiry DateTime?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -45,7 +45,7 @@ model ChatSession {
 model Message {
   id        String   @id @default(uuid())
   sessionId String
-  role      String
+  role      String   // 'user' or 'assistant'
   content   String
   createdAt DateTime @default(now())
   
@@ -57,8 +57,8 @@ model UserMemory {
   userId         String
   content        String
   embedding      Unsupported("vector(384)")?
-  category       String
-  source         String
+  category       String   // e.g., "Health Fact", "Preference", "Metric"
+  source         String   // e.g., "Chat", "Manual", "Report"
   createdAt      DateTime @default(now())
 
   user           UserProfile @relation(fields: [userId], references: [id])
@@ -69,8 +69,8 @@ model KnowledgeChunk {
   title          String
   content        String
   embedding      Unsupported("vector(384)")?
-  source         String
-  tradition      String?
+  source         String   // e.g., "Charaka Samhita", "Modern Science"
+  tradition      String?  // e.g., "Ayurveda", "TCM"
   tags           String[]
   createdAt      DateTime @default(now())
 }
@@ -81,9 +81,9 @@ model ClinicLead {
   contactName  String
   email        String
   phone        String?
-  tradition    String?
-  patientCount String?
+  tradition    String?  // e.g., Ayurveda, Kampo
+  patientCount String?  // e.g., "100-500/mo"
   message      String?
-  status       String   @default("New")
+  status       String   @default("New") // New, Contacted, Converted
   createdAt    DateTime @default(now())
 }
