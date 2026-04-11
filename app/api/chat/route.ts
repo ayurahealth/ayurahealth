@@ -30,7 +30,6 @@ import {
   buildAutoRecoveryPolicy,
   buildSystemPrompt,
   formatMessagesForApi,
-  hasStructuredSections,
   scoreResponseQuality,
 } from '../../../lib/ai/prompt-manager'
 import type { ResponseQuality, AutoRecoveryPolicy } from '../../../lib/ai/prompt-manager'
@@ -132,10 +131,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
     }
 
-    let json: unknown
-    try { json = JSON.parse(body) } catch {
-      return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 })
-    }
+    const json = JSON.parse(body) as any
 
     const validation = chatSchema.safeParse(json)
     if (!validation.success) {
@@ -197,33 +193,36 @@ export async function POST(req: NextRequest) {
     const allKnowledgeCtx = [knowledgeResult.context, webResult.context].filter(Boolean).join('')
     const allChunks = [...knowledgeResult.chunks, ...webResult.chunks]
 
-    // 10. Agent orchestration (if Deep Think or Web Search)
-    let agentTraceCtx = ''
+    // 10. Agent orchestration
     const agentTrace: Array<{ id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }> = []
-    if (effectiveDeepThink || effectiveWebSearch) {
-      const routing = routeRequest({ modelPreference: preferredModel, hasImages: false, deepThink: effectiveDeepThink })
-      const key = routing.provider.name === 'Groq' ? process.env.GROQ_API_KEY || ''
-        : routing.provider.name === 'OpenRouter' ? process.env.OPENROUTER_API_KEY || ''
-        : ''
-      if (key) {
-        const apiUrl = routing.provider.name === 'Groq' ? 'https://api.groq.com/openai/v1/chat/completions'
-          : 'https://openrouter.ai/api/v1/chat/completions'
-        const headers: Record<string, string> = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }
-        if (routing.provider.name === 'OpenRouter') {
-          headers['HTTP-Referer'] = 'https://ayurahealth.com'
-          headers['X-Title'] = 'AyuraHealth VAIDYA'
+    const agentTraceCtxResult = await (async (): Promise<string> => {
+      if (effectiveDeepThink || effectiveWebSearch) {
+        const routing = routeRequest({ modelPreference: preferredModel, hasImages: false, deepThink: effectiveDeepThink })
+        const key = routing.provider.name === 'Groq' ? process.env.GROQ_API_KEY || ''
+          : routing.provider.name === 'OpenRouter' ? process.env.OPENROUTER_API_KEY || ''
+          : ''
+        if (key) {
+          const apiUrl = routing.provider.name === 'Groq' ? 'https://api.groq.com/openai/v1/chat/completions'
+            : 'https://openrouter.ai/api/v1/chat/completions'
+          const headers: Record<string, string> = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }
+          if (routing.provider.name === 'OpenRouter') {
+            headers['HTTP-Referer'] = 'https://ayurahealth.com'
+            headers['X-Title'] = 'AyuraHealth VAIDYA'
+          }
+          const result = await orchestrateAgents({
+            userQuery,
+            knowledgeCtx: allKnowledgeCtx,
+            apiUrl,
+            headers,
+            model: routing.model,
+          })
+          agentTrace.push(...result.agentTrace)
+          return result.context
         }
-        const result = await orchestrateAgents({
-          userQuery,
-          knowledgeCtx: allKnowledgeCtx,
-          apiUrl,
-          headers,
-          model: routing.model,
-        })
-        agentTraceCtx = result.context
-        agentTrace.push(...result.agentTrace)
       }
-    }
+      return ''
+    })()
+    const agentTraceCtx = agentTraceCtxResult
 
     // 11. Build system prompt
     const systemPrompt = buildSystemPrompt({
@@ -287,15 +286,17 @@ export async function POST(req: NextRequest) {
     }
 
     // 14. Execute final LLM streaming completion
-    let streamResult: { stream: ReadableStream<Uint8Array>; provider: string; model: string }
-    try {
-      streamResult = await executeStreamingCompletion(
-        { model: '', messages: currentMessages, maxTokens, temperature },
-        { modelPreference: preferredModel, hasImages, deepThink: effectiveDeepThink },
-      )
-    } catch (err) {
+    // 14. Execute final LLM streaming completion
+    const streamResult = await executeStreamingCompletion(
+      { model: '', messages: currentMessages, maxTokens, temperature },
+      { modelPreference: preferredModel, hasImages, deepThink: effectiveDeepThink },
+    ).catch(err => {
       log.error('ALL_PROVIDERS_FAILED', { error: String(err) })
-      return NextResponse.json({ error: 'AI service temporarily unavailable.', details: 'All providers failed to start streaming.' }, { status: 500 })
+      return null
+    })
+
+    if (!streamResult) {
+      return NextResponse.json({ error: 'AI service temporarily unavailable.' }, { status: 500 })
     }
 
     // 15. Return composite streaming response
