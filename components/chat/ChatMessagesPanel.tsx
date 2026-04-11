@@ -138,7 +138,7 @@ export default function ChatMessagesPanel({
             <VaidyaOracle state="idle" />
           </motion.div>
           <div style={{ marginTop: '-1.25rem', opacity: 0.56 }}>
-            <p style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.2rem', color: '#c9a84c' }}>VAIDYA is ready.</p>
+            <p style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.2rem', color: 'hsl(var(--gold-accent))' }}>VAIDYA is ready.</p>
             <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Ask your first health question below...</p>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function ChatMessagesPanel({
             style={{ marginBottom: '1.75rem', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '0.85rem' }}
           >
           {msg.role === 'assistant' && (
-            <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', border: '1px solid rgba(106,191,138,0.2)' }}>
+            <div className="glass-card" style={{ width: 32, height: 32, flexShrink: 0, background: 'linear-gradient(135deg, hsl(var(--sage-deep)), hsl(var(--sage-accent)))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', border: '1px solid hsla(var(--sage-accent), 0.2)' }}>
               🌿
             </div>
           )}
@@ -191,7 +191,7 @@ export default function ChatMessagesPanel({
 
                   {structured.keyPoints.length > 0 && (
                     <div style={{ background: 'rgba(106,191,138,0.04)', border: '1px solid rgba(106,191,138,0.18)', borderRadius: 12, padding: '0.7rem 0.85rem' }}>
-                      <div style={{ fontSize: '0.64rem', color: '#6abf8a', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                      <div style={{ fontSize: '0.64rem', color: 'hsl(var(--sage-accent))', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
                         Key Points
                       </div>
                       <div style={{ display: 'grid', gap: '0.28rem' }}>
@@ -216,8 +216,8 @@ export default function ChatMessagesPanel({
                   )}
 
                   {structured.followUps.length > 0 && (
-                    <div style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.18)', borderRadius: 12, padding: '0.7rem 0.85rem' }}>
-                      <div style={{ fontSize: '0.64rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    <div style={{ background: 'hsla(var(--gold-accent), 0.04)', border: '1px solid hsla(var(--gold-accent), 0.18)', borderRadius: 12, padding: '0.7rem 0.85rem' }}>
+                      <div style={{ fontSize: '0.64rem', color: 'hsl(var(--gold-accent))', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
                         Follow-ups
                       </div>
                       <div style={{ display: 'grid', gap: '0.28rem' }}>
@@ -235,8 +235,8 @@ export default function ChatMessagesPanel({
               )}
 
               {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                <div style={{ marginTop: '1.25rem', borderTop: '1px solid rgba(106,191,138,0.12)', paddingTop: '0.9rem' }}>
-                  <div style={{ fontSize: '0.68rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.65rem', opacity: 0.8 }}>Consulted Classical Texts:</div>
+                <div style={{ marginTop: '1.25rem', borderTop: '1px solid hsla(var(--sage-accent), 0.12)', paddingTop: '0.9rem' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'hsl(var(--gold-accent))', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.65rem', opacity: 0.8 }}>Consulted Classical Texts:</div>
                   <div style={{ display: 'grid', gap: '0.45rem' }}>
                     {msg.sources.map((src, idx) => (
                       <button
@@ -245,10 +245,10 @@ export default function ChatMessagesPanel({
                         className="glass-card"
                         style={{
                           padding: '0.45rem 0.85rem',
-                          border: '1px solid rgba(201, 168, 76, 0.25)',
+                          border: '1px solid hsla(var(--gold-accent), 0.25)',
                           borderRadius: 12,
                           fontSize: '0.78rem',
-                          color: '#e8dfc8',
+                          color: 'var(--ios-text)',
                           cursor: 'pointer',
                           display: 'grid',
                           textAlign: 'left',
@@ -259,7 +259,7 @@ export default function ChatMessagesPanel({
                         onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                          <span style={{ width: 14, height: 14, color: '#6abf8a' }}>{traditionIcons[src.tradition?.toLowerCase() || 'ayurveda']}</span>
+                          <span style={{ width: 14, height: 14, color: 'hsl(var(--sage-accent))' }}>{traditionIcons[src.tradition?.toLowerCase() || 'ayurveda']}</span>
                           <span style={{ fontWeight: 600 }}>{src.source}</span>
                           <span style={{ marginLeft: 'auto', fontSize: '0.62rem', color: 'rgba(232,223,200,0.4)' }}>{src.tradition}</span>
                         </div>
@@ -271,8 +271,8 @@ export default function ChatMessagesPanel({
               )}
 
               {msg.role === 'assistant' && msg.agentTrace && msg.agentTrace.length > 0 && (
-                <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(201,168,76,0.14)', paddingTop: '0.75rem' }}>
-                  <div style={{ fontSize: '0.66rem', color: '#c9a84c', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.45rem' }}>
+                <div style={{ marginTop: '1rem', borderTop: '1px solid hsla(var(--gold-accent), 0.14)', paddingTop: '0.75rem' }}>
+                  <div style={{ fontSize: '0.66rem', color: 'hsl(var(--gold-accent))', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.45rem' }}>
                     Agent Trace
                   </div>
                   <div style={{ display: 'grid', gap: '0.45rem' }}>

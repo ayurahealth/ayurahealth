@@ -84,7 +84,14 @@ export class GroqProvider implements LLMProvider {
         max_tokens: request.maxTokens,
         temperature: request.temperature,
         stream: false,
-        tools: request.tools,
+        tools: request.tools?.map(t => ({
+          type: 'function' as const,
+          function: {
+            name: t.name,
+            description: t.description,
+            parameters: t.parameters
+          }
+        })),
       }),
     })
 
@@ -121,7 +128,14 @@ export class GroqProvider implements LLMProvider {
         max_tokens: request.maxTokens,
         temperature: request.temperature,
         stream: true,
-        tools: request.tools,
+        tools: request.tools?.map(t => ({
+          type: 'function' as const,
+          function: {
+            name: t.name,
+            description: t.description,
+            parameters: t.parameters
+          }
+        })),
       }),
     })
 

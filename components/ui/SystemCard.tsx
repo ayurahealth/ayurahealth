@@ -26,10 +26,15 @@ export default function SystemCard({ label, icon, active, onClick, style }: Syst
         ...style,
       }}
     >
-      <span style={{ width: 16, height: 16, color: active ? 'var(--ios-primary)' : 'rgba(232,223,200,0.5)' }}>
+      <span style={{ width: 16, height: 16, color: active ? 'hsl(var(--gold-accent))' : 'hsla(var(--gold-pale-h), var(--gold-pale-s), var(--gold-pale-l), 0.5)' }}>
         {icon}
       </span>
-      <span style={{ fontSize: '0.66rem', fontWeight: active ? 700 : 500, lineHeight: 1.1 }}>{label}</span>
+      <span style={{ 
+        fontSize: '0.66rem', 
+        fontWeight: active ? 700 : 500, 
+        lineHeight: 1.1,
+        color: active ? 'hsl(var(--gold-accent))' : 'hsla(var(--gold-pale-h), var(--gold-pale-s), var(--gold-pale-l), 0.8)'
+      }}>{label}</span>
     </button>
   )
 }

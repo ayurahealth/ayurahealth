@@ -69,6 +69,29 @@ interface ModelTrace {
   }
 }
 
+interface AugmentedWindow extends Window {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  SpeechRecognition?: any; 
+  webkitSpeechRecognition?: any;
+  pdfjsLib?: any;
+  html2canvas?: any;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+}
+
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  onresult: (event: any) => void;
+  onend: () => void;
+  onerror: (event: any) => void;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
 const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
@@ -316,7 +339,7 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const recognitionRef = useRef<SR>(null)
+  const recognitionRef = useRef<SpeechRecognitionInstance>(null)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const linkInputRef = useRef<HTMLInputElement>(null)
@@ -424,7 +447,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const w = window as SR
+      const w = window as unknown as AugmentedWindow
       if ((w.SpeechRecognition || w.webkitSpeechRecognition) && w.speechSynthesis) setVoiceSupported(true)
     }
   }, [])
@@ -477,7 +500,7 @@ export default function ChatPage() {
         await new Promise<void>(resolve => {
           reader.onload = async () => {
             try {
-              const w = window as SR
+              const w = window as unknown as AugmentedWindow
               if (w.pdfjsLib) {
                 w.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
                 const pdf = await w.pdfjsLib.getDocument({ data: reader.result }).promise
@@ -485,7 +508,8 @@ export default function ChatPage() {
                 for (let p = 1; p <= Math.min(pdf.numPages, 10); p++) {
                   const page = await pdf.getPage(p)
                   const content = await page.getTextContent()
-                  text += content.items.map((item: SR) => item.str).join(' ') + '\n'
+                  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                  text += content.items.map((item: any) => item.str).join(' ') + '\n'
                 }
                 setAttachments(prev => [...prev, { id, type: 'pdf', name: file.name, content: text.substring(0, 8000), size }])
               } else {
@@ -575,7 +599,7 @@ export default function ChatPage() {
     if (!shareCardRef.current || !dosha) return
     setIsSharing(true)
     try {
-      const w = window as SR
+      const w = window as unknown as AugmentedWindow
       if (!w.html2canvas) { setIsSharing(false); return }
       const canvas = await w.html2canvas(shareCardRef.current, { scale: 3, useCORS: true, backgroundColor: DOSHA_META[dosha].cardBg, width: 400, height: 500, logging: false })
       canvas.toBlob(async (blob: Blob | null) => {
@@ -603,7 +627,7 @@ export default function ChatPage() {
 
   const startListening = useCallback(() => {
     if (typeof window === 'undefined') return
-    const w = window as SR
+    const w = window as unknown as AugmentedWindow
     const SRClass = w.SpeechRecognition || w.webkitSpeechRecognition
     if (!SRClass) return
     if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return }
@@ -611,8 +635,10 @@ export default function ChatPage() {
     recognition.lang = lang === 'ja' ? 'ja-JP' : lang === 'hi' ? 'hi-IN' : 'en-US'
     recognition.continuous = false; recognition.interimResults = true
     recognition.onstart = () => setIsListening(true)
-    recognition.onresult = (event: SR) => {
-      const transcript = Array.from(event.results).map((r: SR) => r[0].transcript).join('')
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results).map((r: any) => r[0].transcript).join('')
+      /* eslint-enable @typescript-eslint/no-explicit-any */
       setInput(transcript)
       if (event.results[event.results.length - 1].isFinal) setIsListening(false)
     }
