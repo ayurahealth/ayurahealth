@@ -55,6 +55,13 @@ interface OpenRouterResponse {
   usage?: { total_tokens?: number }
 }
 
+interface ORMessage {
+  role: string
+  content: string | ChatPart[]
+  tool_calls?: Array<{ id: string; type: 'function'; function: { name: string; arguments: string } }>
+  tool_call_id?: string
+}
+
 export class OpenRouterProvider implements LLMProvider {
   readonly name = 'OpenRouter'
   readonly supportsStreaming = true
@@ -77,9 +84,9 @@ export class OpenRouterProvider implements LLMProvider {
     }
   }
 
-  private formatMessages(messages: ChatMessage[]): Array<{ role: string; content: string | ChatPart[]; tool_calls?: any; tool_call_id?: string }> {
+  private formatMessages(messages: ChatMessage[]): ORMessage[] {
     return messages.map((m) => {
-      const msg: any = {
+      const msg: ORMessage = {
         role: m.role,
         content: m.content,
       }
@@ -203,7 +210,7 @@ export class OpenRouterProvider implements LLMProvider {
               } : undefined
 
               if (content || toolCall) {
-                const chunk: any = { content }
+                const chunk: { content?: string; toolCall?: typeof toolCall } = { content }
                 if (toolCall) chunk.toolCall = toolCall
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`))
               }

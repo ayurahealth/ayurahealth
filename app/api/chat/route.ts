@@ -86,6 +86,27 @@ interface PrismaChatClient {
   }
 }
 
+interface TraceItem {
+  id: 'planner' | 'researcher' | 'synthesizer'
+  label: string
+  summary: string
+}
+
+interface ToolTraceItem {
+  id: string
+  name: string
+  args: string
+  output: string
+}
+
+interface KnowledgeSource {
+  title: string
+  content: string
+  tradition: string
+  source: string
+  similarity: number
+}
+
 // ── Stream Headers ──────────────────────────────────────────────────────────
 const STREAM_HEADERS = {
   'Content-Type': 'text/event-stream',
@@ -246,8 +267,8 @@ export async function POST(req: NextRequest) {
     ))
 
     // 13. Agentic Tool Execution Loop (up to 3 iterations)
-    let currentMessages = [...completionMessages]
-    let toolTrace: any[] = []
+    let currentMessages: ChatMessage[] = [...completionMessages]
+    let toolTrace: ToolTraceItem[] = []
     
     // Only use tools if Deep Think or specific tags are present, or in Researcher mode
     const useTools = effectiveWebSearch || effectiveDeepThink || userQuery.toLowerCase().includes('search') || userQuery.toLowerCase().includes('profile')
@@ -316,9 +337,9 @@ export async function POST(req: NextRequest) {
 function createCompositeStream(args: {
   llmStream: ReadableStream<Uint8Array>
   metadata: {
-    sources: any[]
+    sources: KnowledgeSource[]
     sessionId?: string
-    agentTrace: any[]
+    agentTrace: TraceItem[]
     modelUsed: string
     providerUsed: string
     policy: AutoRecoveryPolicy
