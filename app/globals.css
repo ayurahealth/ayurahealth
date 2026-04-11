@@ -367,53 +367,13 @@ img { max-width: 100%; }
   }
 }
 
-.synthesis-header {
-  font-family: var(--font-cormorant), serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #c9a84c;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
-  letter-spacing: 0.05em;
-}
-
-.section-header {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.02em;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.95); opacity: 0; }
-  50% { opacity: 0.3; }
-  100% { transform: scale(1.5); opacity: 0; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
 .knowledge-pulse-core {
   position: relative;
   width: 12px;
   height: 12px;
-  background: #4ade80;
+  background: hsl(var(--sage-accent));
   border-radius: 50%;
-  box-shadow: 0 0 20px #4ade80;
+  box-shadow: 0 0 20px hsla(var(--sage-accent), 0.5);
 }
 
 .knowledge-pulse-ring {
@@ -422,7 +382,7 @@ img { max-width: 100%; }
   left: -100%;
   width: 300%;
   height: 300%;
-  border: 2px solid #4ade80;
+  border: 1px solid hsla(var(--sage-accent), 0.5);
   border-radius: 50%;
   animation: pulse-ring 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
 }
@@ -433,9 +393,20 @@ img { max-width: 100%; }
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: rgba(201, 168, 76, 0.15);
-  color: #c9a84c;
-  border: 1px solid rgba(201, 168, 76, 0.3);
+  background: hsla(var(--gold-accent), 0.15);
+  color: hsl(var(--gold-accent));
+  border: 1px solid hsla(var(--gold-accent), 0.3);
+  letter-spacing: 0.05em;
+}
+
+.synthesis-header {
+  font-family: var(--font-cormorant), serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: hsl(var(--gold-accent));
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid hsla(var(--gold-accent), 0.2);
   letter-spacing: 0.05em;
 }
 

@@ -59,8 +59,7 @@ export async function POST(req: Request) {
 
     const { primaryDosha, vataScore, pittaScore, kaphaScore, age, gender, healthGoal, conditions } = validation.data
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updatedProfile = await (prisma as any).userProfile.upsert({
+    const updatedProfile = await prisma.userProfile.upsert({
       where: { id: user.id },
       update: {
         primaryDosha,
