@@ -12,6 +12,13 @@ const PRICES: Record<string, { amount: number; name: string }> = {
   'premium-annual': { amount: 319200, name: 'Premium Annual' },   // ₹3,192 in paise
   'premium-plus-annual': { amount: 639200, name: 'Premium Plus Annual' }, // ₹6,392 in paise
 }
+interface RazorpayErrorResponse {
+  error?: {
+    description?: string
+    reason?: string
+    code?: string
+  }
+}
 
 function getRazorpayConfig() {
   // Support both canonical keys and existing custom legacy names in Vercel.
@@ -44,15 +51,12 @@ async function razorpayApi<T>(path: string, init?: RequestInit): Promise<T> {
     },
   })
 
-  const data = await response.json().catch(() => ({}))
+  const data = (await response.json().catch(() => ({}))) as RazorpayErrorResponse
   if (!response.ok) {
     const errorMessage =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (data as any)?.error?.description ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (data as any)?.error?.reason ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (data as any)?.error ||
+      data.error?.description ||
+      data.error?.reason ||
+      data.error?.code ||
       `Razorpay API failed (${response.status})`
     throw new Error(errorMessage)
   }

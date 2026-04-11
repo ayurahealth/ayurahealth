@@ -41,10 +41,10 @@ export async function getEmbedding(text: string): Promise<number[]> {
   // ── Legacy Mode: Local Transformers.js ─────────────────────────────────────
   try {
     const extract = await getExtractor();
-    const output = await extract(text, { pooling: 'mean', normalize: true });
+    const output = await extract(text, { pooling: 'mean', normalize: true }) as { data: Float32Array };
     
-    // The extractor returns a Tensor which has a 'data' property of type Float32Array (or similar)
-    return Array.from((output as { data: Float32Array }).data);
+    // The extractor returns a Tensor which has a 'data' property of type Float32Array
+    return Array.from(output.data);
   } catch (error) {
     console.error('EMBEDDING_ENGINE_CRASH:', error);
     throw new Error('Consultation engine (RAG) is currently unavailable. Please check your API keys.');
