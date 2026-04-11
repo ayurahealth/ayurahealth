@@ -32,7 +32,7 @@ import {
   formatMessagesForApi,
   scoreResponseQuality,
 } from '../../../lib/ai/prompt-manager'
-import type { ResponseQuality, AutoRecoveryPolicy } from '../../../lib/ai/prompt-manager'
+import type { AutoRecoveryPolicy } from '../../../lib/ai/prompt-manager'
 import {
   fetchClinicalMemory,
   fetchKnowledgeContext,
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
     }
 
-    const json = JSON.parse(body) as any
+    const json = JSON.parse(body) as Record<string, unknown>
 
     const validation = chatSchema.safeParse(json)
     if (!validation.success) {
