@@ -58,6 +58,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9.39.4",
     "eslint-config-next": "15.1.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "eventsource": "^4.1.0",
     "prisma": "^7.7.0",
     "tailwindcss": "^4",

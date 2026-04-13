@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         if (tokenBuffer.length === secretBuffer.length) {
           isAuthorized = crypto.timingSafeEqual(tokenBuffer, secretBuffer)
         }
-      } catch (err) {
+      } catch {
         isAuthorized = false
       }
     }
