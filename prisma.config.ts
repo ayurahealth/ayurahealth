@@ -1,8 +1,9 @@
-import { defineConfig } from '@prisma/client/config'
+import 'dotenv/config';
+import { defineConfig, env } from '@prisma/config';
 
 export default defineConfig({
+  schema: 'prisma/schema.prisma',
   datasource: {
-    url: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+    url: env('DATABASE_URL'),
   },
-  // Ensure we are using the driver adapter in the client constructor
-})
+});
