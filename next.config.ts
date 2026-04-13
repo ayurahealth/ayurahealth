@@ -1,9 +1,8 @@
 import type { NextConfig } from 'next'
-import path from 'path'
 
 const nextConfig: NextConfig = {
   // Prevent Next.js from inferring tracing root from parent lockfiles.
-  outputFileTracingRoot: path.join(__dirname),
+  outputFileTracingRoot: process.cwd(),
   
   // Disable strict ESLint during builds as it's now handled by CI or separate scripts
   eslint: {

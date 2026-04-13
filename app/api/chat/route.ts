@@ -19,8 +19,41 @@ import { NextRequest, NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
 
-import { checkRateLimit } from '../../../lib/rateLimit'
-import { sanitizeUserInput, sanitizeAIResponse } from '../../../lib/security/input-sanitizer'
+// Rate limiting (ACE Framework 5.1)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
+function checkRateLimit(ip: string, max = 20, windowMs = 60000): boolean {
+  const now = Date.now()
+  const rec = rateLimitMap.get(ip)
+  if (!rec || now > rec.resetTime) { 
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs }); 
+    return true 
+  }
+  if (rec.count >= max) return false
+  rec.count++; 
+  return true
+}
+
+// Prompt Injection Protection (ACE Framework 5.2)
+function sanitizeInput(input: string): string {
+  return input
+    .replace(/ignore\s+(all\s+)?previous\s+instructions?/gi, '')
+    .replace(/system\s*:/gi, '')
+    .replace(/\[INST\]/gi, '')
+    .replace(/<<SYS>>/gi, '')
+    .replace(/<\/?(s|system|human|assistant)>/gi, '')
+    .trim()
+    .slice(0, 4000)
+}
+
+// Response Sanitization (Inlined for robustness)
+function sanitizeAIResponse(text: string): string {
+  return text
+    .replace(/PROMPT PROFILE:\s*(BALANCED|STRICT|RECOVERY)/gi, '')
+    .replace(/AUTO RECOVERY POLICY ACTIVE:[^\n]*/gi, '')
+    .replace(/OUTPUT CONTRACT \(ALWAYS FOLLOW\):[^]*?(?=###|$)/gi, '')
+    .replace(/VAIDYA CLINICAL MEMORY \(PATIENT FILE\):[^\n]*/gi, '')
+}
+
 import {
   validateLang,
   validateSystems,
@@ -112,14 +145,13 @@ export async function POST(req: NextRequest) {
 
   // 2. Rate limiting + CEO Bypass
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests. Please wait 1 minute.' }, { status: 429 })
+  }
+
   const ceoToken = req.cookies.get('ayura_ceo_token')?.value
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
   const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
-
-  const { allowed } = await checkRateLimit(ip, isCeo)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Too many requests. Please wait a minute.' }, { status: 429 })
-  }
   if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
 
   // 3. Auth + Paywall
@@ -161,19 +193,7 @@ export async function POST(req: NextRequest) {
     const preferredModel = (modelPreference || 'auto') as ModelPreference
 
     const lastMsg = messages[messages.length - 1]
-    const userQuery = lastMsg.role === 'user' ? lastMsg.content : ''
-
-    // 7. Input safety check (NEW — previously defined but never called)
-    const sanitized = sanitizeUserInput(userQuery, safeLang)
-    if (sanitized.blocked) {
-      return new NextResponse(
-        createTextStream(sanitized.sanitizedContent, {}),
-        { headers: STREAM_HEADERS }
-      )
-    }
-    if (sanitized.warnings.length > 0) {
-      log.warn('INPUT_WARNINGS', { warnings: sanitized.warnings, ip })
-    }
+    const userQuery = lastMsg.role === 'user' ? sanitizeInput(lastMsg.content) : ''
 
     // 8. Build prompt profile + auto-recovery
     const promptProfile = buildPromptProfile(messages)
