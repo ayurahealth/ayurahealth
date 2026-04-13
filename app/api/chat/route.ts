@@ -465,14 +465,3 @@ function createCompositeStream(args: {
   })
 }
 
-function createTextStream(content: string, metadata: unknown): ReadableStream {
-  const encoder = new TextEncoder()
-  return new ReadableStream({
-    start(controller) {
-      controller.enqueue(encoder.encode(`data: ${JSON.stringify(metadata)}\n\n`))
-      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
-      controller.close()
-    }
-  })
-}
-
