@@ -209,6 +209,11 @@ export default function ChatPage() {
   const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
   const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
 
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const [lang, setLang] = useState<Lang>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ayura_lang')
@@ -217,6 +222,19 @@ export default function ChatPage() {
     return 'en'
   })
   const [screen, setScreen] = useState<Screen>('landing')
+  
+  // ... state continues ...
+
+  if (!mounted) {
+    return (
+      <main style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#c9a84c', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', letterSpacing: '0.25em', textAlign: 'center' }}>
+          Initializing VAIDYA Healing Wisdom...
+          <div style={{ color: 'rgba(106,191,138,0.4)', fontSize: '0.7rem', marginTop: '1rem', letterSpacing: '0.1em' }}>NEURAL SYNTHESIS IN PROGRESS</div>
+        </div>
+      </main>
+    )
+  }
   const [currentQ, setCurrentQ] = useState(0)
   const [answers, setAnswers] = useState<string[]>([])
   const [dosha, setDosha] = useState<Dosha | null>(null)
