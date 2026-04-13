@@ -2,32 +2,47 @@ import { PrismaClient } from '@prisma/client'
 import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 
+let globalPool: Pool | undefined
+
 const prismaClientSingleton = () => {
   const dbUrl =
     process.env.DATABASE_URL ||
     process.env.POSTGRES_PRISMA_URL ||
     process.env.POSTGRES_URL
 
-  // Support Vercel Postgres/Supabase env naming
-  if (!process.env.DATABASE_URL && dbUrl) {
-    process.env.DATABASE_URL = dbUrl
+  if (!dbUrl) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      return {} as PrismaClient
+    }
+    throw new Error('DATABASE_URL is not set')
   }
 
-  // Prisma 7 strictly REQUIRES an adapter. 
-  // We provide a dummy pool if the URL is missing during Vercel's build step.
-  const pool = dbUrl ? new Pool({ connectionString: dbUrl }) : new Pool()
+  // Reuse existing pool if available to prevent leaks (Finding #8)
+  const pool = globalPool || new Pool({ connectionString: dbUrl })
+  globalPool = pool
+  
   const adapter = new PrismaPg(pool)
+  const client = new PrismaClient({ adapter })
 
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['error'] : [],
-  })
+  // Override disconnect to coordinate pool shutdown
+  const originalDisconnect = client.$disconnect.bind(client)
+  client.$disconnect = async () => {
+    await originalDisconnect()
+    if (globalPool) {
+      await globalPool.end()
+      globalPool = undefined
+    }
+  }
+
+  return client
 }
 
-declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
 
-export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+export const prisma = globalForPrisma.prisma ?? (prismaClientSingleton() as PrismaClient)
 
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+export default prisma
