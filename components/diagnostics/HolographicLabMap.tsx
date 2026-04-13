@@ -4,7 +4,7 @@ import React, { useRef, useMemo, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, Text, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { BIOMARKER_MAP, getElementColor, Biomarker } from '@/lib/diagnostics/biomarkerData'
+import { BIOMARKER_MAP, getElementColor, Biomarker } from '../../lib/diagnostics/biomarkerData'
 
 interface LabResult {
   id: string

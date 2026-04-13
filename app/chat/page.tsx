@@ -10,8 +10,9 @@ import Logo from '../../components/Logo'
 import ChatSidebar from '../../components/chat/ChatSidebar'
 import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
-import VedicOraclePanel from '@/components/vedic/VedicOraclePanel'
+import VedicOraclePanel from '../../components/vedic/VedicOraclePanel'
 import { vaidyaVoice } from '../../lib/vaidyaVoice'
+import { getApiUrl } from '../../lib/constants'
 import { calculateHealthScores, loadProfile } from '../../lib/healthProfile'
 
 interface Message {
@@ -537,7 +538,7 @@ export default function ChatPage() {
     setShowLinkInput(false)
     setLinkInput('')
     try {
-      const res = await fetch('/api/fetch-link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
+      const res = await fetch(getApiUrl('/api/fetch-link'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       const id = Math.random().toString(36).slice(2)
@@ -595,7 +596,7 @@ export default function ChatPage() {
     const newMessages: Message[] = [...messages, { role: 'user', content }]
     setMessages(newMessages); setLoading(true); setStreaming('')
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch(getApiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -672,7 +673,7 @@ export default function ChatPage() {
 
 
       if (currentModelTrace.quality) {
-        fetch('/api/quality-event', {
+        fetch(getApiUrl('/api/quality-event'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -690,7 +691,7 @@ export default function ChatPage() {
       }
       
       if (newMessages.length <= 2 && activeUser && !incognito) {
-        fetch('/api/chat-session', {
+        fetch(getApiUrl('/api/chat-session'), {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({ 
@@ -751,7 +752,7 @@ export default function ChatPage() {
 
         // Save to Database if user is signed in
         if (user) {
-          fetch('/api/user-profile', {
+          fetch(getApiUrl('/api/user-profile'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

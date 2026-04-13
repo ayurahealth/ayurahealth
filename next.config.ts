@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  // Required for Capacitor/iOS static export
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
+  
   // Prevent Next.js from inferring tracing root from parent lockfiles.
   outputFileTracingRoot: process.cwd(),
   
