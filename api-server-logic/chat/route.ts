@@ -19,7 +19,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
 
-import { checkRateLimitDistributed } from '../../../lib/security/ratelimit'
+import { checkRateLimitDistributed } from '../../lib/security/ratelimit'
 
 // Prompt Injection Protection (ACE Framework 5.2 - Finding #2)
 function sanitizeInput(input: string): string {
@@ -66,8 +66,8 @@ import {
   buildSystemPrompt,
   formatMessagesForApi,
   scoreResponseQuality,
-} from '../../../lib/ai/prompt-manager'
-import type { AutoRecoveryPolicy } from '../../../lib/ai/prompt-manager'
+} from '../../lib/ai/prompt-manager'
+import type { AutoRecoveryPolicy } from '../../lib/ai/prompt-manager'
 import {
   fetchClinicalMemory,
   fetchPatientProfile,
@@ -77,12 +77,12 @@ import {
   orchestrateAgents,
   type KnowledgeChunkResult,
   type AgentTraceItem,
-} from '../../../lib/ai/context-engine'
-import { executeCompletion, executeStreamingCompletion, routeRequest } from '../../../lib/ai/llm-router'
-import type { ModelPreference } from '../../../lib/ai/llm-router'
-import type { ChatMessage } from '../../../lib/ai/providers/types'
-import { VAIDYA_TOOLS, executeToolCall } from '../../../lib/ai/tool-executor'
-import { log } from '../../../lib/logger'
+} from '../../lib/ai/context-engine'
+import { executeCompletion, executeStreamingCompletion, routeRequest } from '../../lib/ai/llm-router'
+import type { ModelPreference } from '../../lib/ai/llm-router'
+import type { ChatMessage } from '../../lib/ai/providers/types'
+import { VAIDYA_TOOLS, executeToolCall } from '../../lib/ai/tool-executor'
+import { log } from '../../lib/logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -305,8 +305,14 @@ export async function POST(req: NextRequest) {
 
           if (check.toolCalls && check.toolCalls.length > 0) {
             log.info('LLM_REQUESTED_TOOLS', { count: check.toolCalls.length })
-            for (const tool of check.toolCalls) {
-              const result = await executeToolCall(tool)
+            const results = await Promise.all(
+              check.toolCalls.map(async (tool) => {
+                const result = await executeToolCall(tool)
+                return { tool, result }
+              })
+            )
+
+            for (const { tool, result } of results) {
               const toolName = tool.function.name
               currentMessages.push({ role: 'assistant', content: `[CALLING_TOOL: ${toolName}]` })
               currentMessages.push({ role: 'system', content: `TOOL_RESULT [${toolName}]: ${result.output}` })
@@ -381,7 +387,7 @@ function createCompositeStream(args: {
     async start(controller) {
       if (args.clerkUserId && !activeSessionId) {
         try {
-          const prismaMod = await import('../../../lib/prisma')
+          const prismaMod = await import('../../lib/prisma')
           const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
           const session = await prismaClient.chatSession.create({
             data: { userId: args.clerkUserId, topic: args.userQuery.slice(0, 50), summary: '' }
@@ -395,7 +401,7 @@ function createCompositeStream(args: {
         }
       } else if (args.clerkUserId && activeSessionId) {
         try {
-          const prismaMod = await import('../../../lib/prisma')
+          const prismaMod = await import('../../lib/prisma')
           const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
           await prismaClient.message.create({
             data: { sessionId: activeSessionId, role: 'user', content: args.userQuery }
@@ -448,7 +454,7 @@ function createCompositeStream(args: {
           })
 
           try {
-            const prismaMod = await import('../../../lib/prisma')
+            const prismaMod = await import('../../lib/prisma')
             const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
             await prismaClient.message.create({
               data: { sessionId: activeSessionId, role: 'assistant', content: sanitizedText }
@@ -462,17 +468,6 @@ function createCompositeStream(args: {
         reader.releaseLock()
       }
     },
-  })
-}
-
-function createTextStream(content: string, metadata: unknown): ReadableStream {
-  const encoder = new TextEncoder()
-  return new ReadableStream({
-    start(controller) {
-      controller.enqueue(encoder.encode(`data: ${JSON.stringify(metadata)}\n\n`))
-      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
-      controller.close()
-    }
   })
 }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
-import { checkRateLimit, checkPaymentRateLimit } from '../../../../lib/rateLimit'
+import { checkRateLimit, checkPaymentRateLimit } from '../../../lib/rateLimit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -185,7 +185,7 @@ export async function PUT(request: NextRequest) {
       const { tier, email } = (order.notes || {}) as { tier?: string; email?: string }
 
       if (email) {
-        const { prisma } = await import('../../../../lib/prisma')
+        const { prisma } = await import('../../../lib/prisma')
         // Record subscription if profile exists; do not fail payment on missing profile.
         await prisma.userProfile.updateMany({
           where: { email },

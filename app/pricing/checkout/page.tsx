@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { CheckoutContent } from './checkout-content'
 
-export const dynamic = 'force-dynamic'
+
 
 function CheckoutLoading() {
   return (
