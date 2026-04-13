@@ -242,9 +242,6 @@ export default function ChatPage() {
   const [labResults, setLabResults] = useState<Array<{ id: string; value: string; status: 'optimal' | 'low' | 'high' }>>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [attachLoading, setAttachLoading] = useState(false)
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
