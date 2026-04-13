@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useUser, useClerk } from '@clerk/nextjs'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { t, type Lang } from '../../lib/translations'
 import { motion } from 'framer-motion'
 import VaidyaOracle from '../../components/VaidyaOracle'
@@ -201,9 +202,12 @@ function toWikiName(input: string): string {
   return input.replace(/[^a-zA-Z0-9\s/-]+/g, '').trim() || 'AyuraHealth Note'
 }
 
-export default function ChatPage() {
+function ChatContent() {
   const { user, isLoaded: clerkLoaded } = useUser()
   const clerk = useClerk()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
   
   // ── CEO Bypass: Check for frictionless owner access ────────────────────────
   const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
@@ -408,21 +412,20 @@ export default function ChatPage() {
   const doshaColor = dosha ? DOSHA_META[dosha].color : '#6abf8a'
   const tx = t[lang]
 
-  // Intercept the /chat?q=... parameter from the landing page growth hack
+  // Intercept the /chat?q=... parameter from the landing page
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const qs = new URLSearchParams(window.location.search)
-      const q = qs.get('q')
-      if (q && screen === 'landing' && messages.length === 0) {
-        setScreen('chat')
-        setInput(q)
-        // Optional: clear the URL so reloading doesn't reset it
-        const url = new URL(window.location.href)
-        url.searchParams.delete('q')
-        window.history.replaceState({}, '', url.toString())
-      }
+    const q = searchParams.get('q')
+    if (q && screen === 'landing' && messages.length === 0) {
+      setScreen('chat')
+      setInput(q)
+
+      // Clear the URL parameter so reloading doesn't reset it
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('q')
+      const queryString = params.toString()
+      router.replace(`${pathname}${queryString ? `?${queryString}` : ''}`)
     }
-  }, [screen, messages.length])
+  }, [screen, messages.length, searchParams, router, pathname])
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -1659,5 +1662,20 @@ export default function ChatPage() {
       )}
 
     </main>
+  )
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <main style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
+          <p style={{ color: '#e8dfc8', fontFamily: '"DM Sans", sans-serif' }}>Loading consultation...</p>
+        </div>
+      </main>
+    }>
+      <ChatContent />
+    </Suspense>
   )
 }
