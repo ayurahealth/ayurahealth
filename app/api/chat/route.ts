@@ -68,6 +68,8 @@ import {
 import type { AutoRecoveryPolicy } from '../../../lib/ai/prompt-manager'
 import {
   fetchClinicalMemory,
+  fetchPatientProfile,
+  fetchChatHistory,
   fetchKnowledgeContext,
   fetchWebContext,
   orchestrateAgents,
@@ -206,11 +208,16 @@ export async function POST(req: NextRequest) {
     const effectiveWebSearch = autoRecoveryPolicy.webSearchSuppressed ? false : Boolean(webSearch)
 
     // 9. Fetch context (in parallel)
-    const [clinicalMemoryCtx, knowledgeResult, webResult] = await Promise.all([
+    const [clinicalMemoryCtx, patientProfileCtx, knowledgeResult, webResult, historyBackfill] = await Promise.all([
       clerkUser?.id ? fetchClinicalMemory(clerkUser.id) : Promise.resolve(''),
+      clerkUser?.id ? fetchPatientProfile(clerkUser.id) : Promise.resolve(''),
       fetchKnowledgeContext(userQuery),
       effectiveWebSearch ? fetchWebContext(userQuery) : Promise.resolve({ context: '', chunks: [] as Array<{ title: string; content: string; tradition: string; source: string; similarity: number }> }),
+      (sessionId && messages.length === 1) ? fetchChatHistory(sessionId) : Promise.resolve([]),
     ])
+
+    // Backfill history if available
+    const effectiveMessages = historyBackfill.length > 0 ? [...historyBackfill, messages[messages.length-1]] : messages
 
     const allKnowledgeCtx = [knowledgeResult.context, webResult.context].filter(Boolean).join('')
     const allChunks = [...knowledgeResult.chunks, ...webResult.chunks]
@@ -248,7 +255,7 @@ export async function POST(req: NextRequest) {
 
     // 11. Build system prompt
     const systemPrompt = buildSystemPrompt({
-      messages,
+      messages: effectiveMessages,
       systems: safeSystems,
       dosha: safeDosha,
       lang: safeLang,
@@ -257,13 +264,14 @@ export async function POST(req: NextRequest) {
       vedicContext,
       knowledgeCtx: allKnowledgeCtx,
       clinicalMemoryCtx,
+      patientProfileCtx,
       agentTraceCtx,
       promptProfile,
       autoRecoveryPolicy,
     })
 
     // 12. Format messages for API
-    const completionMessages = formatMessagesForApi(messages, safeAttachments, systemPrompt)
+    const completionMessages = formatMessagesForApi(effectiveMessages, safeAttachments, systemPrompt)
     const hasImages = safeAttachments.some(a => a.type === 'image')
     const maxTokens = effectiveDeepThink ? 4000 : 2500
     const temperature = Math.max(0.2, Math.min(0.8,

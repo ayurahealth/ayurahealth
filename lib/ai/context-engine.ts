@@ -31,6 +31,21 @@ export interface AgentTraceItem {
 }
 
 interface PrismaContextClient {
+  userProfile: {
+    findUnique(args: { where: { id: string } }): Promise<null | {
+      primaryDosha: string | null
+      healthGoal: string | null
+      age: number | null
+      gender: string | null
+      conditions: string[]
+    }>
+  }
+  chatSession: {
+    findUnique(args: { 
+      where: { id: string }
+      include: { messages: { orderBy: { createdAt: 'asc' }; take: number } }
+    }): Promise<null | { messages: Array<{ role: string; content: string }> }>
+  }
   userMemory: {
     findMany(args: {
       where: { userId: string }
@@ -65,6 +80,45 @@ export async function fetchClinicalMemory(userId: string): Promise<string> {
     log.error('CLINICAL_MEMORY_FETCH_ERROR', { userId, error: String(err) })
   }
   return ''
+}
+
+export async function fetchPatientProfile(userId: string): Promise<string> {
+  try {
+    const prisma = await getPrisma()
+    const profile = await prisma.userProfile.findUnique({
+      where: { id: userId }
+    })
+    if (profile) {
+      const parts = [
+        `\n🩺 PATIENT CLINICAL FILE\n`,
+        profile.primaryDosha ? `[Dosha] ${profile.primaryDosha}` : '',
+        profile.healthGoal ? `[Health Goal] ${profile.healthGoal}` : '',
+        profile.age ? `[Age] ${profile.age}` : '',
+        profile.gender ? `[Gender] ${profile.gender}` : '',
+        profile.conditions && profile.conditions.length > 0 
+          ? `[Known Conditions] ${profile.conditions.join(', ')}` 
+          : ''
+      ].filter(Boolean)
+      return parts.join('\n')
+    }
+  } catch (err) {
+    log.error('PATIENT_PROFILE_FETCH_ERROR', { userId, error: String(err) })
+  }
+  return ''
+}
+
+export async function fetchChatHistory(sessionId: string): Promise<Array<{ role: string; content: string }>> {
+  try {
+    const prisma = await getPrisma()
+    const session = await prisma.chatSession.findUnique({
+      where: { id: sessionId },
+      include: { messages: { orderBy: { createdAt: 'asc' }, take: 15 } }
+    })
+    return session?.messages || []
+  } catch (err) {
+    log.error('CHAT_HISTORY_FETCH_ERROR', { sessionId, error: String(err) })
+    return []
+  }
 }
 
 // ── RAG Knowledge Retrieval ─────────────────────────────────────────────────
