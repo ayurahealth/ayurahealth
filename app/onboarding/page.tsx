@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { getApiUrl } from '../../lib/constants';
@@ -14,6 +14,7 @@ export default function OnboardingPage() {
     age: '',
     gender: '',
     healthGoal: '',
+    acceptedTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 

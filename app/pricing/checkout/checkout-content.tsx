@@ -97,7 +97,7 @@ export function CheckoutContent() {
               currency: orderData.currency,
               name: 'AyuraHealth',
               description: `${info.name} Subscription`,
-              image: `${window.location.origin}/opengraph-image`,
+              image: `${window.location.origin}/og-image.svg`,
               order_id: orderData.orderId,
               handler: async (response: RazorpayResponse) => {
                 try {

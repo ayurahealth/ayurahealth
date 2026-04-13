@@ -1,58 +1,76 @@
-import { currentUser } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useUser } from '@clerk/react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { DashboardContent } from './dashboard-content'
-import { prisma } from '../../lib/prisma'
+import { getApiUrl } from '../../lib/constants'
 
-export const dynamic = 'force-dynamic'
+export default function DashboardPage() {
+  const { user, isLoaded, isSignedIn } = useUser()
+  const router = useRouter()
+  const [dbProfile, setDbProfile] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isFetching, setIsFetching] = useState(false)
 
-export default async function DashboardPage() {
-  // Try to grab the Clerk user
-  let user = null
-  try {
-    user = await currentUser()
-  } catch (err) {
-    console.warn("Clerk Error on Dashboard", err)
-  }
-  
-  // Provide mock local user if they aren't signed in so they can see the design
-  if (!user) {
-    redirect('/')
-  }
-  
-  const userEmail = user.emailAddresses?.[0]?.emailAddress || 'guest@ayurahealth.com'
-  
-  // Database Fusion: Fetch or securely create the user's Health Profile in Prisma SQLite
-  let dbProfile = null
-  try {
-    dbProfile = await prisma.userProfile.findUnique({
-      where: { id: user.id }
-    })
-    
-    if (!dbProfile) {
-      dbProfile = await prisma.userProfile.create({
-        data: {
-          id: user.id,
-          email: userEmail,
-          primaryDosha: 'Vata-Pitta',
-          vataScore: 45,
-          pittaScore: 35,
-          kaphaScore: 20
-        }
-      })
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/')
     }
-  } catch (e) {
-    console.error("Database unavailable during build/scaffold:", e)
-    // Fallback if sqlite is locked
-    dbProfile = {
-      primaryDosha: 'Vata-Pitta',
-      vataScore: 45,
-      pittaScore: 35,
-      kaphaScore: 20
+  }, [isLoaded, isSignedIn, router])
+
+  useEffect(() => {
+    if (isSignedIn && !dbProfile && !isFetching) {
+      setIsFetching(true)
+      fetch(getApiUrl('/api/user-profile'))
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setDbProfile(data.profile)
+          } else {
+            setError(data.error || 'Failed to load profile')
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching profile:', err)
+          setError('Network error')
+        })
+        .finally(() => {
+          setIsFetching(false)
+        })
     }
+  }, [isSignedIn, dbProfile, isFetching])
+
+  if (!isLoaded || !isSignedIn) {
+    return (
+      <main style={{ background: '#05100a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e8dfc8' }}>
+        <p>Checking authentication...</p>
+      </main>
+    )
   }
-  
-  return <DashboardContent 
-           user={JSON.parse(JSON.stringify(user))} 
-           dbProfile={JSON.parse(JSON.stringify(dbProfile))} 
-         />
+
+  if (error) {
+    return (
+       <main style={{ background: '#05100a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e8dfc8', padding: '2rem', textAlign: 'center' }}>
+        <div>
+          <h1 style={{ color: '#c9a84c', marginBottom: '1rem' }}>Profile Error</h1>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()} style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#1a4d2e', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Retry</button>
+        </div>
+      </main>
+    )
+  }
+
+  if (!dbProfile) {
+    return (
+      <main style={{ background: '#05100a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e8dfc8' }}>
+        <div style={{ textAlign: 'center' }}>
+           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
+           <p>Syncing your Vedic Pulse...</p>
+        </div>
+      </main>
+    )
+  }
+
+  return <DashboardContent user={user} dbProfile={dbProfile} />
 }

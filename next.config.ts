@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   },
   skipTrailingSlashRedirect: true,
 
+  /*
   async headers() {
     const csp = [
       "default-src 'self'",
@@ -65,12 +66,15 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  */
+  /*
   async redirects() {
     return [
       { source: '/home', destination: '/', permanent: true },
       { source: '/blog', destination: '/', permanent: true },
     ]
   },
+  */
 }
 
 export default nextConfig
