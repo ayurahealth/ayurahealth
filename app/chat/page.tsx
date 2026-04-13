@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useSafeClerk as useClerk, useSafeUser as useUser } from '../../lib/clerk-client'
 import { t, type Lang } from '../../lib/translations'
+import DOMPurify from 'isomorphic-dompurify'
 import { motion } from 'framer-motion'
 import VaidyaOracle from '../../components/VaidyaOracle'
 import EngagementStory from '../../components/EngagementStory'
@@ -159,7 +160,7 @@ const QUESTIONS = (lang: Lang) => [
 ]
 
 function renderMarkdown(text: string, doshaColor = '#6abf8a'): string {
-  return text
+  const html = text
     .replace(/\*\*✦ VAIDYA'S NEURAL SYNTHESIS\*\*/g, `<div class="synthesis-header">✦ VAIDYA'S NEURAL SYNTHESIS</div>`)
     .replace(/\*\*🧪 Mathematical Precision Log\*\*/g, `<div class="section-header" style="color:${doshaColor}">🧪 Mathematical Precision Log</div>`)
     .replace(/\*\*🌿 The Path of Multi-Tradition Balance\*\*/g, `<div class="section-header" style="color:${doshaColor}">🌿 The Path of Multi-Tradition Balance</div>`)
@@ -172,6 +173,8 @@ function renderMarkdown(text: string, doshaColor = '#6abf8a'): string {
     .replace(/^(\d+)\. (.+)$/gm, '<div style="margin:0.3rem 0 0.3rem 0.5rem;display:flex;gap:0.5rem"><span style="opacity:0.5;min-width:1.2rem">$1.</span><span>$2</span></div>')
     .replace(/^- (.+)$/gm, '<div style="margin:0.25rem 0 0.25rem 0.5rem;display:flex;gap:0.5rem"><span style="opacity:0.4">•</span><span>$1</span></div>')
     .replace(/\n\n/g, '<br/><br/>').replace(/\n/g, '<br/>')
+
+  return DOMPurify.sanitize(html)
 }
 
 function timeAgo(ts: number): string {
