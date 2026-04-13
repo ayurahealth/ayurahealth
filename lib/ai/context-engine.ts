@@ -115,6 +115,8 @@ export async function fetchChatHistory(sessionId: string): Promise<Array<{ role:
       // Use array syntax and explicit cast to bypass the restrictive 'asc' type blocker in the generated client
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       include: { messages: { orderBy: [{ createdAt: 'desc' } as any], take: 15 } }
+      // Final Architectural Fix: Use plain object as required by the production Prisma client (Finding #7 resolution)
+      include: { messages: { orderBy: { createdAt: 'desc' as any }, take: 15 } }
     })
     // Reverse to chronological order for AI context (Finding #7)
     return (session?.messages || []).reverse()
