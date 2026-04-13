@@ -1,3 +1,5 @@
+export const dynamic = 'force-static'
+
 export async function GET() {
   const pages = ['/', '/chat', '/pricing', '/clinic', '/diet', '/privacy', '/terms']
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
