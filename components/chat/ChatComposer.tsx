@@ -99,7 +99,7 @@ export default function ChatComposer({
                 <div style={{ color: `${attachmentColorMap[att.type]}`, fontSize: '0.7rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{att.name}</div>
                 {att.size && <div style={{ color: 'rgba(200,200,200,0.35)', fontSize: '0.6rem' }}>{att.size}</div>}
               </div>
-              <button onClick={() => onRemoveAttachment(att.id)} style={{ background: 'none', border: 'none', color: 'rgba(200,200,200,0.3)', fontSize: '0.9rem', cursor: 'pointer', flexShrink: 0, lineHeight: 1, padding: '0 2px' }}>×</button>
+              <button aria-label="Remove attachment" title="Remove attachment" onClick={() => onRemoveAttachment(att.id)} style={{ background: 'none', border: 'none', color: 'rgba(200,200,200,0.3)', fontSize: '0.9rem', cursor: 'pointer', flexShrink: 0, lineHeight: 1, padding: '0 2px' }}>×</button>
             </div>
           ))}
           {attachLoading && (
@@ -126,16 +126,16 @@ export default function ChatComposer({
             autoFocus
           />
           <button onClick={onAddLink} disabled={!isValidUrl(linkInput)} style={{ padding: '0.6rem 1rem', background: isValidUrl(linkInput) ? 'hsla(var(--gold-accent), 0.15)' : 'transparent', border: `1px solid ${isValidUrl(linkInput) ? 'hsla(var(--gold-accent), 0.4)' : 'var(--ios-stroke)'}`, borderRadius: 12, color: isValidUrl(linkInput) ? 'hsl(var(--gold-accent))' : 'var(--ios-muted)', fontSize: '0.85rem', cursor: isValidUrl(linkInput) ? 'pointer' : 'not-allowed', fontWeight: 600, whiteSpace: 'nowrap' }}>Add →</button>
-          <button onClick={onCancelLinkInput} style={{ padding: '0.6rem 0.75rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: 'rgba(200,200,200,0.35)', fontSize: '0.85rem', cursor: 'pointer' }}>✕</button>
+          <button aria-label="Cancel link input" title="Cancel link input" onClick={onCancelLinkInput} style={{ padding: '0.6rem 0.75rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: 'rgba(200,200,200,0.35)', fontSize: '0.85rem', cursor: 'pointer' }}>✕</button>
         </div>
       )}
 
       <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'flex-end', maxWidth: 920, margin: '0 auto' }}>
         <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={onFileSelect} style={{ display: 'none' }} />
-        <button onClick={() => fileInputRef.current?.click()} disabled={attachments.length >= 4} title="Attach image or PDF" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: attachments.length > 0 ? 'rgba(122,175,212,0.12)' : 'rgba(106,191,138,0.06)', border: `1px solid ${attachments.length > 0 ? 'rgba(122,175,212,0.4)' : 'rgba(106,191,138,0.15)'}`, color: attachments.length > 0 ? '#7aafd4' : 'rgba(200,200,200,0.4)', cursor: attachments.length >= 4 ? 'not-allowed' : 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
+        <button aria-label="Attach image or PDF" onClick={() => fileInputRef.current?.click()} disabled={attachments.length >= 4} title="Attach image or PDF" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: attachments.length > 0 ? 'rgba(122,175,212,0.12)' : 'rgba(106,191,138,0.06)', border: `1px solid ${attachments.length > 0 ? 'rgba(122,175,212,0.4)' : 'rgba(106,191,138,0.15)'}`, color: attachments.length > 0 ? '#7aafd4' : 'rgba(200,200,200,0.4)', cursor: attachments.length >= 4 ? 'not-allowed' : 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
           📎
         </button>
-        <button onClick={onToggleLinkInput} title="Add a link" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: showLinkInput ? 'hsla(var(--gold-accent), 0.12)' : 'hsla(var(--sage-accent), 0.06)', border: `1px solid ${showLinkInput ? 'hsla(var(--gold-accent), 0.4)' : 'hsla(var(--sage-accent), 0.15)'}`, color: showLinkInput ? 'hsl(var(--gold-accent))' : 'var(--ios-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
+        <button aria-label="Add a link" onClick={onToggleLinkInput} title="Add a link" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: showLinkInput ? 'hsla(var(--gold-accent), 0.12)' : 'hsla(var(--sage-accent), 0.06)', border: `1px solid ${showLinkInput ? 'hsla(var(--gold-accent), 0.4)' : 'hsla(var(--sage-accent), 0.15)'}`, color: showLinkInput ? 'hsl(var(--gold-accent))' : 'var(--ios-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
           🔗
         </button>
         {voiceSupported && (
@@ -170,6 +170,8 @@ export default function ChatComposer({
           onBlur={(e) => (e.currentTarget.style.borderColor = 'hsla(var(--sage-accent), 0.2)')}
         />
         <button 
+          aria-label="Send message"
+          title="Send message"
           onClick={onSendMessage} 
           disabled={loading || (!input.trim() && attachments.length === 0)} 
           className="send-button-premium"
