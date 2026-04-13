@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser } from '@clerk/react'
+import { useSafeUser as useUser } from '../../lib/clerk-client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { DashboardContent } from './dashboard-content'

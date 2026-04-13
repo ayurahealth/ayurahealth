@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/react';
+import { useSafeUser as useUser } from '../../lib/clerk-client';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { getApiUrl } from '../../lib/constants';

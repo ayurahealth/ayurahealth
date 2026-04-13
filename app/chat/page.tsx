@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useUser, useClerk } from '@clerk/react'
+import { useSafeClerk as useClerk, useSafeUser as useUser } from '../../lib/clerk-client'
 import { t, type Lang } from '../../lib/translations'
 import { motion } from 'framer-motion'
 import VaidyaOracle from '../../components/VaidyaOracle'

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { SignInButton, UserButton, useUser } from '@clerk/react'
+import { SafeSignInButton, SafeUserButton, useSafeUser } from '../lib/clerk-client'
 import Logo from './Logo'
 
 const LANGUAGES = [
@@ -36,7 +36,7 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
   const pickerRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   
-  const { isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoaded } = useSafeUser()
 
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0]
   const filtered = LANGUAGES.filter(l =>
@@ -219,11 +219,11 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
           <div style={{ marginLeft: '0.5rem', display: 'flex', alignItems: 'center', height: 32 }}>
             {isLoaded ? (
               isSignedIn ? (
-                <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
+                <SafeUserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
               ) : (
-                <SignInButton mode="modal">
+                <SafeSignInButton mode="modal">
                   <button className="nav-pill" style={{ background: 'hsl(var(--sage-accent))', color: 'hsl(var(--sage-deep))', border: 'none', fontWeight: 600, cursor: 'pointer' }}>Sign In</button>
-                </SignInButton>
+                </SafeSignInButton>
               )
             ) : null}
           </div>
