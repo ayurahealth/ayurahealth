@@ -35,8 +35,7 @@ export default function TranslatorPage() {
       } else {
         alert("Failed to analyze biomarkers.")
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       alert("Error reaching VAIDYA.")
     } finally {
       setAnalyzing(false)

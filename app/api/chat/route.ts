@@ -19,8 +19,43 @@ import { NextRequest, NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
 
-import { checkRateLimit } from '../../../lib/rateLimit'
-import { sanitizeUserInput, sanitizeAIResponse } from '../../../lib/security/input-sanitizer'
+import { checkRateLimitDistributed } from '../../../lib/security/ratelimit'
+
+// Prompt Injection Protection (ACE Framework 5.2 - Finding #2)
+function sanitizeInput(input: string): string {
+  if (!input) return ''
+  
+  // 1. Unicode Normalization (NFKC) to catch lookalikes
+  let sanitized = input.normalize('NFKC')
+
+  // 2. Canonicalize common bypass characters
+  sanitized = sanitized
+    .replace(/\u200B/g, '') // Zero width space
+    .replace(/\uFEFF/g, '') // BOM
+
+  // 3. Regex Filtering (Expanded for Nested/Encoded/HMR variants)
+  sanitized = sanitized
+    .replace(/ignore\s+(all\s+)?previous\s+instructions?/gi, '')
+    .replace(/system\s*[:\-\=]/gi, '')
+    .replace(/\[INST\]/gi, '')
+    .replace(/<<SYS>>/gi, '')
+    .replace(/<\/?(s|system|human|assistant)>/gi, '')
+    .replace(/base64|encoding|payload/gi, '') // Detect mentions of encodings
+    .trim()
+    .slice(0, 4000)
+
+  return sanitized
+}
+
+// Response Sanitization (Inlined for robustness)
+function sanitizeAIResponse(text: string): string {
+  return text
+    .replace(/PROMPT PROFILE:\s*(BALANCED|STRICT|RECOVERY)/gi, '')
+    .replace(/AUTO RECOVERY POLICY ACTIVE:[^\n]*/gi, '')
+    .replace(/OUTPUT CONTRACT \(ALWAYS FOLLOW\):[^]*?(?=###|$)/gi, '')
+    .replace(/VAIDYA CLINICAL MEMORY \(PATIENT FILE\):[^\n]*/gi, '')
+}
+
 import {
   validateLang,
   validateSystems,
@@ -35,6 +70,8 @@ import {
 import type { AutoRecoveryPolicy } from '../../../lib/ai/prompt-manager'
 import {
   fetchClinicalMemory,
+  fetchPatientProfile,
+  fetchChatHistory,
   fetchKnowledgeContext,
   fetchWebContext,
   orchestrateAgents,
@@ -110,16 +147,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
   }
 
-  // 2. Rate limiting + CEO Bypass
+  // 2. Rate limiting + CEO Bypass (Finding #1: Serverless Distributed)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
+  const isAllowed = await checkRateLimitDistributed(ip)
+  if (!isAllowed) {
+    return NextResponse.json({ error: 'Too many requests. Please wait 1 minute.' }, { status: 429 })
+  }
+
   const ceoToken = req.cookies.get('ayura_ceo_token')?.value
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
   const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
-
-  const { allowed } = await checkRateLimit(ip, isCeo)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Too many requests. Please wait a minute.' }, { status: 429 })
-  }
   if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
 
   // 3. Auth + Paywall
@@ -161,19 +198,7 @@ export async function POST(req: NextRequest) {
     const preferredModel = (modelPreference || 'auto') as ModelPreference
 
     const lastMsg = messages[messages.length - 1]
-    const userQuery = lastMsg.role === 'user' ? lastMsg.content : ''
-
-    // 7. Input safety check (NEW — previously defined but never called)
-    const sanitized = sanitizeUserInput(userQuery, safeLang)
-    if (sanitized.blocked) {
-      return new NextResponse(
-        createTextStream(sanitized.sanitizedContent, {}),
-        { headers: STREAM_HEADERS }
-      )
-    }
-    if (sanitized.warnings.length > 0) {
-      log.warn('INPUT_WARNINGS', { warnings: sanitized.warnings, ip })
-    }
+    const userQuery = lastMsg.role === 'user' ? sanitizeInput(lastMsg.content) : ''
 
     // 8. Build prompt profile + auto-recovery
     const promptProfile = buildPromptProfile(messages)
@@ -186,11 +211,16 @@ export async function POST(req: NextRequest) {
     const effectiveWebSearch = autoRecoveryPolicy.webSearchSuppressed ? false : Boolean(webSearch)
 
     // 9. Fetch context (in parallel)
-    const [clinicalMemoryCtx, knowledgeResult, webResult] = await Promise.all([
+    const [clinicalMemoryCtx, patientProfileCtx, knowledgeResult, webResult, historyBackfill] = await Promise.all([
       clerkUser?.id ? fetchClinicalMemory(clerkUser.id) : Promise.resolve(''),
+      clerkUser?.id ? fetchPatientProfile(clerkUser.id) : Promise.resolve(''),
       fetchKnowledgeContext(userQuery),
       effectiveWebSearch ? fetchWebContext(userQuery) : Promise.resolve({ context: '', chunks: [] as Array<{ title: string; content: string; tradition: string; source: string; similarity: number }> }),
+      (sessionId && messages.length === 1) ? fetchChatHistory(sessionId) : Promise.resolve([]),
     ])
+
+    // Backfill history if available
+    const effectiveMessages = historyBackfill.length > 0 ? [...historyBackfill, messages[messages.length-1]] : messages
 
     const allKnowledgeCtx = [knowledgeResult.context, webResult.context].filter(Boolean).join('')
     const allChunks = [...knowledgeResult.chunks, ...webResult.chunks]
@@ -228,7 +258,7 @@ export async function POST(req: NextRequest) {
 
     // 11. Build system prompt
     const systemPrompt = buildSystemPrompt({
-      messages,
+      messages: effectiveMessages,
       systems: safeSystems,
       dosha: safeDosha,
       lang: safeLang,
@@ -237,13 +267,14 @@ export async function POST(req: NextRequest) {
       vedicContext,
       knowledgeCtx: allKnowledgeCtx,
       clinicalMemoryCtx,
+      patientProfileCtx,
       agentTraceCtx,
       promptProfile,
       autoRecoveryPolicy,
     })
 
     // 12. Format messages for API
-    const completionMessages = formatMessagesForApi(messages, safeAttachments, systemPrompt)
+    const completionMessages = formatMessagesForApi(effectiveMessages, safeAttachments, systemPrompt)
     const hasImages = safeAttachments.some(a => a.type === 'image')
     const maxTokens = effectiveDeepThink ? 4000 : 2500
     const temperature = Math.max(0.2, Math.min(0.8,
@@ -274,8 +305,14 @@ export async function POST(req: NextRequest) {
 
           if (check.toolCalls && check.toolCalls.length > 0) {
             log.info('LLM_REQUESTED_TOOLS', { count: check.toolCalls.length })
-            for (const tool of check.toolCalls) {
-              const result = await executeToolCall(tool)
+            const results = await Promise.all(
+              check.toolCalls.map(async (tool) => {
+                const result = await executeToolCall(tool)
+                return { tool, result }
+              })
+            )
+
+            for (const { tool, result } of results) {
               const toolName = tool.function.name
               currentMessages.push({ role: 'assistant', content: `[CALLING_TOOL: ${toolName}]` })
               currentMessages.push({ role: 'system', content: `TOOL_RESULT [${toolName}]: ${result.output}` })

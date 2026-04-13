@@ -20,7 +20,9 @@
     "@capacitor/ios": "^8.3.0",
     "@clerk/nextjs": "^7.0.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
+    "@prisma/config": "^7.7.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@types/pg": "^8.20.0",
@@ -52,22 +54,36 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.1.6",
     "eventsource": "^4.1.0",
     "prisma": "^7.7.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "overrides": {
     "hono": "4.12.12",
     "@hono/node-server": "1.19.13",
-    "@react-spring/animated": { "react": "*" },
-    "@react-spring/core": { "react": "*" },
-    "@react-spring/shared": { "react": "*" },
-    "@react-spring/three": { "react": "*" },
-    "react-composer": { "react": "*" },
-    "@react-three/drei": { "react": "*", "react-dom": "*", "@react-three/fiber": "*" }
+    "@react-spring/animated": {
+      "react": "*"
+    },
+    "@react-spring/core": {
+      "react": "*"
+    },
+    "@react-spring/shared": {
+      "react": "*"
+    },
+    "@react-spring/three": {
+      "react": "*"
+    },
+    "react-composer": {
+      "react": "*"
+    },
+    "@react-three/drei": {
+      "react": "*",
+      "react-dom": "*",
+      "@react-three/fiber": "*"
+    }
   }
 }
