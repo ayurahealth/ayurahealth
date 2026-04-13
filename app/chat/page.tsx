@@ -205,6 +205,20 @@ export default function ChatPage() {
   const { user, isLoaded: clerkLoaded } = useUser()
   const clerk = useClerk()
   
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const [lang, setLang] = useState<Lang>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ayura_lang')
+      if (saved === 'ja' || saved === 'hi') return saved as Lang
+    }
+    return 'en'
+  })
+  const [screen, setScreen] = useState<Screen>('landing')
+  
   const [currentQ, setCurrentQ] = useState(0)
   const [answers, setAnswers] = useState<string[]>([])
   const [dosha, setDosha] = useState<Dosha | null>(null)
@@ -232,20 +246,6 @@ export default function ChatPage() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  // ── CEO Bypass: Check for frictionless owner access ────────────────────────
-  const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
-  const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
-
-  if (!mounted) {
-    return (
-      <main style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#c9a84c', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', letterSpacing: '0.25em', textAlign: 'center' }}>
-          Initializing VAIDYA Healing Wisdom...
-          <div style={{ color: 'rgba(106,191,138,0.4)', fontSize: '0.7rem', marginTop: '1rem', letterSpacing: '0.1em' }}>NEURAL SYNTHESIS IN PROGRESS</div>
-        </div>
-      </main>
-    )
-  }
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
@@ -476,6 +476,22 @@ export default function ChatPage() {
     const scores = calculateHealthScores(messages, profile)
     setHealthScores(scores)
   }, [messages])
+
+  // ── CEO Bypass Check ────────────────────────────────────────────────────────
+  const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
+  const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
+
+  // ── Lifecycle Guard ─────────────────────────────────────────────────────────
+  if (!mounted) {
+    return (
+      <main style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#c9a84c', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', letterSpacing: '0.25em', textAlign: 'center' }}>
+          Initializing VAIDYA Healing Wisdom...
+          <div style={{ color: 'rgba(106,191,138,0.4)', fontSize: '0.7rem', marginTop: '1rem', letterSpacing: '0.1em' }}>NEURAL SYNTHESIS IN PROGRESS</div>
+        </div>
+      </main>
+    )
+  }
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
