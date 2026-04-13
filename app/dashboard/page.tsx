@@ -6,12 +6,20 @@ import { useEffect, useState, useRef } from 'react'
 import { DashboardContent } from './dashboard-content'
 import { getApiUrl } from '../../lib/constants'
 
+type DBProfile = {
+  vataScore?: number;
+  pittaScore?: number;
+  kaphaScore?: number;
+  primaryDosha?: string;
+  healthGoal?: string;
+  conditions?: string[];
+  chatSessions?: { id: string; topic: string; createdAt: string; summary?: string }[];
+}
+
 export default function DashboardPage() {
   const { user, isLoaded, isSignedIn } = useUser()
   const router = useRouter()
-  const [dbProfile, setDbProfile] = useState<unknown>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isFetching, setIsFetching] = useState(false)
+  const [dbProfile, setDbProfile] = useState<DBProfile | null>(null)
   const fetchingRef = useRef(false)
 
   useEffect(() => {
@@ -23,22 +31,19 @@ export default function DashboardPage() {
   useEffect(() => {
     if (isSignedIn && !dbProfile && !fetchingRef.current) {
       fetchingRef.current = true
-      // setIsFetching(true)
       fetch(getApiUrl('/api/user-profile'))
         .then(res => res.json())
         .then(data => {
           if (data.success) {
             setDbProfile(data.profile)
           } else {
-            setError(data.error || 'Failed to load profile')
+            console.error(data.error || 'Failed to load profile')
           }
         })
         .catch(err => {
           console.error('Error fetching profile:', err)
-          setError('Network error')
         })
         .finally(() => {
-          setIsFetching(false)
           fetchingRef.current = false
         })
     }
@@ -56,8 +61,6 @@ export default function DashboardPage() {
     <DashboardContent
       user={user}
       dbProfile={dbProfile}
-      error={error}
-      isFetching={isFetching}
     />
   )
 }
