@@ -205,13 +205,14 @@ export interface PromptBuildInput {
   vedicContext?: string
   knowledgeCtx?: string
   clinicalMemoryCtx?: string
+  patientProfileCtx?: string
   agentTraceCtx?: string
   promptProfile: PromptProfile
   autoRecoveryPolicy: AutoRecoveryPolicy
 }
 
 export function buildSystemPrompt(input: PromptBuildInput): string {
-  const { systems, dosha, lang, attachments, deepThink, vedicContext, knowledgeCtx, clinicalMemoryCtx, agentTraceCtx, promptProfile, autoRecoveryPolicy } = input
+  const { systems, dosha, lang, attachments, deepThink, vedicContext, knowledgeCtx, clinicalMemoryCtx, patientProfileCtx, agentTraceCtx, promptProfile, autoRecoveryPolicy } = input
 
   const langName = LANG_NAMES[lang] || 'English'
 
@@ -320,6 +321,7 @@ ${knowledgeCtx ? `\nFOUNDATIONAL DATA RETRIEVED FROM AI BRAIN (NotebookLM Curate
     `PROMPT PROFILE: ${promptProfile.name.toUpperCase()}`,
     promptProfile.instruction,
     autoRecoveryPolicy.applied ? `AUTO RECOVERY POLICY ACTIVE: ${autoRecoveryPolicy.reasons.join(' | ')}` : '',
+    patientProfileCtx || '',
     clinicalMemoryCtx || '',
     responseTemplate,
     vedicSection,
