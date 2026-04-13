@@ -477,21 +477,6 @@ export default function ChatPage() {
     setHealthScores(scores)
   }, [messages])
 
-  // ── CEO Bypass Check ────────────────────────────────────────────────────────
-  const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
-  const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
-
-  // ── Lifecycle Guard ─────────────────────────────────────────────────────────
-  if (!mounted) {
-    return (
-      <main style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#c9a84c', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', letterSpacing: '0.25em', textAlign: 'center' }}>
-          Initializing VAIDYA Healing Wisdom...
-          <div style={{ color: 'rgba(106,191,138,0.4)', fontSize: '0.7rem', marginTop: '1rem', letterSpacing: '0.1em' }}>NEURAL SYNTHESIS IN PROGRESS</div>
-        </div>
-      </main>
-    )
-  }
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -566,50 +551,7 @@ export default function ChatPage() {
 
   const removeAttachment = (id: string) => setAttachments(prev => prev.filter(a => a.id !== id))
 
-  const calcDosha = useCallback((ans: string[]): Dosha => {
-    const counts: Record<string, number> = { Vata: 0, Pitta: 0, Kapha: 0 }
-    ans.forEach(a => { counts[a] = (counts[a] || 0) + 1 })
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] as Dosha
-  }, [])
 
-  const handleAnswer = useCallback((d: string) => {
-    setAnswers(prev => {
-      const newAnswers = [...prev, d]
-      if (currentQ < QUESTIONS(lang).length - 1) {
-        setCurrentQ(prevQ => prevQ + 1)
-      } else { 
-        const resultDosha = calcDosha(newAnswers)
-        setDosha(resultDosha)
-        setScreen('result')
-
-        // Save to Database if user is signed in
-        if (user) {
-          fetch('/api/user-profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              primaryDosha: resultDosha,
-              vataScore: newAnswers.filter(a => a === 'Vata').length * 20,
-              pittaScore: newAnswers.filter(a => a === 'Pitta').length * 20,
-              kaphaScore: newAnswers.filter(a => a === 'Kapha').length * 20
-            })
-          }).catch(err => console.error('Failed to save profile:', err))
-        }
-      }
-      return newAnswers
-    })
-  }, [currentQ, lang, user, calcDosha])
-
-  const startChat = useCallback((d?: Dosha | null) => {
-    const activeDosha = d ?? dosha
-    setScreen('chat')
-    const dType = activeDosha || ''
-    const meta = dType ? DOSHA_META[dType as Dosha] : null
-    const greeting = meta
-      ? tx.greeting_dosha.replace(/{dosha}/g, dType).replace('{tagline}', tx[meta.taglineKey as keyof typeof tx] as string).replace('{desc}', tx[meta.descKey as keyof typeof tx] as string)
-      : tx.greeting
-    setMessages([{ role: 'assistant', content: greeting }])
-  }, [dosha, tx])
 
   const resumeSession = () => {
     if (!savedState) return
@@ -644,32 +586,7 @@ export default function ChatPage() {
     finally { setIsSharing(false) }
   }
 
-  const speakText = useCallback((text: string) => {
-    if (typeof window === 'undefined') return
-    vaidyaVoice.speak(text, () => setIsSpeaking(false))
-    setIsSpeaking(true)
-  }, [])
 
-  const startListening = useCallback(() => {
-    if (typeof window === 'undefined') return
-    const w = window as unknown as AugmentedWindow
-    const SRClass = w.SpeechRecognition || w.webkitSpeechRecognition
-    if (!SRClass) return
-    if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return }
-    const recognition = new SRClass()
-    recognition.lang = lang === 'ja' ? 'ja-JP' : lang === 'hi' ? 'hi-IN' : 'en-US'
-    recognition.continuous = false; recognition.interimResults = true
-    recognition.onstart = () => setIsListening(true)
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results).map((r: any) => r[0].transcript).join('')
-      /* eslint-enable @typescript-eslint/no-explicit-any */
-      setInput(transcript)
-      if (event.results[event.results.length - 1].isFinal) setIsListening(false)
-    }
-    recognition.onerror = () => setIsListening(false); recognition.onend = () => setIsListening(false)
-    recognitionRef.current = recognition; recognition.start()
-  }, [lang, isListening])
 
   const sendMessage = async (text?: string) => {
     const content = text || input.trim()
@@ -818,6 +735,78 @@ export default function ChatPage() {
       return [...prev, id]
     })
   }
+
+  const calcDosha = useCallback((ans: string[]): Dosha => {
+    const counts: Record<string, number> = { Vata: 0, Pitta: 0, Kapha: 0 }
+    ans.forEach(a => { counts[a] = (counts[a] || 0) + 1 })
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] as Dosha
+  }, [])
+
+  const handleAnswer = useCallback((d: string) => {
+    setAnswers(prev => {
+      const newAnswers = [...prev, d]
+      if (currentQ < QUESTIONS(lang).length - 1) {
+        setCurrentQ(prevQ => prevQ + 1)
+      } else { 
+        const resultDosha = calcDosha(newAnswers)
+        setDosha(resultDosha)
+        setScreen('result')
+
+        // Save to Database if user is signed in
+        if (user) {
+          fetch('/api/user-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              primaryDosha: resultDosha,
+              vataScore: newAnswers.filter(a => a === 'Vata').length * 20,
+              pittaScore: newAnswers.filter(a => a === 'Pitta').length * 20,
+              kaphaScore: newAnswers.filter(a => a === 'Kapha').length * 20
+            })
+          }).catch(err => console.error('Failed to save profile:', err))
+        }
+      }
+      return newAnswers
+    })
+  }, [currentQ, lang, user, calcDosha])
+
+  const startChat = useCallback((d?: Dosha | null) => {
+    const activeDosha = d ?? dosha
+    setScreen('chat')
+    const dType = activeDosha || ''
+    const meta = dType ? DOSHA_META[dType as Dosha] : null
+    const greeting = meta
+      ? tx.greeting_dosha.replace(/{dosha}/g, dType).replace('{tagline}', tx[meta.taglineKey as keyof typeof tx] as string).replace('{desc}', tx[meta.descKey as keyof typeof tx] as string)
+      : tx.greeting
+    setMessages([{ role: 'assistant', content: greeting }])
+  }, [dosha, tx])
+
+  const speakText = useCallback((text: string) => {
+    if (typeof window === 'undefined') return
+    vaidyaVoice.speak(text, () => setIsSpeaking(false))
+    setIsSpeaking(true)
+  }, [])
+
+  const startListening = useCallback(() => {
+    if (typeof window === 'undefined') return
+    const w = window as unknown as AugmentedWindow
+    const SRClass = w.SpeechRecognition || w.webkitSpeechRecognition
+    if (!SRClass) return
+    if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return }
+    const recognition = new SRClass()
+    recognition.lang = lang === 'ja' ? 'ja-JP' : lang === 'hi' ? 'hi-IN' : 'en-US'
+    recognition.continuous = false; recognition.interimResults = true
+    recognition.onstart = () => setIsListening(true)
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results).map((r: any) => r[0].transcript).join('')
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      setInput(transcript)
+      if (event.results[event.results.length - 1].isFinal) setIsListening(false)
+    }
+    recognition.onerror = () => setIsListening(false); recognition.onend = () => setIsListening(false)
+    recognitionRef.current = recognition; recognition.start()
+  }, [lang, isListening])
 
   const exportChatToObsidian = useCallback((options?: {
     includeSources?: boolean
@@ -1008,11 +997,29 @@ export default function ChatPage() {
       '',
       'Next: return to AyuraHealth chat and use "Send to Obsidian".',
       '',
+      'Next: return to AyuraHealth chat and use "Send to Obsidian".',
+      '',
     ].join('\n')
     const testUrl = `obsidian://new?name=${encodeURIComponent('AyuraHealth Connection Test')}${vaultParam}&content=${encodeURIComponent(testContent)}`
     window.location.href = testUrl
     setObsidianSetupNote('Connection attempt sent to Obsidian. If no note appears, use "Download Markdown" and drag the file into your vault.')
   }, [obsidianVault])
+
+  // ── CEO Bypass Check ────────────────────────────────────────────────────────
+  const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
+  const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
+
+  // ── Lifecycle Guard ─────────────────────────────────────────────────────────
+  if (!mounted) {
+    return (
+      <main style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#c9a84c', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', letterSpacing: '0.25em', textAlign: 'center' }}>
+          Initializing VAIDYA Healing Wisdom...
+          <div style={{ color: 'rgba(106,191,138,0.4)', fontSize: '0.7rem', marginTop: '1rem', letterSpacing: '0.1em' }}>NEURAL SYNTHESIS IN PROGRESS</div>
+        </div>
+      </main>
+    )
+  }
 
   const oracleState = isListening ? 'listening' : (loading && !streaming) ? 'thinking' : streaming ? 'responding' : 'idle';
 
