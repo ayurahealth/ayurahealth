@@ -205,9 +205,7 @@ export default function ChatPage() {
   const { user, isLoaded: clerkLoaded } = useUser()
   const clerk = useClerk()
   
-  // ── CEO Bypass: Check for frictionless owner access ────────────────────────
-  const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
-  const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
+  const activeUser = user
 
   const [lang, setLang] = useState<Lang>(() => {
     if (typeof window !== 'undefined') {
