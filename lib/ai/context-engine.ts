@@ -112,9 +112,10 @@ export async function fetchChatHistory(sessionId: string): Promise<Array<{ role:
     const prisma = await getPrisma()
     const session = await prisma.chatSession.findUnique({
       where: { id: sessionId },
-      include: { messages: { orderBy: { createdAt: 'asc' }, take: 15 } }
+      include: { messages: { orderBy: { createdAt: 'desc' }, take: 15 } }
     })
-    return session?.messages || []
+    // Reverse to chronological order for AI context (Finding #7)
+    return (session?.messages || []).reverse()
   } catch (err) {
     log.error('CHAT_HISTORY_FETCH_ERROR', { sessionId, error: String(err) })
     return []

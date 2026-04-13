@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /wp-admin/
-Disallow: /*.php$
+Disallow: /*.php
+# robots.txt wildcards cannot strictly enforce "end of path" matching, so /*.php blocks PHP urls
 Sitemap: https://ayurahealth.com/sitemap.xml

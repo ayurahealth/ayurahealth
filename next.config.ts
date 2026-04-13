@@ -4,13 +4,13 @@ const nextConfig: NextConfig = {
   // Prevent Next.js from inferring tracing root from parent lockfiles.
   outputFileTracingRoot: process.cwd(),
   
-  // Disable strict ESLint during builds as it's now handled by CI or separate scripts
+  // Enforce strict ESLint and TypeScript checks during builds for production stability
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   typescript: {
-    ignoreBuildErrors: true, 
+    ignoreBuildErrors: false, 
   },
 
   skipTrailingSlashRedirect: true,

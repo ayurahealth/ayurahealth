@@ -29,9 +29,24 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    if (!secret || token !== secret) {
+    // Timing-safe verification (Finding #5)
+    let isAuthorized = false
+    if (secret && token) {
+      try {
+        const crypto = await import('crypto')
+        const tokenBuffer = Buffer.from(token)
+        const secretBuffer = Buffer.from(secret)
+        if (tokenBuffer.length === secretBuffer.length) {
+          isAuthorized = crypto.timingSafeEqual(tokenBuffer, secretBuffer)
+        }
+      } catch (err) {
+        isAuthorized = false
+      }
+    }
+
+    if (!isAuthorized) {
       return NextResponse.json(
-        { error: 'Unauthorized', hint: 'Set HEALTH_CHECK_SECRET in the deployment environment' },
+        { error: 'Unauthorized', hint: 'Check HEALTH_CHECK_SECRET connectivity' },
         { status: 401, headers: { 'Cache-Control': 'no-store' } }
       )
     }

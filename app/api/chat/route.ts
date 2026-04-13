@@ -19,30 +19,32 @@ import { NextRequest, NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
 
-// Rate limiting (ACE Framework 5.1)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
-function checkRateLimit(ip: string, max = 20, windowMs = 60000): boolean {
-  const now = Date.now()
-  const rec = rateLimitMap.get(ip)
-  if (!rec || now > rec.resetTime) { 
-    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs }); 
-    return true 
-  }
-  if (rec.count >= max) return false
-  rec.count++; 
-  return true
-}
+import { checkRateLimitDistributed } from '../../../lib/security/ratelimit'
 
-// Prompt Injection Protection (ACE Framework 5.2)
+// Prompt Injection Protection (ACE Framework 5.2 - Finding #2)
 function sanitizeInput(input: string): string {
-  return input
+  if (!input) return ''
+  
+  // 1. Unicode Normalization (NFKC) to catch lookalikes
+  let sanitized = input.normalize('NFKC')
+
+  // 2. Canonicalize common bypass characters
+  sanitized = sanitized
+    .replace(/\u200B/g, '') // Zero width space
+    .replace(/\uFEFF/g, '') // BOM
+
+  // 3. Regex Filtering (Expanded for Nested/Encoded/HMR variants)
+  sanitized = sanitized
     .replace(/ignore\s+(all\s+)?previous\s+instructions?/gi, '')
-    .replace(/system\s*:/gi, '')
+    .replace(/system\s*[:\-\=]/gi, '')
     .replace(/\[INST\]/gi, '')
     .replace(/<<SYS>>/gi, '')
     .replace(/<\/?(s|system|human|assistant)>/gi, '')
+    .replace(/base64|encoding|payload/gi, '') // Detect mentions of encodings
     .trim()
     .slice(0, 4000)
+
+  return sanitized
 }
 
 // Response Sanitization (Inlined for robustness)
@@ -145,9 +147,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
   }
 
-  // 2. Rate limiting + CEO Bypass
+  // 2. Rate limiting + CEO Bypass (Finding #1: Serverless Distributed)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
-  if (!checkRateLimit(ip)) {
+  const isAllowed = await checkRateLimitDistributed(ip)
+  if (!isAllowed) {
     return NextResponse.json({ error: 'Too many requests. Please wait 1 minute.' }, { status: 429 })
   }
 
