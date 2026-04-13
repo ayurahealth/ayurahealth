@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Nav from '../../components/Nav'
 import { motion } from 'framer-motion'
 
-export function DashboardContent({ user, dbProfile }: { user: { firstName?: string } | null; dbProfile: { vataScore?: number; pittaScore?: number; kaphaScore?: number; primaryDosha?: string; healthGoal?: string; conditions?: string[]; chatSessions?: { id: string; topic: string; createdAt: string; summary?: string }[] } | null }) {
+export function DashboardContent({ user, dbProfile }: { user: { firstName?: string | null } | null; dbProfile: { vataScore?: number; pittaScore?: number; kaphaScore?: number; primaryDosha?: string; healthGoal?: string; conditions?: string[]; chatSessions?: { id: string; topic: string; createdAt: string; summary?: string }[] } | null }) {
   const [mounted, setMounted] = useState(false)
   
   // Real-Time Database Profile Dosha Balance

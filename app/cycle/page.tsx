@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUser, SignInButton } from '@clerk/nextjs';
+import { useUser, SignInButton } from '@clerk/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AyurvedicCycle from '../../components/AyurvedicCycle';
 import DoshaQuiz from '../../components/DoshaQuiz';

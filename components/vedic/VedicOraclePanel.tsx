@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
-import type { VedicOracleResponse } from '@/lib/vedic/types'
+import { getApiUrl } from '../../lib/constants'
+import type { VedicOracleResponse } from '../../lib/vedic/types'
 import BirthChartInput from './BirthChartInput'
 import PlanetaryHealthCard from './PlanetaryHealthCard'
 import VedicClockWidget from './VedicClockWidget'
@@ -30,7 +31,7 @@ export default function VedicOraclePanel({ initialDosha = 'Vata', labResults = [
     setLoading(true)
     setError('')
     try {
-      const response = await fetch('/api/vedic/analyze', {
+      const response = await fetch(getApiUrl('/api/vedic/analyze'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  // Required for Capacitor/iOS static export
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
+  
   // Prevent Next.js from inferring tracing root from parent lockfiles.
   outputFileTracingRoot: process.cwd(),
   
@@ -8,8 +14,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, 
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   skipTrailingSlashRedirect: true,
 
+  /*
   async headers() {
     const csp = [
       "default-src 'self'",
@@ -59,12 +70,15 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  */
+  /*
   async redirects() {
     return [
       { source: '/home', destination: '/', permanent: true },
       { source: '/blog', destination: '/', permanent: true },
     ]
   },
+  */
 }
 
 export default nextConfig

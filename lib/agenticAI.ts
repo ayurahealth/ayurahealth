@@ -1,3 +1,4 @@
+import { getApiUrl } from './constants'
 export interface AgentThought {
   step: number
   action: string
@@ -46,7 +47,7 @@ End with "✦ RECOMMENDATIONS:" followed by actionable steps.`
   ]
 
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch(getApiUrl('/api/chat'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -1,4 +1,5 @@
 // VAIDYA Health Profile — grows with every conversation
+import { getApiUrl } from './constants'
 
 export interface HealthProfile {
   conditions: string[]       // "anxiety", "IBS", "insomnia" etc
@@ -83,7 +84,7 @@ export function extractHealthClues(text: string, profile: HealthProfile): Health
  */
 export async function syncProfileToCloud(profile: HealthProfile) {
   try {
-    const res = await fetch('/api/profile/sync', {
+    const res = await fetch(getApiUrl('/api/profile/sync'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(profile)

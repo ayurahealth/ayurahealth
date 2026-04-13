@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { SuccessContent } from './success-content'
 
-export const dynamic = 'force-dynamic'
+
 
 function SuccessLoading() {
   return (

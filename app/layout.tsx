@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next'
+export const dynamic = 'force-static'
+
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
@@ -51,7 +53,7 @@ export const metadata: Metadata = {
     alternateLocale: ['ja_JP', 'hi_IN', 'zh_CN', 'ko_KR', 'ar_SA'],
     images: [
       {
-        url: `${BASE_URL}/opengraph-image`,
+        url: `${BASE_URL}/og-image.svg`,
         width: 1200,
         height: 630,
         alt: 'AyuraHealth — Ancient Wisdom, Modern AI · Natural Healing',
@@ -59,7 +61,7 @@ export const metadata: Metadata = {
       },
       // Square image for platforms that prefer it (WhatsApp profile / Instagram)
       {
-        url: `${BASE_URL}/opengraph-image`,
+        url: `${BASE_URL}/og-image.svg`,
         width: 1200,
         height: 1200,
         alt: 'AyuraHealth — Ancient Wisdom, Modern AI',
@@ -75,7 +77,7 @@ export const metadata: Metadata = {
     creator: '@ayurahealth',
     title: 'AyuraHealth — Ancient Wisdom, Modern AI',
     description: 'Discover your Ayurvedic dosha. Personalized health guidance from 8 ancient healing traditions + NVIDIA Nemotron AI.',
-    images: [`${BASE_URL}/opengraph-image`],
+    images: [`${BASE_URL}/og-image.svg`],
   },
 
   // ─── PWA / Mobile ───
@@ -84,7 +86,7 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'AyuraHealth',
-    startupImage: [`${BASE_URL}/opengraph-image`],
+    startupImage: [`${BASE_URL}/og-image.svg`],
   },
 
   // ─── SEO ───
@@ -104,7 +106,7 @@ export const metadata: Metadata = {
   category: 'health',
 }
 
-import { ClerkProvider } from "@clerk/nextjs";
+import ClerkWrapper from '../components/ClerkWrapper'
 import ConsentBanner from '../components/ConsentBanner'
 import { Cormorant_Garamond, DM_Sans } from 'next/font/google'
 
@@ -133,7 +135,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="shortcut icon" href="/favicon.svg" />
 
         {/* ─── Extra meta for LINE / KakaoTalk / WeChat / Viber ─── */}
-        <meta property="og:image" content={`${BASE_URL}/opengraph-image`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.svg`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:type" content="image/png" />
@@ -181,18 +183,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             "operatingSystem": "Any",
             "inLanguage": ["en", "ja", "hi", "zh", "ko", "ar", "sa"],
             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-            "image": `${BASE_URL}/opengraph-image`,
+            "image": `${BASE_URL}/og-image.svg`,
             "author": { "@type": "Organization", "name": "AyuraHealth", "url": BASE_URL },
           }
         ])}} />
       </head>
       <body>
-        <ClerkProvider>
+        <ClerkWrapper>
           {children}
           <ConsentBanner />
           <Analytics />
           <SpeedInsights />
-        </ClerkProvider>
+        </ClerkWrapper>
       </body>
     </html>
   )

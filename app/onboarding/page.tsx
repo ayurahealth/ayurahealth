@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { getApiUrl } from '../../lib/constants';
 
 export default function OnboardingPage() {
   const { user, isLoaded } = useUser();
@@ -13,6 +14,7 @@ export default function OnboardingPage() {
     age: '',
     gender: '',
     healthGoal: '',
+    acceptedTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,7 +27,7 @@ export default function OnboardingPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/user-profile', {
+      const res = await fetch(getApiUrl('/api/user-profile'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

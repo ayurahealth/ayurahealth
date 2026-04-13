@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import type { DailyGuidance } from '@/lib/vedic/types'
+import type { DailyGuidance } from '../../lib/vedic/types'
 
 interface Props { guidance: DailyGuidance }
 

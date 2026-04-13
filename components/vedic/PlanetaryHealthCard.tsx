@@ -1,6 +1,6 @@
 'use client'
-import type { GrahaPosition } from '@/lib/vedic/types'
-import { GRAHA_HEALTH_PROFILES } from '@/lib/vedic/jyotish-engine'
+import type { GrahaPosition } from '../../lib/vedic/types'
+import { GRAHA_HEALTH_PROFILES } from '../../lib/vedic/jyotish-engine'
 
 interface Props { position: GrahaPosition }
 
