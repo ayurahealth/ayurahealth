@@ -305,8 +305,14 @@ export async function POST(req: NextRequest) {
 
           if (check.toolCalls && check.toolCalls.length > 0) {
             log.info('LLM_REQUESTED_TOOLS', { count: check.toolCalls.length })
-            for (const tool of check.toolCalls) {
-              const result = await executeToolCall(tool)
+            const results = await Promise.all(
+              check.toolCalls.map(async (tool) => {
+                const result = await executeToolCall(tool)
+                return { tool, result }
+              })
+            )
+
+            for (const { tool, result } of results) {
               const toolName = tool.function.name
               currentMessages.push({ role: 'assistant', content: `[CALLING_TOOL: ${toolName}]` })
               currentMessages.push({ role: 'system', content: `TOOL_RESULT [${toolName}]: ${result.output}` })
