@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import DOMPurify from 'isomorphic-dompurify'
 
 const DOSHAS = ['Vata', 'Pitta', 'Kapha']
 const SEASONS = ['Spring', 'Summer', 'Autumn', 'Winter']
@@ -124,7 +125,7 @@ Use this EXACT format:
   }
 
   const formatDiet = (text: string) => {
-    return text
+    const html = text
       .replace(/^# (.+)$/gm, '<h1 style="font-family: Cormorant Garamond, serif; font-size: 1.8rem; color: #c9a84c; margin: 1.5rem 0 0.5rem; font-weight: 300;">$1</h1>')
       .replace(/^## (.+)$/gm, '<h2 style="font-family: Cormorant Garamond, serif; font-size: 1.3rem; color: #6abf8a; margin: 1.5rem 0 0.5rem; font-weight: 400;">$1</h2>')
       .replace(/^\*(.+)\*$/gm, '<p style="color: rgba(232,223,200,0.4); font-size: 0.82rem; font-style: italic; margin-bottom: 1rem;">$1</p>')
@@ -133,6 +134,8 @@ Use this EXACT format:
       .replace(/^(\d+\. .+)$/gm, '<div style="color: rgba(232,223,200,0.7); font-size: 0.88rem; margin: 0.3rem 0; padding-left: 1rem;">$1</div>')
       .replace(/^---$/gm, '<hr style="border: none; border-top: 1px solid rgba(106,191,138,0.12); margin: 1.5rem 0;">')
       .replace(/\n/g, '<br/>')
+
+    return DOMPurify.sanitize(html)
   }
 
   return (
