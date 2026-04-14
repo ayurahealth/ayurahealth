@@ -118,9 +118,9 @@ function saveState(s: SavedState) { try { localStorage.setItem(STORAGE_KEY, JSON
 function clearState() { try { localStorage.removeItem(STORAGE_KEY) } catch {} }
 
 const DOSHA_META = {
-  Vata:  { emoji: '🌬️', color: '#7aafd4', glow: 'transparent', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'vata_tagline', descKey: 'vata_desc', strengthsKey: 'vata_strengths', watchKey: 'vata_watch' },
-  Pitta: { emoji: '🔥', color: '#e8835a', glow: 'transparent', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'pitta_tagline', descKey: 'pitta_desc', strengthsKey: 'pitta_strengths', watchKey: 'pitta_watch' },
-  Kapha: { emoji: '🌍', color: '#6abf8a', glow: 'transparent', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'kapha_tagline', descKey: 'kapha_desc', strengthsKey: 'kapha_strengths', watchKey: 'kapha_watch' },
+  Vata:  { emoji: '🌬️', color: 'var(--accent-main)', glow: 'hsla(var(--accent-main-hsl), 0.2)', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'vata_tagline', descKey: 'vata_desc', strengthsKey: 'vata_strengths', watchKey: 'vata_watch' },
+  Pitta: { emoji: '🔥', color: 'var(--accent-secondary)', glow: 'hsla(var(--accent-secondary-hsl), 0.2)', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'pitta_tagline', descKey: 'pitta_desc', strengthsKey: 'pitta_strengths', watchKey: 'pitta_watch' },
+  Kapha: { emoji: '🌍', color: 'var(--accent-main)', glow: 'hsla(var(--accent-main-hsl), 0.2)', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'kapha_tagline', descKey: 'kapha_desc', strengthsKey: 'kapha_strengths', watchKey: 'kapha_watch' },
 }
 
 const MEDICINE_SYSTEMS = [
@@ -1298,259 +1298,357 @@ export default function ChatPage() {
         </header>
       )}
 
-      {/* ── LANDING SCREEN ─────────────────────────────────────────────────── */}
       {screen === 'landing' && (
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', textAlign: 'center', padding: '2rem 1rem' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 840, margin: '0 auto', textAlign: 'center', padding: '4rem 1.5rem' }}>
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            style={{ marginTop: '2rem' }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>🧪</div>
-          </motion.div>
-
-          <header style={{ marginBottom: '3.5rem', marginTop: '-1rem' }}>
+            <div style={{ fontSize: '1rem', color: 'var(--accent-main)', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+              ✦ Clinical Intelligence
+            </div>
             <h1 style={{ 
-              fontFamily: '"Cormorant Garamond", serif', 
-              fontSize: '3.8rem', 
-              color: '#c9a84c', 
-              marginBottom: '0.5rem',
+              fontFamily: 'var(--font-display)', 
+              fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', 
+              color: 'var(--text-main)', 
+              marginBottom: '1.5rem',
               letterSpacing: '-0.02em',
-              lineHeight: 1.1
+              lineHeight: 1.1,
+              fontWeight: 500
             }}>
               {t[lang].title}
             </h1>
             <p style={{ 
-              fontSize: '1.2rem', 
-              opacity: 0.6, 
-              color: '#e8dfc8', 
-              maxWidth: 500, 
-              margin: '0 auto',
-              lineHeight: 1.5,
-              fontWeight: 400
+              fontSize: '1.25rem', 
+              color: 'var(--text-muted)', 
+              maxWidth: 580, 
+              margin: '0 auto 3.5rem',
+              lineHeight: 1.6
             }}>
               {t[lang].subtitle}
             </p>
-          </header>
+          </motion.div>
 
-          <div style={{ background: 'var(--surface-low)', border: '1px solid var(--border-low)', borderRadius: 20, padding: '2rem', marginBottom: '1rem' }}>
+          <div className="glass-surface" style={{ padding: '3rem', marginBottom: '1.5rem', borderRadius: '32px' }}>
             <EngagementStory />
-            <div style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '0.75rem' }}>📊</div>
-            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--accent-main)', fontSize: '1.4rem', textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>Professional Assessment</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'center', lineHeight: 1.6, marginBottom: '1.5rem' }}>Identify your underlying health triggers through a structured 5-minute clinical evaluation.</p>
-            <button onClick={() => { setCurrentQ(0); setAnswers([]); setScreen('quiz') }} style={{ width: '100%', padding: '0.9rem', background: 'var(--accent-main)', color: 'var(--bg-main)', border: 'none', borderRadius: 14, fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>Start Clinical Assessment</button>
+            <div style={{ fontSize: '2.5rem', textAlign: 'center', marginBottom: '1rem' }}>🔬</div>
+            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-main)', fontSize: '1.75rem', textAlign: 'center', fontWeight: 600, marginBottom: '0.75rem' }}>Precision Diagnostic</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', textAlign: 'center', lineHeight: 1.7, marginBottom: '2.5rem' }}>
+              Identify underlying bio-energetic imbalances through a structured 5-minute clinical protocol.
+            </p>
+            <button 
+              onClick={() => { setCurrentQ(0); setAnswers([]); setScreen('quiz') }} 
+              className="btn-primary"
+              style={{ width: '100%', height: 60, fontSize: '1.1rem' }}
+            >
+              Start Clinical Intake
+            </button>
           </div>
-          <button onClick={() => { setDosha(null); startChat(null) }} style={{ width: '100%', padding: '0.8rem', background: 'transparent', color: 'rgba(200,200,200,0.45)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, fontSize: '0.9rem', cursor: 'pointer' }}>{tx.skip_btn}</button>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '2.5rem', flexWrap: 'wrap' }}>
-            {[['📜','Charaka Samhita'],['☯️','Huangdi Neijing'],['🏔️','Sowa Rigpa'],['💊','Evidence-Based']].map(([e,s],i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'rgba(200,200,200,0.3)', fontSize: '0.75rem' }}><span>{e}</span><span>{s}</span></div>
+          
+          <button 
+            onClick={() => { setDosha(null); startChat(null) }} 
+            style={{ 
+              width: '100%', 
+              padding: '1rem', 
+              background: 'transparent', 
+              color: 'var(--text-muted)', 
+              border: '1px solid var(--border-low)', 
+              borderRadius: 16, 
+              fontSize: '0.95rem', 
+              cursor: 'pointer',
+              fontWeight: 500
+            }}
+          >
+            {tx.skip_btn}
+          </button>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '4rem', flexWrap: 'wrap', opacity: 0.4 }}>
+            {[['Charaka Samhita'],['Huangdi Neijing'],['Sowa Rigpa'],['Evidence-Based']].map(([s],i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em' }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-main)' }} />
+                <span>{s}</span>
+              </div>
             ))}
           </div>
-          <p style={{ textAlign: 'center', color: 'rgba(200,200,200,0.25)', fontSize: '0.68rem', marginTop: '2rem', lineHeight: 1.5 }}>{tx.disclaimer}</p>
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '3rem', lineHeight: 1.6, maxWidth: 600, margin: '3rem auto 0', opacity: 0.5 }}>{tx.disclaimer}</p>
         </div>
       )}
 
-      {/* QUIZ */}
       {screen === 'quiz' && (
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 560, margin: '0 auto', padding: '2rem 1.5rem 6rem' }}>
-          <div style={{ marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span style={{ color: 'rgba(200,200,200,0.4)', fontSize: '0.8rem' }}>{tx.question_of} {currentQ + 1} {tx.of} {questions.length}</span>
-              <span style={{ color: 'rgba(200,200,200,0.4)', fontSize: '0.8rem' }}>{Math.round((currentQ / questions.length) * 100)}%</span>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto', padding: '4rem 1.5rem' }}>
+          <div style={{ marginBottom: '3rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'flex-end' }}>
+              <div>
+                <span style={{ color: 'var(--accent-main)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Protocol Phase</span>
+                <div style={{ color: 'var(--text-main)', fontSize: '1.25rem', fontWeight: 600 }}>Step {currentQ + 1} of {questions.length}</div>
+              </div>
+              <span style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: 500 }}>{Math.round((currentQ / questions.length) * 100)}%</span>
             </div>
-            <div style={{ height: 3, background: 'rgba(255,255,255,0.07)', borderRadius: 2 }}>
-              <div style={{ height: 3, background: 'linear-gradient(90deg, #3d7a28, #6abf8a)', borderRadius: 2, width: `${(currentQ / questions.length) * 100}%`, transition: 'width 0.4s ease' }} />
+            <div style={{ height: 6, background: 'var(--surface-mid)', borderRadius: 10, overflow: 'hidden' }}>
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${(currentQ / questions.length) * 100}%` }}
+                style={{ height: '100%', background: 'var(--accent-main)', borderRadius: 10 }} 
+              />
             </div>
           </div>
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{questions[currentQ].emoji}</div>
-            <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#e8dfc8', fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.4 }}>{questions[currentQ].q}</h2>
+
+          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>{questions[currentQ].emoji}</div>
+            <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-main)', fontSize: '2rem', fontWeight: 500, lineHeight: 1.3 }}>
+              {questions[currentQ].q}
+            </h2>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+
+          <div style={{ display: 'grid', gap: '1rem' }}>
             {questions[currentQ].opts.map((opt, i) => (
-              <button key={i} onClick={() => handleAnswer(opt.d)}
-                style={{ padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(106,191,138,0.15)', borderRadius: 16, color: 'rgba(232,223,200,0.85)', fontSize: '0.95rem', cursor: 'pointer', textAlign: 'left', lineHeight: 1.5, transition: 'all 0.2s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(106,191,138,0.5)'; (e.currentTarget as HTMLElement).style.background = 'rgba(106,191,138,0.08)' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(106,191,138,0.15)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)' }}
-              >{opt.l}</button>
+              <button 
+                key={i} 
+                onClick={() => handleAnswer(opt.d)}
+                className="flat-card"
+                style={{ 
+                  padding: '1.5rem', 
+                  background: 'var(--surface-low)', 
+                  border: '1px solid var(--border-mid)', 
+                  borderRadius: 20, 
+                  color: 'var(--text-main)', 
+                  fontSize: '1.1rem', 
+                  cursor: 'pointer', 
+                  textAlign: 'left', 
+                  lineHeight: 1.4, 
+                  transition: 'all 0.2s cubic-bezier(0.23, 1, 0.32, 1)',
+                  fontWeight: 500
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-main)'; e.currentTarget.style.background = 'var(--surface-mid)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-mid)'; e.currentTarget.style.background = 'var(--surface-low)'; e.currentTarget.style.transform = 'translateY(0)' }}
+              >
+                {opt.l}
+              </button>
             ))}
           </div>
-          {currentQ > 0 && <button onClick={() => { setCurrentQ(currentQ - 1); setAnswers(answers.slice(0, -1)) }} style={{ marginTop: '1.5rem', background: 'none', border: 'none', color: 'rgba(200,200,200,0.35)', fontSize: '0.85rem', cursor: 'pointer' }}>{tx.back}</button>}
+
+          {currentQ > 0 && (
+            <button 
+              onClick={() => { setCurrentQ(currentQ - 1); setAnswers(answers.slice(0, -1)) }} 
+              style={{ marginTop: '2rem', background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.95rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              ← Previous Step
+            </button>
+          )}
         </div>
       )}
 
       {/* RESULT */}
       {screen === 'result' && dosha && (
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 540, margin: '0 auto', padding: '2rem 1.5rem 6rem' }}>
-          <div style={{ opacity: revealed ? 1 : 0, transform: revealed ? 'translateY(0)' : 'translateY(24px)', transition: 'all 0.6s ease' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <div style={{ fontSize: '5rem', marginBottom: '0.5rem', filter: `drop-shadow(0 0 30px ${DOSHA_META[dosha].glow})` }}>{DOSHA_META[dosha].emoji}</div>
-              <div style={{ color: 'rgba(200,200,200,0.4)', fontSize: '0.85rem', marginBottom: '0.4rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{tx.your_dosha_is}</div>
-              <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '3.5rem', fontWeight: 700, color: DOSHA_META[dosha].color, textShadow: `0 0 40px ${DOSHA_META[dosha].glow}`, margin: 0 }}>{dosha}</h2>
-              <p style={{ color: 'rgba(200,200,200,0.5)', fontStyle: 'italic', marginTop: '0.5rem' }}>{tx[DOSHA_META[dosha].taglineKey as keyof typeof tx] as string}</p>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 640, margin: '0 auto', padding: '4rem 1.5rem' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+              <motion.div 
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                style={{ fontSize: '6rem', marginBottom: '1rem', filter: `drop-shadow(0 0 30px ${DOSHA_META[dosha].glow})` }}
+              >
+                {DOSHA_META[dosha].emoji}
+              </motion.div>
+              <div style={{ color: 'var(--accent-main)', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                Foundational Constitution
+              </div>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '4rem', fontWeight: 500, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.02em' }}>
+                {dosha}
+              </h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.25rem', marginTop: '0.75rem', fontWeight: 400 }}>
+                {tx[DOSHA_META[dosha].taglineKey as keyof typeof tx] as string}
+              </p>
             </div>
-            <div style={{ background: DOSHA_META[dosha].bg, border: `1px solid ${DOSHA_META[dosha].color}30`, borderRadius: 20, padding: '1.5rem', marginBottom: '1.25rem' }}>
-              <p style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>{tx[DOSHA_META[dosha].descKey as keyof typeof tx] as string}</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+
+            <div className="glass-surface" style={{ padding: '2.5rem', marginBottom: '2rem', borderRadius: '28px', border: `1px solid ${DOSHA_META[dosha].color}30` }}>
+              <p style={{ color: 'var(--text-main)', fontSize: '1.1rem', lineHeight: 1.7, marginBottom: '2.5rem' }}>{tx[DOSHA_META[dosha].descKey as keyof typeof tx] as string}</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                 {[{ label: tx.strengths, key: DOSHA_META[dosha].strengthsKey }, { label: tx.watch, key: DOSHA_META[dosha].watchKey }].map((item, i) => (
                   <div key={i}>
-                    <div style={{ color: DOSHA_META[dosha].color, fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{item.label}</div>
-                    <div style={{ color: 'rgba(232,223,200,0.65)', fontSize: '0.85rem', lineHeight: 1.5 }}>{tx[item.key as keyof typeof tx] as string}</div>
+                    <div style={{ 
+                      color: i === 0 ? 'var(--accent-main)' : 'var(--accent-secondary)', 
+                      fontSize: '0.75rem', 
+                      fontWeight: 700, 
+                      letterSpacing: '0.1em', 
+                      textTransform: 'uppercase', 
+                      marginBottom: '0.6rem' 
+                    }}>
+                      {item.label}
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>{tx[item.key as keyof typeof tx] as string}</div>
                   </div>
                 ))}
               </div>
             </div>
-            {/* Hidden share card */}
-            <div ref={shareCardRef} style={{ position: 'absolute', left: '-9999px', top: 0, width: 400, height: 500, overflow: 'hidden', background: DOSHA_META[dosha].cardBg, fontFamily: 'Georgia, serif' }}>
-              <svg width="400" height="500" style={{ position: 'absolute', top: 0, left: 0, opacity: 0.07 }}>
-                <defs><pattern id="sc-m" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke={DOSHA_META[dosha].color} strokeWidth="0.5"/>
-                  <circle cx="50" cy="50" r="28" fill="none" stroke={DOSHA_META[dosha].color} strokeWidth="0.5"/>
-                  <line x1="8" y1="50" x2="92" y2="50" stroke={DOSHA_META[dosha].color} strokeWidth="0.3"/>
-                  <line x1="50" y1="8" x2="50" y2="92" stroke={DOSHA_META[dosha].color} strokeWidth="0.3"/>
-                  <line x1="20" y1="20" x2="80" y2="80" stroke={DOSHA_META[dosha].color} strokeWidth="0.3"/>
-                  <line x1="80" y1="20" x2="20" y2="80" stroke={DOSHA_META[dosha].color} strokeWidth="0.3"/>
-                </pattern></defs>
-                <rect width="400" height="500" fill="url(#sc-m)"/>
-              </svg>
-              <div style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: `radial-gradient(circle, ${DOSHA_META[dosha].color}18 0%, transparent 70%)`, borderRadius: '50%' }} />
-              <div style={{ position: 'absolute', inset: 16, border: `1px solid ${DOSHA_META[dosha].color}25`, borderRadius: 24 }} />
-              <div style={{ position: 'relative', textAlign: 'center', paddingTop: 44 }}>
-                <div style={{ color: `${DOSHA_META[dosha].color}70`, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase' }}>My Ayurvedic Constitution</div>
-              </div>
-              <div style={{ textAlign: 'center', marginTop: 20, fontSize: 80, lineHeight: 1 }}>{DOSHA_META[dosha].emoji}</div>
-              <div style={{ textAlign: 'center', marginTop: 12 }}>
-                <div style={{ fontFamily: 'Georgia, serif', fontSize: 64, fontWeight: 700, color: DOSHA_META[dosha].color, lineHeight: 1 }}>{dosha}</div>
-                <div style={{ color: `${DOSHA_META[dosha].color}80`, fontSize: 14, fontStyle: 'italic', marginTop: 6 }}>{tx[DOSHA_META[dosha].taglineKey as keyof typeof tx] as string}</div>
-              </div>
-              <div style={{ margin: '20px 40px', height: 1, background: `linear-gradient(90deg, transparent, ${DOSHA_META[dosha].color}40, transparent)` }} />
-              <div style={{ display: 'flex', gap: 0, margin: '0 32px' }}>
-                <div style={{ flex: 1, paddingRight: 16, borderRight: `1px solid ${DOSHA_META[dosha].color}20` }}>
-                  <div style={{ color: DOSHA_META[dosha].color, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>Strengths</div>
-                  <div style={{ color: 'rgba(232,223,200,0.7)', fontSize: 12, lineHeight: 1.6 }}>{tx[DOSHA_META[dosha].strengthsKey as keyof typeof tx] as string}</div>
-                </div>
-                <div style={{ flex: 1, paddingLeft: 16 }}>
-                  <div style={{ color: DOSHA_META[dosha].color, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>Watch for</div>
-                  <div style={{ color: 'rgba(232,223,200,0.7)', fontSize: 12, lineHeight: 1.6 }}>{tx[DOSHA_META[dosha].watchKey as keyof typeof tx] as string}</div>
-                </div>
-              </div>
-              <div style={{ position: 'absolute', bottom: 28, left: 0, right: 0, textAlign: 'center' }}>
-                <div style={{ color: '#c9a84c', fontSize: 16, fontWeight: 700, letterSpacing: '0.04em' }}>🌿 AyuraHealth</div>
-                <div style={{ color: 'rgba(200,200,200,0.3)', fontSize: 11, marginTop: 4, letterSpacing: '0.06em' }}>ayurahealth.com</div>
-              </div>
+
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              <button 
+                onClick={() => startChat(dosha)} 
+                className="btn-primary"
+                style={{ height: 64, fontSize: '1.1rem' }}
+              >
+                Sync with VAIDYA Protocol →
+              </button>
+              
+              <button 
+                onClick={shareCard} 
+                disabled={isSharing} 
+                className="flat-card"
+                style={{ 
+                  height: 56, 
+                  background: shareSuccess ? 'hsla(var(--accent-main-hsl), 0.1)' : 'var(--surface-low)', 
+                  border: `1px solid ${shareSuccess ? 'var(--accent-main)' : 'var(--border-low)'}`, 
+                  color: shareSuccess ? 'var(--accent-main)' : 'var(--text-main)', 
+                  borderRadius: 16, 
+                  fontSize: '1rem', 
+                  fontWeight: 600, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '0.75rem' 
+                }}
+              >
+                {isSharing ? '⏳ Generating...' : shareSuccess ? '✓ Protocol Card Saved' : '📤 Share My Bio-Signature'}
+              </button>
+
+              <button 
+                onClick={() => { setCurrentQ(0); setAnswers([]); setScreen('quiz') }} 
+                style={{ marginTop: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer', textAlign: 'center' }}
+              >
+                {tx.retake}
+              </button>
             </div>
-            <button onClick={() => startChat(dosha)} style={{ width: '100%', padding: '1rem', background: `linear-gradient(135deg, ${DOSHA_META[dosha].color}90, ${DOSHA_META[dosha].color}60)`, color: '#fff', border: `1px solid ${DOSHA_META[dosha].color}50`, borderRadius: 16, fontSize: '1rem', fontWeight: 600, cursor: 'pointer', marginBottom: '0.75rem' }}>{tx.start_consult}</button>
-            <button onClick={shareCard} disabled={isSharing} style={{ width: '100%', padding: '0.85rem', background: shareSuccess ? 'rgba(106,191,138,0.15)' : 'rgba(255,255,255,0.04)', color: shareSuccess ? '#6abf8a' : 'rgba(232,223,200,0.7)', border: `1px solid ${shareSuccess ? 'rgba(106,191,138,0.4)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 16, fontSize: '0.95rem', fontWeight: 500, cursor: isSharing ? 'wait' : 'pointer', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.3s' }}>
-              {isSharing ? '⏳ Generating...' : shareSuccess ? '✅ Card saved! Share anywhere' : '📤 Share my dosha card'}
-            </button>
-            <button onClick={() => { setCurrentQ(0); setAnswers([]); setScreen('quiz') }} style={{ width: '100%', padding: '0.8rem', background: 'transparent', color: 'rgba(200,200,200,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, fontSize: '0.85rem', cursor: 'pointer' }}>{tx.retake}</button>
-          </div>
+          </motion.div>
         </div>
       )}
 
       {screen === 'chat' && (
-        <div className="chat-shell" style={{ position: 'relative', zIndex: 1, maxWidth: 1180, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
-          <div className="liquid-glass ios-surface chat-topbar" style={{ padding: '0.42rem 0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="chat-shell" style={{ position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
+          <div className="glass-surface" style={{ margin: '1rem', padding: '0.5rem 1rem', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid var(--border-low)' }}>
             <Logo size={24} showText={true} href="/" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.38rem' }}>
-              <div className="ios-chip active chat-disclaimer-chip" style={{ padding: '0.2rem 0.5rem', borderRadius: 11, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ fontSize: '0.65rem', filter: 'grayscale(1)' }}>🛡️</span>
-                <span style={{ color: '#c9a84c', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Educational Only — Not Medical Advice</span>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'none', md: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
+                <ShieldCheck size={14} style={{ color: 'var(--accent-main)' }} />
+                <span style={{ fontSize: '0.7rem', color: 'var(--accent-secondary)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Clinical Synthesis Active</span>
               </div>
-              <select
-                value={modelPreference}
-                onChange={(e) => setModelPreference(e.target.value as ModelPreference)}
-                className="ios-chip"
-                title="Choose intelligence model"
-                style={{
-                  padding: '0.22rem 0.5rem',
-                  borderRadius: 12,
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '0.64rem',
-                  color: 'rgba(232,223,200,0.85)',
-                  background: 'rgba(255,255,255,0.06)'
-                }}
-              >
-                <option value="auto">Auto AI</option>
-                <option value="claude">Claude</option>
-                <option value="gpt">ChatGPT</option>
-                <option value="gemini">Gemini</option>
-                <option value="deepseek">DeepSeek</option>
-                <option value="mistral">Mistral</option>
-                <option value="llama">Llama</option>
-                <option value="groq">Groq Fast</option>
-              </select>
-              <div className="ios-segmented" style={{ padding: '0.18rem', borderRadius: 11 }}>
-                {(['fast', 'deep', 'research'] as ResponseMode[]).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => setResponseMode(mode)}
-                    className={`ios-segmented-item ${responseMode === mode ? 'active' : ''}`}
-                    style={{ fontSize: '0.64rem', padding: '0.2rem 0.44rem' }}
-                    title={mode === 'fast' ? 'Fast response' : mode === 'deep' ? 'Deeper reasoning' : 'Deep + web research'}
-                  >
-                    {mode === 'fast' ? 'Fast' : mode === 'deep' ? 'Deep' : 'Research'}
-                  </button>
-                ))}
+
+              <div style={{ display: 'flex', gap: '0.25rem' }}>
+                <select
+                  value={modelPreference}
+                  onChange={(e) => setModelPreference(e.target.value as ModelPreference)}
+                  style={{
+                    background: 'var(--surface-mid)',
+                    color: 'var(--text-main)',
+                    border: '1px solid var(--border-low)',
+                    padding: '0.35rem 0.5rem',
+                    borderRadius: '10px',
+                    fontSize: '0.75rem',
+                    outline: 'none',
+                    fontWeight: 500
+                  }}
+                >
+                  <option value="auto">Auto Model</option>
+                  <option value="claude">Claude</option>
+                  <option value="gpt">GPT-4</option>
+                  <option value="gemini">Gemini</option>
+                  <option value="deepseek">DeepSeek</option>
+                  <option value="groq">Groq Fast</option>
+                </select>
+
+                <div style={{ 
+                  display: 'flex', 
+                  background: 'var(--surface-mid)', 
+                  borderRadius: '10px', 
+                  padding: '2px', 
+                  border: '1px solid var(--border-low)' 
+                }}>
+                  {(['fast', 'deep', 'research'] as ResponseMode[]).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setResponseMode(mode)}
+                      style={{ 
+                        fontSize: '0.7rem', 
+                        padding: '0.35rem 0.6rem',
+                        borderRadius: '8px',
+                        background: responseMode === mode ? 'var(--accent-main)' : 'transparent',
+                        color: responseMode === mode ? 'var(--bg-main)' : 'var(--text-muted)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setWebSearchEnabled((v) => !v)}
+                  style={{
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '10px',
+                    background: webSearchEnabled ? 'hsla(var(--accent-main-hsl), 0.1)' : 'var(--surface-mid)',
+                    color: webSearchEnabled ? 'var(--accent-main)' : 'var(--text-muted)',
+                    border: `1px solid ${webSearchEnabled ? 'var(--accent-main)' : 'var(--border-low)'}`,
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <Globe size={14} />
+                  {webSearchEnabled ? 'Live Web' : 'Static'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowObsidianModal(true)}
+                  disabled={messages.length === 0}
+                  style={{
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '10px',
+                    background: 'var(--surface-low)',
+                    color: 'var(--accent-secondary)',
+                    border: '1px solid var(--border-low)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
+                    opacity: messages.length > 0 ? 1 : 0.4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <Brain size={14} />
+                  Export
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setWebSearchEnabled((v) => !v)}
-                className={`ios-chip ${webSearchEnabled ? 'active' : ''}`}
-                style={{
-                  padding: '0.22rem 0.5rem',
-                  borderRadius: 12,
-                  border: 'none',
+
+              <button 
+                onClick={() => setScreen('landing')} 
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  color: 'var(--text-muted)', 
+                  fontSize: '0.8rem', 
                   cursor: 'pointer',
-                  fontSize: '0.64rem',
-                  color: webSearchEnabled ? '#6abf8a' : 'rgba(232,223,200,0.8)'
+                  marginLeft: '0.5rem'
                 }}
-                title="Include live web sources"
               >
-                🌐 Web {responseMode === 'research' ? 'Auto' : webSearchEnabled ? 'On' : 'Off'}
+                Exit
               </button>
-              <button
-                type="button"
-                onClick={() => setShowObsidianModal(true)}
-                disabled={messages.length === 0}
-                className={`ios-chip ${messages.length > 0 ? 'active' : ''}`}
-                style={{
-                  padding: '0.22rem 0.5rem',
-                  borderRadius: 12,
-                  border: 'none',
-                  cursor: messages.length > 0 ? 'pointer' : 'not-allowed',
-                  opacity: messages.length > 0 ? 1 : 0.45,
-                  fontSize: '0.64rem',
-                  color: '#c9a84c'
-                }}
-                title="Open premium Obsidian export options"
-              >
-                🧠 Obsidian Export
-              </button>
-              <select
-                value={theme}
-                onChange={(e) => setTheme(e.target.value as ThemeName)}
-                className="ios-chip"
-                style={{
-                  padding: '0.22rem 0.5rem',
-                  borderRadius: 12,
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '0.64rem',
-                  color: 'rgba(232,223,200,0.8)'
-                }}
-                title="Choose app theme"
-              >
-                {THEME_OPTIONS.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-              <button onClick={() => setScreen('landing')} style={{ background: 'transparent', border: 'none', color: 'rgba(200,200,200,0.56)', fontSize: '0.7rem', cursor: 'pointer' }}>Exit</button>
             </div>
           </div>
           <div className="chat-desktop-layout">

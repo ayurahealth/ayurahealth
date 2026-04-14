@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 
 export default function VaidyaOracle({ state = 'idle' }: { state?: 'idle' | 'listening' | 'thinking' | 'responding' }) {
   const colors = {
-    idle: '#6abf8a',
-    listening: '#60a5fa',
-    thinking: '#c9a84c',
-    responding: '#e8dfc8',
+    idle: 'var(--accent-main)',
+    listening: 'hsl(204, 53%, 65%)',
+    thinking: 'var(--accent-secondary)',
+    responding: 'var(--text-main)',
   };
 
   const activeColor = colors[state] || colors.idle;

@@ -3,8 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { useSafeUser as useUser } from '@/lib/clerk-client';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getApiUrl } from '@/lib/constants';
+import { 
+  ChevronRight, 
+  ChevronLeft, 
+  Heart, 
+  Sparkles, 
+  ShieldAlert, 
+  ArrowRight,
+  User,
+  Users,
+  Compass
+} from 'lucide-react';
 
 export default function OnboardingPage() {
   const { user, isLoaded } = useUser();
@@ -47,121 +58,256 @@ export default function OnboardingPage() {
 
   if (!isLoaded || !user) return null;
 
+  const totalSteps = 4;
+
   return (
-    <main style={{ minHeight: '100vh', background: '#05100a', color: '#e8dfc8', fontFamily: '"DM Sans", sans-serif', padding: '2rem' }}>
-      <div style={{ maxWidth: '500px', margin: '4rem auto', position: 'relative', zIndex: 1 }}>
-        <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌿</div>
-          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: '#c9a84c', marginBottom: '0.5rem' }}>Welcome to your Journey</h1>
-          <p style={{ opacity: 0.6 }}>Let VAIDYA know you better to personalize your healing.</p>
+    <main style={{ minHeight: '100dvh', background: 'var(--bg-main)', color: 'var(--text-main)', padding: '2rem 1rem' }}>
+      <div style={{ maxWidth: '600px', margin: '2rem auto', position: 'relative' }}>
+        
+        {/* Progress Stepper */}
+        <div style={{ marginBottom: '3rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'flex-end' }}>
+            <div>
+              <span style={{ color: 'var(--accent-main)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Phase 01</span>
+              <div style={{ color: 'var(--text-main)', fontSize: '1.25rem', fontWeight: 600 }}>Clinical Intake</div>
+            </div>
+            <span style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: 500 }}>{Math.round((step / totalSteps) * 100)}%</span>
+          </div>
+          <div style={{ height: 6, background: 'var(--surface-mid)', borderRadius: 10, overflow: 'hidden', display: 'flex', gap: '4px' }}>
+            {[1, 2, 3, 4].map(s => (
+              <div 
+                key={s} 
+                style={{ 
+                  flex: 1, 
+                  height: '100%', 
+                  background: s <= step ? 'var(--accent-main)' : 'var(--border-mid)',
+                  transition: 'background 0.4s ease'
+                }} 
+              />
+            ))}
+          </div>
+        </div>
+
+        <header style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            style={{ marginBottom: '1rem', color: 'var(--accent-main)' }}
+          >
+            <Compass size={40} />
+          </motion.div>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2.25rem', color: 'var(--text-main)', marginBottom: '0.75rem', fontWeight: 500 }}>
+            Welcome to the Sanctuary
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '400px', margin: '0 auto' }}>
+            Personalize VAIDYA&apos;s synthesis by defining your current baseline.
+          </p>
         </header>
 
-        <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(106, 191, 138, 0.2)', borderRadius: '24px', padding: '2.5rem', backdropFilter: 'blur(10px)' }}>
-          {step === 1 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#c9a84c' }}>What is your age?</h2>
-              <input 
-                type="number" 
-                placeholder="Years"
-                value={formData.age}
-                onChange={e => setFormData({ ...formData, age: e.target.value })}
-                style={{ width: '100%', padding: '1rem', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', fontSize: '1.1rem', marginBottom: '2rem' }}
-              />
-              <button 
-                onClick={nextStep} 
-                disabled={!formData.age}
-                style={{ width: '100%', padding: '1rem', background: '#1a4d2e', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', opacity: formData.age ? 1 : 0.5 }}
+        <div className="glass-surface" style={{ padding: '2.5rem', borderRadius: '28px' }}>
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div 
+                key="step1"
+                initial={{ opacity: 0, x: 20 }} 
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
               >
-                Continue
-              </button>
-            </motion.div>
-          )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--accent-secondary)' }}>
+                  <User size={20} />
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>Biological Age</h2>
+                </div>
+                <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
+                  <input 
+                    type="number" 
+                    placeholder="Enter your age"
+                    value={formData.age}
+                    onChange={e => setFormData({ ...formData, age: e.target.value })}
+                    style={{ 
+                      width: '100%', 
+                      padding: '1.25rem', 
+                      background: 'var(--bg-main)', 
+                      border: '1px solid var(--border-mid)', 
+                      borderRadius: '16px', 
+                      color: 'var(--text-main)', 
+                      fontSize: '1.25rem',
+                      outline: 'none'
+                    }}
+                    autoFocus
+                  />
+                  <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 500 }}>Years</div>
+                </div>
+                
+                <button 
+                  onClick={nextStep} 
+                  disabled={!formData.age}
+                  className="btn-primary"
+                  style={{ width: '100%', height: 56, opacity: formData.age ? 1 : 0.4 }}
+                >
+                  Continue
+                </button>
+              </motion.div>
+            )}
 
-          {step === 2 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#c9a84c' }}>How do you identify?</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
-                {['Female', 'Male', 'Non-binary', 'Other'].map(g => (
+            {step === 2 && (
+              <motion.div 
+                key="step2"
+                initial={{ opacity: 0, x: 20 }} 
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--accent-secondary)' }}>
+                  <Users size={20} />
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>Biological Identity</h2>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2.5rem' }}>
+                  {['Female', 'Male', 'Non-binary', 'Other'].map(g => (
+                    <button 
+                      key={g} 
+                      onClick={() => setFormData({ ...formData, gender: g })}
+                      className="flat-card"
+                      style={{ 
+                        padding: '1.25rem', 
+                        background: formData.gender === g ? 'hsla(var(--accent-main-hsl), 0.1)' : 'var(--bg-main)', 
+                        border: `1px solid ${formData.gender === g ? 'var(--accent-main)' : 'var(--border-low)'}`, 
+                        borderRadius: '16px', 
+                        color: formData.gender === g ? 'var(--accent-main)' : 'var(--text-muted)', 
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        fontSize: '1rem',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button onClick={prevStep} style={{ flex: 1, height: 56, background: 'none', border: '1px solid var(--border-low)', borderRadius: 16, color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' }}>Back</button>
                   <button 
-                    key={g} 
-                    onClick={() => setFormData({ ...formData, gender: g })}
-                    style={{ padding: '0.8rem', background: formData.gender === g ? 'rgba(106, 191, 138, 0.2)' : 'rgba(0,0,0,0.2)', border: `1px solid ${formData.gender === g ? '#6abf8a' : 'rgba(255,255,255,0.1)'}`, borderRadius: '12px', color: 'white', cursor: 'pointer' }}
+                    onClick={nextStep} 
+                    disabled={!formData.gender}
+                    className="btn-primary"
+                    style={{ flex: 2, height: 56, opacity: formData.gender ? 1 : 0.4 }}
                   >
-                    {g}
+                    Continue
                   </button>
-                ))}
-              </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={prevStep} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white' }}>Back</button>
-                <button 
-                  onClick={nextStep} 
-                  disabled={!formData.gender}
-                  style={{ flex: 2, padding: '1rem', background: '#1a4d2e', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', opacity: formData.gender ? 1 : 0.5 }}
-                >
-                  Continue
-                </button>
-              </div>
-            </motion.div>
-          )}
+                </div>
+              </motion.div>
+            )}
 
-          {step === 3 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#c9a84c' }}>What is your primary health goal?</h2>
-              <textarea 
-                placeholder="e.g. Better sleep, Managing stress, Digestive health..."
-                value={formData.healthGoal}
-                onChange={e => setFormData({ ...formData, healthGoal: e.target.value })}
-                style={{ width: '100%', padding: '1rem', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', fontSize: '1rem', height: '120px', marginBottom: '2rem' }}
-              />
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={prevStep} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white' }}>Back</button>
-                <button 
-                  onClick={nextStep} 
-                  disabled={!formData.healthGoal}
-                  style={{ flex: 2, padding: '1rem', background: '#1a4d2e', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', opacity: formData.healthGoal ? 1 : 0.5 }}
-                >
-                  Continue
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {step === 4 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: '1.2rem', color: '#c9a84c' }}>Final Agreement</h2>
-              <div style={{ background: 'rgba(201,168,76,0.05)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.5rem', fontSize: '0.85rem', lineHeight: 1.6, color: 'rgba(232,223,200,0.8)' }}>
-                <p style={{ marginBottom: '1rem' }}><strong>IMPORTANT:</strong> AyuraHealth (IYura) provides educational wellness insights based on traditional Ayurvedic principles and AI synthesis.</p>
-                <p>It is <strong>NOT</strong> a medical device and does not provide diagnosis or treatment. Always consult a physician for medical decisions.</p>
-              </div>
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer', marginBottom: '2rem' }}>
-                <input 
-                  type="checkbox" 
-                  checked={formData.acceptedTerms}
-                  onChange={e => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  style={{ marginTop: '4px', width: '18px', height: '18px', accentColor: '#6abf8a' }}
+            {step === 3 && (
+              <motion.div 
+                key="step3"
+                initial={{ opacity: 0, x: 20 }} 
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--accent-secondary)' }}>
+                  <Heart size={20} />
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>Primary Health Focus</h2>
+                </div>
+                <textarea 
+                  placeholder="e.g. Managing metabolic health, improving sleep quality, optimizing hormone balance..."
+                  value={formData.healthGoal}
+                  onChange={e => setFormData({ ...formData, healthGoal: e.target.value })}
+                  style={{ 
+                    width: '100%', 
+                    padding: '1.25rem', 
+                    background: 'var(--bg-main)', 
+                    border: '1px solid var(--border-mid)', 
+                    borderRadius: '16px', 
+                    color: 'var(--text-main)', 
+                    fontSize: '1rem', 
+                    height: '160px', 
+                    marginBottom: '2.5rem',
+                    resize: 'none',
+                    outline: 'none',
+                    lineHeight: 1.6
+                  }}
+                  autoFocus
                 />
-                <span style={{ fontSize: '0.85rem', color: 'rgba(232,223,200,0.6)' }}>I understand that VAIDYA AI provides educational information only and is not a substitute for professional medical advice.</span>
-              </label>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={prevStep} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white' }}>Back</button>
-                <button 
-                  onClick={handleSubmit} 
-                  disabled={!formData.acceptedTerms || isSubmitting}
-                  style={{ flex: 2, padding: '1rem', background: '#1a4d2e', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', opacity: formData.acceptedTerms ? 1 : 0.5 }}
-                >
-                  {isSubmitting ? 'Finalizing...' : 'Enter Sanctuary →'}
-                </button>
-              </div>
-            </motion.div>
-          )}
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button onClick={prevStep} style={{ flex: 1, height: 56, background: 'none', border: '1px solid var(--border-low)', borderRadius: 16, color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' }}>Back</button>
+                  <button 
+                    onClick={nextStep} 
+                    disabled={!formData.healthGoal}
+                    className="btn-primary"
+                    style={{ flex: 2, height: 56, opacity: formData.healthGoal ? 1 : 0.4 }}
+                  >
+                    Continue
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div 
+                key="step4"
+                initial={{ opacity: 0, x: 20 }} 
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--accent-secondary)' }}>
+                  <ShieldAlert size={20} />
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>Protocol Affirmation</h2>
+                </div>
+                
+                <div style={{ background: 'hsla(var(--accent-secondary-hsl), 0.05)', border: '1px solid hsla(var(--accent-secondary-hsl), 0.2)', borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', fontSize: '0.9rem', lineHeight: 1.7, color: 'var(--text-muted)' }}>
+                  <p style={{ marginBottom: '1rem' }}>
+                    <strong style={{ color: 'var(--accent-secondary)' }}>PRE-FLIGHT ADVISORY:</strong> AyuraHealth (IYura) provides educational synthesis based on traditional bio-energetic principles.
+                  </p>
+                  <p>
+                    It is <strong style={{ color: 'var(--text-main)' }}>not a medical device</strong> and does not provide clinical diagnosis or treatment. Always consult a licensed physician for medical decisions.
+                  </p>
+                </div>
+
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', cursor: 'pointer', marginBottom: '2.5rem', padding: '0.5rem' }}>
+                  <div style={{ position: 'relative', width: 24, height: 24, flexShrink: 0, marginTop: 2 }}>
+                    <input 
+                      type="checkbox" 
+                      checked={formData.acceptedTerms}
+                      onChange={e => setFormData({ ...formData, acceptedTerms: e.target.checked })}
+                      style={{ opacity: 0, position: 'absolute', inset: 0, cursor: 'pointer', zIndex: 1 }}
+                    />
+                    <div style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      borderRadius: '6px', 
+                      background: formData.acceptedTerms ? 'var(--accent-main)' : 'var(--bg-main)', 
+                      border: `2px solid ${formData.acceptedTerms ? 'var(--accent-main)' : 'var(--border-mid)'}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}>
+                      {formData.acceptedTerms && <ArrowRight size={14} color="var(--bg-main)" strokeWidth={3} />}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    I understand that VAIDYA AI provides educational data synthesis only and is not a substitute for professional medical advice.
+                  </span>
+                </label>
+
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button onClick={prevStep} style={{ flex: 1, height: 56, background: 'none', border: '1px solid var(--border-low)', borderRadius: 16, color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' }}>Back</button>
+                  <button 
+                    onClick={handleSubmit} 
+                    disabled={!formData.acceptedTerms || isSubmitting}
+                    className="btn-primary"
+                    style={{ flex: 2, height: 56, opacity: formData.acceptedTerms ? 1 : 0.4 }}
+                  >
+                    {isSubmitting ? 'Processing...' : 'Finalize & Sync →'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         
-        {/* Progress bar */}
-        <div style={{ marginTop: '2rem', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-          {[1, 2, 3, 4].map(s => (
-            <div key={s} style={{ width: '40px', height: '4px', background: s <= step ? '#6abf8a' : 'rgba(255,255,255,0.1)', borderRadius: '2px' }} />
-          ))}
-        </div>
+        <p style={{ textAlign: 'center', marginTop: '3rem', color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.5 }}>
+          Authorized Clinical Intake Area — SECURE_SSL_ACTIVE
+        </p>
       </div>
     </main>
   );
