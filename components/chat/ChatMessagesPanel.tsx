@@ -42,7 +42,6 @@ interface ChatMessagesPanelProps {
   streaming: string
   oracleState: 'idle' | 'listening' | 'thinking' | 'responding'
   doshaColor: string
-  doshaColor: string
   voiceSupported: boolean
   isSpeaking: boolean
   thinkingDots: string
@@ -163,7 +162,6 @@ export default function ChatMessagesPanel({
             <MessageItem 
               key={i}
               msg={msg}
-              doshaColor={doshaColor}
               doshaColor={doshaColor}
               voiceSupported={voiceSupported}
               isSpeaking={isSpeaking}

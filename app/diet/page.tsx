@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Nav from '../../components/Nav'
+import { useSafeUser as useUser } from '@/lib/clerk-client'
+import { getApiUrl } from '@/lib/constants'
+import { useEffect } from 'react'
 import IOSButton from '../../components/ui/IOSButton'
 import Surface from '../../components/ui/Surface'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -47,21 +50,46 @@ const GOALS = [
 ]
 
 export default function DietChartPage() {
+  const { user } = useUser()
   const [step, setStep] = useState(1)
   const [dosha, setDosha] = useState('')
   const [season, setSeason] = useState('')
   const [goal, setGoal] = useState('')
+  const [conditions, setConditions] = useState<string[]>([])
   const [diet, setDiet] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(getApiUrl('/api/user-profile'))
+        if (res.ok) {
+          const data = await res.json()
+          if (data) {
+            setConditions(data.conditions || [])
+            if (data.primaryDosha) {
+              setDosha(data.primaryDosha)
+              setStep(2) // Skip to season/goal if profile is ready
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch profile in diet:', err)
+      }
+    }
+    fetchProfile()
+  }, [user])
 
   const generate = async () => {
     setLoading(true)
     setStep(3)
     try {
       const prompt = `Generate a complete 7-day personalized dietary protocol for:
-- Profile: ${dosha}
-- Season: ${season}  
-- Objective: ${goal}
+- Patient Profile: ${dosha} Dominant
+- Known Conditions: ${conditions.length > 0 ? conditions.join(', ') : 'None Reported'}
+- Current Season: ${season}  
+- Primary Objective: ${goal}
 
 Use a professional, clinical format with structured tables for herb dosages and specific timing.
 Include classical source citations (e.g., Charaka Samhita).`
