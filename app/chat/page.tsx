@@ -216,13 +216,17 @@ export default function ChatPage() {
   const [dosha, setDosha] = useState<Dosha | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [sessionGuid, setSessionGuid] = useState('')
+  const [dbProfile, setDbProfile] = useState<any>(null)
+
+  const { locale } = useSearchParams() as unknown as { locale?: string }
   const [loading, setLoading] = useState(false)
   const [streaming, setStreaming] = useState('')
   const [selectedSystems, setSelectedSystems] = useState(['ayurveda'])
   const [incognito] = useState(false)
   const [revealed, setRevealed] = useState(false)
   const [isListening, setIsListening] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [thinkingDots, setThinkingDots] = useState('.')
   const [savedState, setSavedState] = useState<SavedState | null>(null)
@@ -434,9 +438,40 @@ export default function ChatPage() {
   }, [])
 
   useEffect(() => {
-    const saved = loadState()
-    if (saved && saved.messages.length > 1) { setSavedState(saved); setShowWelcomeBack(true) }
+    if (typeof window === 'undefined') return
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (!raw) return
+      const s = JSON.parse(raw) as SavedState
+      if (Date.now() - s.savedAt < 7 * 24 * 60 * 60 * 1000) {
+        setDosha(s.dosha)
+        setMessages(s.messages)
+        setSelectedSystems(s.selectedSystems)
+        setLang(s.lang)
+      }
+    } catch {}
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(getApiUrl('/api/user-profile'))
+        if (res.ok) {
+          const data = await res.json()
+          if (data) {
+            setDbProfile(data)
+            if (data.primaryDosha && !dosha) {
+              setDosha(data.primaryDosha as Dosha)
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch profile in chat:', err)
+      }
+    }
+    fetchProfile()
+  }, [user])
 
   useEffect(() => {
     if (incognito || messages.length === 0) return
@@ -1722,13 +1757,15 @@ export default function ChatPage() {
                 streaming={streaming}
                 oracleState={oracleState}
                 doshaColor={doshaColor}
-                doshaColor={doshaColor}
                 voiceSupported={voiceSupported}
                 isSpeaking={isSpeaking}
                 thinkingDots={thinkingDots}
                 onSpeakText={speakText}
                 onSelectSource={setSelectedSource}
                 messagesEndRef={messagesEndRef}
+                userName={user?.firstName || undefined}
+                primaryDosha={dbProfile?.primaryDosha || dosha || undefined}
+                conditions={dbProfile?.conditions || undefined}
               />
 
           {/* Input area */}

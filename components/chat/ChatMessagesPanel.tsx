@@ -6,7 +6,7 @@ import VaidyaOracle from '../VaidyaOracle'
 import { ChatSkeleton } from '../BoneyardLoaders'
 import MessageItem from './MessageItem'
 import ClinicalMarkdown from '../ui/ClinicalMarkdown'
-import { ShieldCheck, Activity, Info } from 'lucide-react'
+import { ShieldCheck, Activity, Info, Printer, Download, FileText } from 'lucide-react'
 
 interface ChatSource {
   title: string
@@ -49,6 +49,9 @@ interface ChatMessagesPanelProps {
   onSpeakText: (text: string) => void
   onSelectSource: (source: ChatSource) => void
   messagesEndRef: RefObject<HTMLDivElement | null>
+  userName?: string
+  primaryDosha?: string
+  conditions?: string[]
 }
 
 export default function ChatMessagesPanel({
@@ -62,9 +65,76 @@ export default function ChatMessagesPanel({
   onSpeakText,
   onSelectSource,
   messagesEndRef,
+  userName = 'Explorer',
+  primaryDosha = 'General',
+  conditions = [],
 }: ChatMessagesPanelProps) {
+  const handlePrint = () => {
+    window.print()
+  }
+
+  const currentDate = new Date().toLocaleDateString('en-US', { 
+    month: 'long', day: 'numeric', year: 'numeric' 
+  })
   return (
-    <div className="native-scroll" style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
+    <div className="native-scroll" style={{ flex: 1, overflowY: 'auto', padding: '2rem', position: 'relative' }}>
+      {/* Print-only Clinical Header */}
+      <div className="clinical-report-header" style={{ display: 'none' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ fontSize: '1.8rem', color: '#1a4d2e', margin: 0 }}>AyuraHealth Clinical Report</h1>
+            <p style={{ fontSize: '0.85rem', color: '#666' }}>Artificial Intelligence x Integrative Health Synthesis</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontWeight: 600, margin: 0 }}>Date: {currentDate}</p>
+            <p style={{ fontSize: '0.75rem', color: '#666' }}>Ref: AH-{Math.random().toString(36).substring(7).toUpperCase()}</p>
+          </div>
+        </div>
+        
+        <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', background: '#f9f9f9', padding: '1rem', borderRadius: '8px' }}>
+          <div>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '0.25rem' }}>Patient Name</p>
+            <p style={{ fontWeight: 600 }}>{userName}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '0.25rem' }}>Bio-Energetic Constitution</p>
+            <p style={{ fontWeight: 600 }}>{primaryDosha}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '0.25rem' }}>Identified Conditions</p>
+            <p style={{ fontSize: '0.85rem' }}>{conditions.length > 0 ? conditions.join(', ') : 'None Reported'}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '0.25rem' }}>Consultation Mode</p>
+            <p style={{ fontSize: '0.85rem' }}>Vaidya AI Neural Synthesis</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="no-print" style={{ position: 'absolute', top: '1.5rem', right: '2rem', zIndex: 10, display: 'flex', gap: '0.75rem' }}>
+        {messages.length > 0 && (
+          <button 
+            onClick={handlePrint}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              background: 'hsla(var(--accent-main-hsl), 0.1)', 
+              border: '1px solid var(--border-mid)', 
+              borderRadius: '12px', 
+              padding: '0.6rem 1rem', 
+              color: 'var(--accent-main)', 
+              fontSize: '0.85rem', 
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            <Printer size={16} />
+            Export Report
+          </button>
+        )}
+      </div>
+
       {messages.length === 0 && !loading && (
         <div style={{ textAlign: 'center', marginTop: '4rem', padding: '0 2rem' }}>
           <motion.div
@@ -194,6 +264,11 @@ export default function ChatMessagesPanel({
       </div>
 
       <div ref={messagesEndRef} style={{ height: 1 }} />
+      
+      {/* Print-only Clinical Footer */}
+      <div className="clinical-footer" style={{ display: 'none' }}>
+        <p>© 2026 AyuraHealth AI Intelligence Unit. This document was generated autonomously by VAIDYA. AyuraHealth provides educational information for wellness purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Verified by AyuraHealth Neural Compliance Engine.</p>
+      </div>
     </div>
   )
 }

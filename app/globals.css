@@ -187,3 +187,48 @@ input:focus, textarea:focus {
 @media (max-width: 768px) {
   .ds-container { padding: 0 1rem; }
 }
+
+/* ── Clinical Print Protocol — @media print ── */
+@media print {
+  @page { margin: 2cm; }
+  body { background: white !important; color: black !important; padding: 0 !important; }
+  
+  /* Hide UI elements */
+  nav, footer, .chat-input-area, .no-print, .btn-primary, .btn-secondary, button {
+    display: none !important;
+  }
+
+  .native-scroll { overflow: visible !important; padding: 0 !important; }
+  
+  .clinical-report-header {
+    display: block !important;
+    border-bottom: 2px solid #1a4d2e;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+  }
+  
+  .print-only { display: block !important; }
+  .glass-surface, .clinical-report, .routine-card, .timeline-card {
+    background: none !important;
+    border: 1px solid #eee !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .hero-text { font-size: 2.5rem !important; color: #1a4d2e !important; }
+  h1, h2, h3 { color: #1a4d2e !important; break-after: avoid; }
+  
+  p, li { font-size: 11pt !important; line-height: 1.5; color: #333 !important; }
+  
+  .clinical-footer {
+    display: block !important;
+    border-top: 1px solid #eee;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+  }
+}
+
+.clinical-report-header, .clinical-footer { display: none; }
