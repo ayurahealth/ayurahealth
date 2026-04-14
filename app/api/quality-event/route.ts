@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
 export const runtime = 'nodejs'
 
 const qualityEventSchema = z.object({

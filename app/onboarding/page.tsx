@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSafeUser as useUser } from '../../lib/clerk-client';
+import { useSafeUser as useUser } from '@/lib/clerk-client';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { getApiUrl } from '../../lib/constants';
+import { getApiUrl } from '@/lib/constants';
 
 export default function OnboardingPage() {
   const { user, isLoaded } = useUser();

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
 
-import { prisma } from '../../lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
 

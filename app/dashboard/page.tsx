@@ -1,10 +1,10 @@
 'use client'
 
-import { useSafeUser as useUser } from '../../lib/clerk-client'
+import { useSafeUser as useUser } from '@/lib/clerk-client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { DashboardContent } from './dashboard-content'
-import { getApiUrl } from '../../lib/constants'
+import { getApiUrl } from '@/lib/constants'
 
 export default function DashboardPage() {
   const { user, isLoaded, isSignedIn } = useUser()

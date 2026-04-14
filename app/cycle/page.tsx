@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { SafeSignInButton as SignInButton, useSafeUser as useUser } from '../../lib/clerk-client';
+import { SafeSignInButton as SignInButton, useSafeUser as useUser } from '@/lib/clerk-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import AyurvedicCycle from '../../components/AyurvedicCycle';
 import DoshaQuiz from '../../components/DoshaQuiz';

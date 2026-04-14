@@ -1,57 +1,53 @@
+'use client'
+
 import { type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 interface IOSButtonProps {
   children: ReactNode
   href?: string
   onClick?: () => void
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'accent' | 'destructive'
   style?: CSSProperties
   className?: string
+  disabled?: boolean
 }
 
-const baseStyle: CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '0.4rem',
-  padding: '0.8rem 1.4rem',
-  borderRadius: '12px',
-  width: '100%',
-  fontSize: '0.9rem',
-  fontWeight: 600,
-  textDecoration: 'none',
-  cursor: 'pointer',
-  transition: 'opacity 0.2s',
-  border: '1px solid transparent',
-}
+export default function IOSButton({ children, href, onClick, variant = 'primary', style, className, disabled }: IOSButtonProps) {
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'secondary': return 'btn-secondary'
+      case 'accent': return 'btn-accent'
+      case 'destructive': return 'btn-destructive'
+      default: return 'btn-primary'
+    }
+  }
 
-const variants: Record<'primary' | 'secondary', CSSProperties> = {
-  primary: {
-    background: 'var(--accent-main)',
-    color: 'var(--bg-main)',
-    borderColor: 'var(--accent-main)',
-  },
-  secondary: {
-    background: 'transparent',
-    color: 'var(--text-main)',
-    borderColor: 'var(--border-mid)',
-  },
-}
+  const commonProps = {
+    whileTap: { scale: 0.97 },
+    transition: { duration: 0.1 },
+    style: { ...style, opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? 'none' as const : 'auto' as const },
+    className: `${getVariantStyles()}${className ? ` ${className}` : ''}`
+  }
 
-
-export default function IOSButton({ children, href, onClick, variant = 'primary', style, className }: IOSButtonProps) {
-  const merged = { ...baseStyle, ...variants[variant], ...style }
   if (href) {
     return (
-      <Link href={href} className={className} style={merged}>
-        {children}
-      </Link>
+      <motion.div {...commonProps} style={{ display: 'inline-block', width: '100%', ...commonProps.style }}>
+        <Link href={href} style={{ textDecoration: 'none', display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', color: 'inherit' }}>
+          {children}
+        </Link>
+      </motion.div>
     )
   }
+
   return (
-    <button type="button" onClick={onClick} className={className} style={merged}>
+    <motion.button 
+      {...commonProps} 
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
-    </button>
+    </motion.button>
   )
 }

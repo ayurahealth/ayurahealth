@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-static'
+
+
 /**
  * AyuraHealth CEO Frictionless Access
  * Securely sets a cookie to bypass Clerk login for the owner/CEO.

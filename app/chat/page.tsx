@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useSafeClerk as useClerk, useSafeUser as useUser } from '../../lib/clerk-client'
-import { t, type Lang } from '../../lib/translations'
+import { useSafeClerk as useClerk, useSafeUser as useUser } from '@/lib/clerk-client'
+import { t, type Lang } from '@/lib/translations'
 import { motion } from 'framer-motion'
 import EngagementStory from '../../components/EngagementStory'
 import Logo from '../../components/Logo'
@@ -11,9 +11,9 @@ import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
 
 import VedicOraclePanel from '../../components/vedic/VedicOraclePanel'
-import { vaidyaVoice } from '../../lib/vaidyaVoice'
-import { getApiUrl } from '../../lib/constants'
-import { calculateHealthScores, loadProfile } from '../../lib/healthProfile'
+import { vaidyaVoice } from '@/lib/vaidyaVoice'
+import { getApiUrl } from '@/lib/constants'
+import { calculateHealthScores, loadProfile } from '@/lib/healthProfile'
 
 interface Message {
   role: 'user' | 'assistant'

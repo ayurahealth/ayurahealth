@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '../../../components/Logo'
-import { getApiUrl } from '../../../lib/constants'
+import { getApiUrl } from '@/lib/constants'
 
 declare global {
   interface Window {
