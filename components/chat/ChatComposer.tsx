@@ -132,6 +132,8 @@ export default function ChatComposer({
               <button 
                 onClick={() => onRemoveAttachment(att.id)} 
                 style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}
+                aria-label={`Remove attachment ${att.name}`}
+                title={`Remove attachment ${att.name}`}
               >
                 <X size={14} />
               </button>
@@ -182,6 +184,8 @@ export default function ChatComposer({
           <button 
             onClick={onCancelLinkInput} 
             style={{ padding: '0 0.75rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            aria-label="Cancel link input"
+            title="Cancel link input"
           >
             <X size={18} />
           </button>
@@ -208,6 +212,8 @@ export default function ChatComposer({
               justifyContent: 'center',
               transition: 'all 0.2s'
             }}
+            aria-label="Attach file"
+            title="Attach file"
           >
             <Paperclip size={20} />
           </button>
@@ -227,6 +233,8 @@ export default function ChatComposer({
               justifyContent: 'center',
               transition: 'all 0.2s'
             }}
+            aria-label="Attach link"
+            title="Attach link"
           >
             <LinkIcon size={20} />
           </button>
@@ -247,6 +255,8 @@ export default function ChatComposer({
                 justifyContent: 'center',
                 transition: 'all 0.2s'
               }}
+              aria-label={isListening ? "Stop listening" : "Start listening"}
+              title={isListening ? "Stop listening" : "Start listening"}
             >
               {isListening ? <Square size={18} fill="currentColor" /> : <Mic size={20} />}
             </button>
@@ -295,6 +305,8 @@ export default function ChatComposer({
             opacity: loading || (!input.trim() && attachments.length === 0) ? 0.4 : 1,
             cursor: loading || (!input.trim() && attachments.length === 0) ? 'not-allowed' : 'pointer'
           }}
+          aria-label="Send message"
+          title="Send message"
         >
           {loading ? <Loader2 size={24} className="animate-spin" /> : <Send size={22} strokeWidth={2.5} />}
         </button>
