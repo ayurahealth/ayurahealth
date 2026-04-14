@@ -12,10 +12,10 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
   const [mounted, setMounted] = useState(false)
   
   const doshaData = {
-    vata: dbProfile?.vataScore || 45,
-    pitta: dbProfile?.pittaScore || 35,
-    kapha: dbProfile?.kaphaScore || 20,
-    primary: dbProfile?.primaryDosha || 'Vata-Pitta',
+    vata: dbProfile?.vataScore || 33,
+    pitta: dbProfile?.pittaScore || 33,
+    kapha: dbProfile?.kaphaScore || 33,
+    primary: dbProfile?.primaryDosha || 'Calculating...',
   }
 
   const circleRadius = 110
@@ -72,7 +72,9 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
           <h1 className="hero-text" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
             Welcome, {firstName}
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: 600 }}>Assessments are stable. Continue current dietary protocol for grounding.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: 600 }}>
+            {dbProfile?.healthGoal ? `Focus: ${dbProfile.healthGoal}` : 'Initialize your clinical profile to receive targeted recommendations.'}
+          </p>
         </motion.div>
 
         <div className="dashboard-grid">
@@ -137,8 +139,26 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
             </div>
 
             <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '1rem', marginTop: '2.5rem', lineHeight: 1.6, maxWidth: 280 }}>
-              Elements of Air and Ether are dominant. Maintain grounding protocols.
+              {doshaData.primary === 'Vata' ? 'Air and Ether are dominant. Maintain grounding protocols.' : 
+               doshaData.primary === 'Pitta' ? 'Fire and Water are elevated. Prioritize cooling protocols.' :
+               doshaData.primary === 'Kapha' ? 'Earth and Water are prominent. Focus on stimulating protocols.' :
+               'Assessment complete. View your specialized clinical analysis below.'}
             </p>
+
+            <div style={{ marginTop: '2rem', width: '100%', borderTop: '1px solid var(--border-low)', paddingTop: '2rem' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Identified Conditions</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {dbProfile?.conditions && dbProfile.conditions.length > 0 ? (
+                  dbProfile.conditions.map(c => (
+                    <span key={c} style={{ background: 'hsla(var(--accent-main-hsl), 0.1)', color: 'var(--accent-main)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                      {c}
+                    </span>
+                  ))
+                ) : (
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No conditions identified.</span>
+                )}
+              </div>
+            </div>
           </Surface>
 
           {/* RIGHT COLUMN: Actionable Routines & Biomarkers */}

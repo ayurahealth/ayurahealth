@@ -31,7 +31,12 @@ export default function OnboardingPage() {
   const [formData, setFormData] = useState({
     age: '',
     gender: '',
+    vataScore: 0,
+    pittaScore: 0,
+    kaphaScore: 0,
+    primaryDosha: '' as string,
     healthGoal: '',
+    conditions: [] as string[],
     acceptedTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,7 +70,7 @@ export default function OnboardingPage() {
 
   if (!isLoaded || !user) return null;
 
-  const totalSteps = 4;
+  const totalSteps = 6;
 
   return (
     <main style={{ minHeight: '100dvh', background: 'var(--bg-main)', color: 'var(--text-main)', padding: '2rem 1rem' }}>
@@ -81,7 +86,7 @@ export default function OnboardingPage() {
             <span style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: 500 }}>{Math.round((step / totalSteps) * 100)}%</span>
           </div>
           <div style={{ height: 6, background: 'var(--surface-mid)', borderRadius: 10, overflow: 'hidden', display: 'flex', gap: '4px' }}>
-            {[1, 2, 3, 4].map(s => (
+            {[1, 2, 3, 4, 5, 6].map(s => (
               <div 
                 key={s} 
                 style={{ 
@@ -211,6 +216,59 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--accent-secondary)' }}>
+                  <Sparkles size={20} />
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>Nature & Constitution</h2>
+                </div>
+                
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+                  Select the trait that most accurately describes your natural state.
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2.5rem' }}>
+                  {[
+                    { id: 'Vata', label: 'I am creative, energetic, and often feel cool or dry.', desc: 'High Vata tendencies' },
+                    { id: 'Pitta', label: 'I am focused, intensive, and tend to feel warm easily.', desc: 'High Pitta tendencies' },
+                    { id: 'Kapha', label: 'I am calm, steady, and have strong physical endurance.', desc: 'High Kapha tendencies' }
+                  ].map(d => (
+                    <button 
+                      key={d.id} 
+                      onClick={() => {
+                        const scores = { vataScore: 20, pittaScore: 20, kaphaScore: 20 };
+                        if (d.id === 'Vata') scores.vataScore = 60;
+                        if (d.id === 'Pitta') scores.pittaScore = 60;
+                        if (d.id === 'Kapha') scores.kaphaScore = 60;
+                        setFormData({ ...formData, ...scores, primaryDosha: d.id });
+                        nextStep();
+                      }}
+                      className="flat-card"
+                      style={{ 
+                        padding: '1.5rem', 
+                        background: 'var(--bg-main)', 
+                        border: '1px solid var(--border-low)', 
+                        borderRadius: '16px', 
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{d.label}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--accent-main)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{d.desc}</div>
+                    </button>
+                  ))}
+                </div>
+                
+                <button onClick={prevStep} style={{ width: '100%', height: 56, background: 'none', border: '1px solid var(--border-low)', borderRadius: 16, color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' }}>Back</button>
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div 
+                key="step4"
+                initial={{ opacity: 0, x: 20 }} 
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--accent-secondary)' }}>
                   <Heart size={20} />
                   <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>Primary Health Focus</h2>
                 </div>
@@ -248,9 +306,82 @@ export default function OnboardingPage() {
               </motion.div>
             )}
 
-            {step === 4 && (
+            {step === 5 && (
               <motion.div 
-                key="step4"
+                key="step5"
+                initial={{ opacity: 0, x: 20 }} 
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--accent-secondary)' }}>
+                  <Activity size={20} />
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>Existing Conditions</h2>
+                </div>
+                
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+                  Select any diagnosed conditions to help VAIDYA calibrate your protocol recommendations.
+                </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                  {[
+                    'PCOS / PCOD', 
+                    'Insomnia', 
+                    'Type 2 Diabetes', 
+                    'Hypertension', 
+                    'Hypo/Hyperthyroid', 
+                    'Digestive Issues', 
+                    'Chronic Fatigue',
+                    'None / Preventative'
+                  ].map(condition => {
+                    const isSelected = formData.conditions.includes(condition);
+                    return (
+                      <button
+                        key={condition}
+                        onClick={() => {
+                          if (condition === 'None / Preventative') {
+                            setFormData({ ...formData, conditions: ['None / Preventative'] });
+                          } else {
+                            const newConditions = isSelected
+                              ? formData.conditions.filter(c => c !== condition)
+                              : [...formData.conditions.filter(c => c !== 'None / Preventative'), condition];
+                            setFormData({ ...formData, conditions: newConditions });
+                          }
+                        }}
+                        style={{
+                          padding: '0.75rem 1.25rem',
+                          borderRadius: '12px',
+                          background: isSelected ? 'hsla(var(--accent-main-hsl), 0.15)' : 'var(--bg-main)',
+                          border: `1px solid ${isSelected ? 'var(--accent-main)' : 'var(--border-low)'}`,
+                          color: isSelected ? 'var(--accent-main)' : 'var(--text-main)',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {condition}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button onClick={prevStep} style={{ flex: 1, height: 56, background: 'none', border: '1px solid var(--border-low)', borderRadius: 16, color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' }}>Back</button>
+                  <button 
+                    onClick={nextStep} 
+                    disabled={formData.conditions.length === 0}
+                    className="btn-primary"
+                    style={{ flex: 2, height: 56, opacity: formData.conditions.length > 0 ? 1 : 0.4 }}
+                  >
+                    Continue
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 6 && (
+              <motion.div 
+                key="step6"
                 initial={{ opacity: 0, x: 20 }} 
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
