@@ -10,9 +10,10 @@ interface SurfaceProps extends PropsWithChildren {
   className?: string
   variant?: SurfaceVariant
   delay?: number
+  onClick?: () => void
 }
 
-export default function Surface({ children, style, className, variant = 'default', delay = 0 }: SurfaceProps) {
+export default function Surface({ children, style, className, variant = 'default', delay = 0, onClick }: SurfaceProps) {
   const getBaseClass = () => {
     if (variant === 'glass') return 'glass-surface'
     return 'flat-card'
@@ -26,6 +27,7 @@ export default function Surface({ children, style, className, variant = 'default
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
       className={`${getBaseClass()}${className ? ` ${className}` : ''}`}
+      onClick={onClick}
       style={{
         background,
         ...style,
