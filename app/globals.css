@@ -63,17 +63,35 @@ h1, h2, h3, h4 {
 
 /* ── Premium Surfaces ── */
 .glass-surface {
-  background: linear-gradient(135deg, hsla(0, 0%, 100%, 0.01), hsla(0, 0%, 100%, 0));
-  background-color: var(--surface-low);
+  background: var(--surface-low);
   border: 1px solid var(--border-low);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
   padding: 1.5rem;
-  transition: all 0.3s var(--ease-out);
+  transition: all 0.4s var(--ease-out);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 .glass-surface:hover {
-  border-color: var(--border-mid);
+  border-color: hsla(var(--accent-main-hsl), 0.2);
   background-color: var(--surface-mid);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+}
+
+.clinical-report {
+  position: relative;
+  background: var(--surface-low);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  overflow: hidden;
+}
+.clinical-report::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
 }
 
 .flat-card {

@@ -255,7 +255,7 @@ export default function OnboardingPage() {
                 
                 <div style={{ background: 'hsla(var(--accent-secondary-hsl), 0.05)', border: '1px solid hsla(var(--accent-secondary-hsl), 0.2)', borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', fontSize: '0.9rem', lineHeight: 1.7, color: 'var(--text-muted)' }}>
                   <p style={{ marginBottom: '1rem' }}>
-                    <strong style={{ color: 'var(--accent-secondary)' }}>PRE-FLIGHT ADVISORY:</strong> AyuraHealth (IYura) provides educational synthesis based on traditional bio-energetic principles.
+                    <strong style={{ color: 'var(--accent-secondary)' }}>MEDICAL DISCLAIMER:</strong> AyuraHealth (IYura) provides educational synthesis based on traditional bio-energetic principles.
                   </p>
                   <p>
                     It is <strong style={{ color: 'var(--text-main)' }}>not a medical device</strong> and does not provide clinical diagnosis or treatment. Always consult a licensed physician for medical decisions.

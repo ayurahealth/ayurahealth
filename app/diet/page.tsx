@@ -22,6 +22,7 @@ import {
   ChevronRight,
   ShieldCheck
 } from 'lucide-react'
+import ClinicalMarkdown from '../../components/ui/ClinicalMarkdown'
 
 const DOSHAS = [
   { id: 'Vata', label: 'Vata', icon: Wind, desc: 'Variable element · Cold & Dry qualities' },
@@ -103,17 +104,6 @@ Include classical source citations (e.g., Charaka Samhita).`
     }
   }
 
-  const formatDiet = (text: string) => {
-    return text
-      .replace(/^# (.+)$/gm, '<h1 style="font-family: var(--font-display); font-size: 2rem; color: var(--accent-main); margin-bottom: 1.5rem; font-weight: 500;">$1</h1>')
-      .replace(/^## (.+)$/gm, '<h2 style="font-family: var(--font-display); font-size: 1.5rem; color: var(--accent-main); margin-top: 2rem; margin-bottom: 1rem; font-weight: 500;">$1</h2>')
-      .replace(/^\*(.+)\*$/gm, '<p style="color: var(--text-muted); font-size: 0.9rem; font-style: italic; margin-bottom: 1rem;">$1</p>')
-      .replace(/^\*\*(.+)\*\*$/gm, '<p style="color: var(--accent-main); font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1rem;">$1</p>')
-      .replace(/^- (.+)$/gm, '<div style="display: flex; gap: 0.75rem; margin: 0.5rem 0; color: var(--text-main); font-size: 0.95rem;"><span style="color: var(--accent-main); opacity: 0.6;">•</span><span>$1</span></div>')
-      .replace(/^(\d+\. .+)$/gm, '<div style="color: var(--text-main); font-size: 0.95rem; margin: 0.5rem 0; padding-left: 1.25rem;">$1</div>')
-      .replace(/^---$/gm, '<hr style="border: none; border-top: 1px solid var(--border-low); margin: 2rem 0;">')
-      .replace(/\n/g, '<br/>')
-  }
 
   return (
     <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
@@ -290,7 +280,7 @@ Include classical source citations (e.g., Charaka Samhita).`
               ) : (
                 <div className="animate-fade-in">
                   <Surface variant="glass" style={{ padding: '3rem', marginBottom: '2.5rem' }}>
-                     <div className="markdown-content" dangerouslySetInnerHTML={{ __html: formatDiet(diet) }} />
+                     <ClinicalMarkdown content={diet} doshaColor={dosha === 'Pitta' ? 'var(--accent-secondary)' : 'var(--accent-main)'} />
                   </Surface>
                   <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                     <IOSButton variant="secondary" onClick={() => { navigator.clipboard.writeText(diet) }} style={{ flex: 1 }}>
@@ -298,9 +288,13 @@ Include classical source citations (e.g., Charaka Samhita).`
                       Copy Protocol
                     </IOSButton>
                     <IOSButton onClick={() => { setStep(1); setDiet('') }} style={{ flex: 1 }}>
-                      <Plus size={18} />
-                      New Evaluation
+                      Next Protocol
                     </IOSButton>
+                  </div>
+
+                  <div style={{ marginTop: '3rem', padding: '1.5rem', borderTop: '1px solid var(--border-low)', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    <p style={{ marginBottom: '0.5rem' }}><strong>MEDICAL DISCLAIMER:</strong> This dietary protocol is for educational synthesis only and is based on traditional Ayurvedic principles.</p>
+                    <p>It is not a substitute for professional medical advice. Always consult a physician before starting any new dietary or herbal regimen.</p>
                   </div>
                 </div>
               )}

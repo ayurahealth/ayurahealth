@@ -5,6 +5,7 @@ import type { RefObject } from 'react'
 import VaidyaOracle from '../VaidyaOracle'
 import { ChatSkeleton } from '../BoneyardLoaders'
 import MessageItem from './MessageItem'
+import ClinicalMarkdown from '../ui/ClinicalMarkdown'
 import { ShieldCheck, Activity, Info } from 'lucide-react'
 
 interface ChatSource {
@@ -41,7 +42,7 @@ interface ChatMessagesPanelProps {
   streaming: string
   oracleState: 'idle' | 'listening' | 'thinking' | 'responding'
   doshaColor: string
-  renderMarkdown: (text: string, doshaColor?: string) => string
+  doshaColor: string
   voiceSupported: boolean
   isSpeaking: boolean
   thinkingDots: string
@@ -55,7 +56,6 @@ export default function ChatMessagesPanel({
   loading,
   streaming,
   doshaColor,
-  renderMarkdown,
   voiceSupported,
   isSpeaking,
   thinkingDots,
@@ -94,7 +94,7 @@ export default function ChatMessagesPanel({
               key={i}
               msg={msg}
               doshaColor={doshaColor}
-              renderMarkdown={renderMarkdown}
+              doshaColor={doshaColor}
               voiceSupported={voiceSupported}
               isSpeaking={isSpeaking}
               onSpeakText={onSpeakText}
@@ -130,7 +130,7 @@ export default function ChatMessagesPanel({
               <ShieldCheck size={20} strokeWidth={2.5} />
             </div>
             <div className="glass-surface" style={{ flex: 1, padding: '1.5rem', borderRadius: '4px 22px 22px 22px' }}>
-              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(streaming, doshaColor) }} />
+              <ClinicalMarkdown content={streaming} doshaColor={doshaColor} />
               <motion.span 
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ repeat: Infinity, duration: 0.8 }}

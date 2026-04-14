@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  /* config options here */
+
   skipTrailingSlashRedirect: true,
 
   /*

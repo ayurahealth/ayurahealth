@@ -13,6 +13,7 @@ import {
   Info
 } from 'lucide-react'
 import { traditionIcons } from '../TraditionIcons'
+import ClinicalMarkdown from '../ui/ClinicalMarkdown'
 
 interface ChatSource {
   title: string
@@ -45,7 +46,6 @@ interface Message {
 interface MessageItemProps {
   msg: Message
   doshaColor: string
-  renderMarkdown: (text: string, doshaColor?: string) => string
   voiceSupported: boolean
   isSpeaking: boolean
   onSpeakText: (text: string) => void
@@ -110,11 +110,11 @@ export default function MessageItem({
             position: 'relative'
           }}
         >
-          <div 
-            className="markdown-content" 
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content, doshaColor) }} 
-            style={{ fontSize: '1rem', lineHeight: 1.6 }}
-          />
+          {!isAssistant ? (
+            <div style={{ fontSize: '1rem', lineHeight: 1.6 }}>{msg.content}</div>
+          ) : (
+            <ClinicalMarkdown content={msg.content} doshaColor={doshaColor} />
+          )}
 
           {isAssistant && msg.sources && msg.sources.length > 0 && (
             <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-low)', paddingTop: '1.25rem' }}>

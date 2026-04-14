@@ -10,9 +10,10 @@ const SkeletonBase = ({ className = '', style = {} }: { className?: string; styl
     transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
     className={`skeleton-boneyard ${className}`}
     style={{
-      background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+      background: 'linear-gradient(90deg, var(--surface-low) 25%, var(--surface-high) 50%, var(--surface-low) 75%)',
       backgroundSize: '200% 100%',
       borderRadius: '12px',
+      border: '1px solid var(--border-low)',
       ...style
     }}
   />

@@ -37,7 +37,7 @@ export default function Logo({ size = 36, showText = true, href = '/' }: LogoPro
           fontFamily: '"Cormorant Garamond", Georgia, serif',
           fontSize: `${Math.round(size * 0.42)}px`,
           fontWeight: 700,
-          color: '#6abf8a',
+          color: 'var(--accent-main)',
           letterSpacing: '0.025em',
           lineHeight: 1,
           whiteSpace: 'nowrap',

@@ -153,21 +153,6 @@ const QUESTIONS = (lang: Lang) => [
   { emoji: '✨', q: t[lang].q5, opts: [{ l: t[lang].q5a, d: 'Vata' }, { l: t[lang].q5b, d: 'Pitta' }, { l: t[lang].q5c, d: 'Kapha' }] },
 ]
 
-function renderMarkdown(text: string, doshaColor = 'var(--accent-main)'): string {
-  return text
-    .replace(/\*\*✦ VAIDYA'S NEURAL SYNTHESIS\*\*/g, `<div class="synthesis-header">✦ CLINICAL EVALUATION</div>`)
-    .replace(/\*\*🧪 Mathematical Precision Log\*\*/g, `<div class="section-header" style="color:${doshaColor}">🧪 DATA CORRELATION LOG</div>`)
-    .replace(/\*\*🌿 The Path of Multi-Tradition Balance\*\*/g, `<div class="section-header" style="color:${doshaColor}">🌿 INTEGRATED GUIDANCE</div>`)
-    .replace(/\*\*📊 Clinical & Biomarker Correlation\*\*/g, `<div class="section-header" style="color:${doshaColor}">📊 BIOMARKER ANALYSIS</div>`)
-    .replace(/\*\*⚡ Integrated Regimen \(Priority Actions\)\*\*/g, `<div class="section-header" style="color:${doshaColor}">⚡ PRIORITIZED REGIMEN</div>`)
-    .replace(/\*\*📚 Verified Lineage\*\*/g, `<div class="section-header" style="color:${doshaColor}">📚 EVIDENCE & PROOF</div>`)
-    .replace(/\*\*([^*]+)\*\*/g, `<strong style="color:${doshaColor}">$1</strong>`)
-    .replace(/\*([^*]+)\*/g, '<em style="opacity:0.85">$1</em>')
-    .replace(/^### (.+)$/gm, `<h3 style="color:${doshaColor};font-size:1rem;font-weight:600;margin:1rem 0 0.4rem">$1</h3>`)
-    .replace(/^(\d+)\. (.+)$/gm, '<div style="margin:0.3rem 0 0.3rem 0.5rem;display:flex;gap:0.5rem"><span style="opacity:0.5;min-width:1.2rem">$1.</span><span>$2</span></div>')
-    .replace(/^- (.+)$/gm, '<div style="margin:0.25rem 0 0.25rem 0.5rem;display:flex;gap:0.5rem"><span style="opacity:0.4">•</span><span>$1</span></div>')
-    .replace(/\n\n/g, '<br/><br/>').replace(/\n/g, '<br/>')
-}
 
 function timeAgo(ts: number): string {
   const diff = Date.now() - ts
@@ -1726,7 +1711,7 @@ export default function ChatPage() {
                 streaming={streaming}
                 oracleState={oracleState}
                 doshaColor={doshaColor}
-                renderMarkdown={renderMarkdown}
+                doshaColor={doshaColor}
                 voiceSupported={voiceSupported}
                 isSpeaking={isSpeaking}
                 thinkingDots={thinkingDots}
@@ -1760,6 +1745,26 @@ export default function ChatPage() {
             onInputKeyDown={handleKey}
             onSendMessage={() => sendMessage()}
           />
+              {/* Clinical Compliance Disclaimer */}
+              <div style={{ 
+                marginTop: '1.5rem', 
+                padding: '1rem', 
+                textAlign: 'center', 
+                borderTop: '1px solid var(--border-low)',
+                fontSize: '0.75rem',
+                color: 'var(--text-muted)',
+                lineHeight: 1.5,
+                opacity: 0.8
+              }}>
+                <p>
+                  <strong>MEDICAL DISCLAIMER:</strong> AyuraHealth synthesis is for educational purposes based on traditional systems. 
+                  It is not a substitute for professional medical advice, diagnosis, or treatment. 
+                  Always seek the advice of your physician regarding medical conditions.
+                </p>
+                <p style={{ marginTop: '0.5rem', fontWeight: 600, color: 'var(--accent-main)' }}>
+                  SECURE_CLINICAL_INTAKE_ACTIVE • IYURA_V1.0_PROD
+                </p>
+              </div>
             </section>
           </div>
         </div>
