@@ -63,14 +63,14 @@ export default function DashboardPage() {
 
   if (!dbProfile) {
     return (
-      <main style={{ background: '#05100a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e8dfc8' }}>
+      <main style={{ background: 'var(--bg-main)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
         <div style={{ textAlign: 'center' }}>
-           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-           <p>Syncing your Vedic Pulse...</p>
+           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Loading health profile...</p>
         </div>
       </main>
     )
   }
+
 
   return <DashboardContent user={user} dbProfile={dbProfile} />
 }

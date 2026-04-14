@@ -9,12 +9,13 @@ interface SurfaceProps extends PropsWithChildren {
 }
 
 export default function Surface({ children, style, className, variant = 'default' }: SurfaceProps) {
-  const background = variant === 'strong' ? 'var(--ios-surface-strong)' : 'var(--ios-surface)'
+  const background = variant === 'strong' ? 'var(--surface-mid)' : 'var(--surface-low)'
   return (
     <div
-      className={`ios-surface${className ? ` ${className}` : ''}`}
+      className={`flat-card${className ? ` ${className}` : ''}`}
       style={{
         background,
+        border: '1px solid var(--border-low)',
         ...style,
       }}
     >

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 
   title: {
-    default: 'AyuraHealth — Ancient Wisdom, Modern AI',
+    default: 'AyuraHealth — Traditional Healing for Modern Life',
     template: '%s | AyuraHealth',
   },
   icons: {
@@ -31,12 +31,11 @@ export const metadata: Metadata = {
       { url: '/favicon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
-  description: 'Your personal holistic health companion — combining Ayurveda, Chinese Medicine, Tibetan, Unani, Siddha, Homeopathy, Naturopathy and Western Medicine. Powered by NVIDIA Nemotron. Free forever.',
+  description: 'A professional health companion unifying 8 traditional healing systems. Get personalized guidance rooted in classical texts like Charaka Samhita and Huangdi Neijing.',
   keywords: [
     'ayurveda', 'holistic health', 'dosha quiz', 'vata pitta kapha',
     'TCM', 'Chinese medicine', 'natural healing', 'AI health',
-    'Charaka Samhita', 'Huangdi Neijing', 'VAIDYA', 'AyuraHealth',
-    'アーユルヴェーダ', 'आयुर्वेद', '아유르베다', 'طب أيورفيدي',
+    'Charaka Samhita', 'Huangdi Neijing', 'AyuraHealth',
   ],
   authors: [{ name: 'AyuraHealth', url: BASE_URL }],
   creator: 'AyuraHealth',
@@ -47,24 +46,15 @@ export const metadata: Metadata = {
     type: 'website',
     url: BASE_URL,
     siteName: 'AyuraHealth',
-    title: 'AyuraHealth — Ancient Wisdom, Modern AI',
-    description: 'Discover your Ayurvedic dosha in 2 minutes. Get personalized health guidance from 8 healing traditions powered by NVIDIA Nemotron. Free forever.',
+    title: 'AyuraHealth — Traditional Healing Systems',
+    description: 'Personalized health guidance from 8 ancient healing traditions. Rooted in classical wisdom, designed for modern health.',
     locale: 'en_US',
-    alternateLocale: ['ja_JP', 'hi_IN', 'zh_CN', 'ko_KR', 'ar_SA'],
     images: [
       {
         url: `${BASE_URL}/og-image.svg`,
         width: 1200,
         height: 630,
-        alt: 'AyuraHealth — Ancient Wisdom, Modern AI · Natural Healing',
-        type: 'image/png',
-      },
-      // Square image for platforms that prefer it (WhatsApp profile / Instagram)
-      {
-        url: `${BASE_URL}/og-image.svg`,
-        width: 1200,
-        height: 1200,
-        alt: 'AyuraHealth — Ancient Wisdom, Modern AI',
+        alt: 'AyuraHealth',
         type: 'image/png',
       },
     ],
@@ -75,8 +65,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@ayurahealth',
     creator: '@ayurahealth',
-    title: 'AyuraHealth — Ancient Wisdom, Modern AI',
-    description: 'Discover your Ayurvedic dosha. Personalized health guidance from 8 ancient healing traditions + NVIDIA Nemotron AI.',
+    title: 'AyuraHealth — Traditional Healing Systems',
+    description: 'Personalized health guidance from 8 ancient healing traditions.',
     images: [`${BASE_URL}/og-image.svg`],
   },
 
@@ -86,25 +76,16 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'AyuraHealth',
-    startupImage: [`${BASE_URL}/og-image.svg`],
   },
 
   // ─── SEO ───
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: 'nJKShriBws7A7s1eIeWX_Bm1XzV4m2NZYACYKzmbryc',
   },
   category: 'health',
 }
+
 
 import ClerkWrapper from '../components/ClerkWrapper'
 import ConsentBanner from '../components/ConsentBanner'

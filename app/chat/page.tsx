@@ -4,12 +4,12 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useSafeClerk as useClerk, useSafeUser as useUser } from '../../lib/clerk-client'
 import { t, type Lang } from '../../lib/translations'
 import { motion } from 'framer-motion'
-import VaidyaOracle from '../../components/VaidyaOracle'
 import EngagementStory from '../../components/EngagementStory'
 import Logo from '../../components/Logo'
 import ChatSidebar from '../../components/chat/ChatSidebar'
 import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
+
 import VedicOraclePanel from '../../components/vedic/VedicOraclePanel'
 import { vaidyaVoice } from '../../lib/vaidyaVoice'
 import { getApiUrl } from '../../lib/constants'
@@ -100,14 +100,9 @@ const THEME_PREF_KEY = 'ayura_theme_pref_v1'
 const AI_PREF_KEY = 'ayura_ai_pref_v1'
 const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
 const THEME_OPTIONS: Array<{ id: ThemeName; label: string }> = [
-  { id: 'green', label: 'Original Green' },
-  { id: 'gold', label: 'Light Gold' },
-  { id: 'forest', label: 'Forest' },
-  { id: 'ocean', label: 'Ocean' },
-  { id: 'plum', label: 'Plum' },
-  { id: 'sunset', label: 'Sunset' },
-  { id: 'slate', label: 'Slate' },
-  { id: 'rose', label: 'Rose' },
+  { id: 'green', label: 'Dark Mode' },
+  { id: 'gold', label: 'Light Mode' },
+  { id: 'forest', label: 'Clinical' },
 ]
 interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
 function loadState(): SavedState | null {
@@ -123,9 +118,9 @@ function saveState(s: SavedState) { try { localStorage.setItem(STORAGE_KEY, JSON
 function clearState() { try { localStorage.removeItem(STORAGE_KEY) } catch {} }
 
 const DOSHA_META = {
-  Vata:  { emoji: '🌬️', color: '#7aafd4', glow: 'rgba(122,175,212,0.3)', bg: 'rgba(122,175,212,0.08)', cardBg: '#0a1620', cardBorder: '#7aafd4', taglineKey: 'vata_tagline', descKey: 'vata_desc', strengthsKey: 'vata_strengths', watchKey: 'vata_watch' },
-  Pitta: { emoji: '🔥', color: '#e8835a', glow: 'rgba(232,131,90,0.3)',  bg: 'rgba(232,131,90,0.08)',  cardBg: '#1a0e08', cardBorder: '#e8835a', taglineKey: 'pitta_tagline', descKey: 'pitta_desc', strengthsKey: 'pitta_strengths', watchKey: 'pitta_watch' },
-  Kapha: { emoji: '🌍', color: '#6abf8a', glow: 'rgba(106,191,138,0.3)', bg: 'rgba(106,191,138,0.08)', cardBg: '#081510', cardBorder: '#6abf8a', taglineKey: 'kapha_tagline', descKey: 'kapha_desc', strengthsKey: 'kapha_strengths', watchKey: 'kapha_watch' },
+  Vata:  { emoji: '🌬️', color: '#7aafd4', glow: 'transparent', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'vata_tagline', descKey: 'vata_desc', strengthsKey: 'vata_strengths', watchKey: 'vata_watch' },
+  Pitta: { emoji: '🔥', color: '#e8835a', glow: 'transparent', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'pitta_tagline', descKey: 'pitta_desc', strengthsKey: 'pitta_strengths', watchKey: 'pitta_watch' },
+  Kapha: { emoji: '🌍', color: '#6abf8a', glow: 'transparent', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'kapha_tagline', descKey: 'kapha_desc', strengthsKey: 'kapha_strengths', watchKey: 'kapha_watch' },
 }
 
 const MEDICINE_SYSTEMS = [
@@ -158,14 +153,14 @@ const QUESTIONS = (lang: Lang) => [
   { emoji: '✨', q: t[lang].q5, opts: [{ l: t[lang].q5a, d: 'Vata' }, { l: t[lang].q5b, d: 'Pitta' }, { l: t[lang].q5c, d: 'Kapha' }] },
 ]
 
-function renderMarkdown(text: string, doshaColor = '#6abf8a'): string {
+function renderMarkdown(text: string, doshaColor = 'var(--accent-main)'): string {
   return text
-    .replace(/\*\*✦ VAIDYA'S NEURAL SYNTHESIS\*\*/g, `<div class="synthesis-header">✦ VAIDYA'S NEURAL SYNTHESIS</div>`)
-    .replace(/\*\*🧪 Mathematical Precision Log\*\*/g, `<div class="section-header" style="color:${doshaColor}">🧪 Mathematical Precision Log</div>`)
-    .replace(/\*\*🌿 The Path of Multi-Tradition Balance\*\*/g, `<div class="section-header" style="color:${doshaColor}">🌿 The Path of Multi-Tradition Balance</div>`)
-    .replace(/\*\*📊 Clinical & Biomarker Correlation\*\*/g, `<div class="section-header" style="color:${doshaColor}">📊 Clinical Correlation</div>`)
-    .replace(/\*\*⚡ Integrated Regimen \(Priority Actions\)\*\*/g, `<div class="section-header" style="color:${doshaColor}">⚡ Your Integrated Regimen</div>`)
-    .replace(/\*\*📚 Verified Lineage\*\*/g, `<div class="section-header" style="color:${doshaColor}">📚 Lineage & Proof</div>`)
+    .replace(/\*\*✦ VAIDYA'S NEURAL SYNTHESIS\*\*/g, `<div class="synthesis-header">✦ CLINICAL EVALUATION</div>`)
+    .replace(/\*\*🧪 Mathematical Precision Log\*\*/g, `<div class="section-header" style="color:${doshaColor}">🧪 DATA CORRELATION LOG</div>`)
+    .replace(/\*\*🌿 The Path of Multi-Tradition Balance\*\*/g, `<div class="section-header" style="color:${doshaColor}">🌿 INTEGRATED GUIDANCE</div>`)
+    .replace(/\*\*📊 Clinical & Biomarker Correlation\*\*/g, `<div class="section-header" style="color:${doshaColor}">📊 BIOMARKER ANALYSIS</div>`)
+    .replace(/\*\*⚡ Integrated Regimen \(Priority Actions\)\*\*/g, `<div class="section-header" style="color:${doshaColor}">⚡ PRIORITIZED REGIMEN</div>`)
+    .replace(/\*\*📚 Verified Lineage\*\*/g, `<div class="section-header" style="color:${doshaColor}">📚 EVIDENCE & PROOF</div>`)
     .replace(/\*\*([^*]+)\*\*/g, `<strong style="color:${doshaColor}">$1</strong>`)
     .replace(/\*([^*]+)\*/g, '<em style="opacity:0.85">$1</em>')
     .replace(/^### (.+)$/gm, `<h3 style="color:${doshaColor};font-size:1rem;font-weight:600;margin:1rem 0 0.4rem">$1</h3>`)
@@ -1013,10 +1008,10 @@ export default function ChatPage() {
   // ── Lifecycle Guard ─────────────────────────────────────────────────────────
   if (!mounted) {
     return (
-      <main style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#c9a84c', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', letterSpacing: '0.25em', textAlign: 'center' }}>
-          Initializing VAIDYA Healing Wisdom...
-          <div style={{ color: 'rgba(106,191,138,0.4)', fontSize: '0.7rem', marginTop: '1rem', letterSpacing: '0.1em' }}>NEURAL SYNTHESIS IN PROGRESS</div>
+      <main style={{ minHeight: '100vh', background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: 'var(--accent-main)', fontFamily: 'var(--font-display)', fontSize: '1.4rem', letterSpacing: '0.25em', textAlign: 'center' }}>
+          Initializing Vaidya AI...
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginTop: '1rem', letterSpacing: '0.1em' }}>PROCESSING CLINICAL DATA</div>
         </div>
       </main>
     )
@@ -1063,33 +1058,16 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* Sacred geometry bg */}
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <svg width="100%" height="100%" style={{ opacity: 0.04 }}>
-          <defs>
-            <pattern id="mandala" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
-              <circle cx="60" cy="60" r="50" fill="none" stroke="#6abf8a" strokeWidth="0.5"/>
-              <circle cx="60" cy="60" r="35" fill="none" stroke="#6abf8a" strokeWidth="0.5"/>
-              <circle cx="60" cy="60" r="20" fill="none" stroke="#6abf8a" strokeWidth="0.5"/>
-              <line x1="10" y1="60" x2="110" y2="60" stroke="#6abf8a" strokeWidth="0.3"/>
-              <line x1="60" y1="10" x2="60" y2="110" stroke="#6abf8a" strokeWidth="0.3"/>
-              <line x1="24.6" y1="24.6" x2="95.4" y2="95.4" stroke="#6abf8a" strokeWidth="0.3"/>
-              <line x1="95.4" y1="24.6" x2="24.6" y2="95.4" stroke="#6abf8a" strokeWidth="0.3"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#mandala)"/>
-        </svg>
-        <div style={{ position: 'absolute', top: '-30%', left: '-20%', width: '80vw', height: '80vw', background: 'radial-gradient(circle, rgba(74,158,106,0.06) 0%, transparent 70%)', borderRadius: '50%' }} />
-      </div>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', background: 'var(--bg-main)' }} />
 
       {/* Paywall Modal */}
       {showPaywall && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(12px)' }}>
           <div style={{ background: 'linear-gradient(145deg, #0a1a0f, #081510)', border: '1px solid rgba(106,191,138,0.25)', borderRadius: 28, padding: '2.5rem 2rem', maxWidth: 440, width: '100%', textAlign: 'center', boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(106,191,138,0.1)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem', filter: 'drop-shadow(0 0 24px rgba(201,168,76,0.5))' }}>🌿</div>
-            <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.9rem', fontWeight: 700, color: '#c9a84c', marginBottom: '0.5rem' }}>Free Consultations Used</div>
-            <p style={{ color: 'rgba(232,223,200,0.6)', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '2rem' }}>
-              You have experienced what VAIDYA can do. Thousands of years of healing wisdom — now unlock it fully.
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.9rem', fontWeight: 600, color: 'var(--accent-main)', marginBottom: '0.5rem' }}>Trial Consultation Limit Reached</div>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '2rem' }}>
+              Standard trials include 3 consultations. Upgrade for complete access to our clinical frameworks and history tracking.
             </p>
             
             {!!activeUser ? (
@@ -1324,11 +1302,12 @@ export default function ChatPage() {
       {screen === 'landing' && (
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', textAlign: 'center', padding: '2rem 1rem' }}>
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
+            style={{ marginTop: '2rem' }}
           >
-            <VaidyaOracle />
+            <div style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>🧪</div>
           </motion.div>
 
           <header style={{ marginBottom: '3.5rem', marginTop: '-1rem' }}>
@@ -1355,12 +1334,12 @@ export default function ChatPage() {
             </p>
           </header>
 
-          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(106,191,138,0.2)', borderRadius: 20, padding: '2rem', backdropFilter: 'blur(10px)', marginBottom: '1rem' }}>
+          <div style={{ background: 'var(--surface-low)', border: '1px solid var(--border-low)', borderRadius: 20, padding: '2rem', marginBottom: '1rem' }}>
             <EngagementStory />
-            <div style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '0.75rem' }}>🧬</div>
-            <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#c9a84c', fontSize: '1.4rem', textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>{tx.quiz_cta_title}</h3>
-            <p style={{ color: 'rgba(232,223,200,0.55)', fontSize: '0.875rem', textAlign: 'center', lineHeight: 1.6, marginBottom: '1.5rem' }}>{tx.quiz_cta_sub}</p>
-            <button onClick={() => { setCurrentQ(0); setAnswers([]); setScreen('quiz') }} style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #2d5a1b, #3d7a28)', color: '#f0e6c8', border: 'none', borderRadius: 14, fontSize: '1rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(45,90,27,0.4)' }}>{tx.quiz_btn}</button>
+            <div style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '0.75rem' }}>📊</div>
+            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--accent-main)', fontSize: '1.4rem', textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>Professional Assessment</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'center', lineHeight: 1.6, marginBottom: '1.5rem' }}>Identify your underlying health triggers through a structured 5-minute clinical evaluation.</p>
+            <button onClick={() => { setCurrentQ(0); setAnswers([]); setScreen('quiz') }} style={{ width: '100%', padding: '0.9rem', background: 'var(--accent-main)', color: 'var(--bg-main)', border: 'none', borderRadius: 14, fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>Start Clinical Assessment</button>
           </div>
           <button onClick={() => { setDosha(null); startChat(null) }} style={{ width: '100%', padding: '0.8rem', background: 'transparent', color: 'rgba(200,200,200,0.45)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, fontSize: '0.9rem', cursor: 'pointer' }}>{tx.skip_btn}</button>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '2.5rem', flexWrap: 'wrap' }}>

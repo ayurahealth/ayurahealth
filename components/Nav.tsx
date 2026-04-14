@@ -45,9 +45,9 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
   )
 
   const defaultLinks = links || [
-    { label: 'Vedic Pulse', href: '/dashboard' },
-    { label: '💳 Pricing', href: '/pricing' },
-    { label: 'For Clinics →', href: '/clinic' },
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'Clinic Portal', href: '/clinic' },
   ]
 
   useEffect(() => {
@@ -85,114 +85,88 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
           position: fixed; top: 0; left: 0; right: 0; z-index: 200; 
           height: 64px; display: flex; align-items: center; 
           justify-content: space-between; padding: 0 2rem; 
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          border-bottom: 1px solid transparent;
+          transition: background 0.2s;
         }
         .nav-root.scrolled { 
-          background: hsla(var(--sage-deep), 0.75); 
-          backdrop-filter: blur(20px) saturate(180%); 
-          -webkit-backdrop-filter: blur(20px) saturate(180%); 
-          border-bottom: 1px solid hsla(var(--sage-accent), 0.08); 
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); 
-          height: 58px;
+          background: var(--bg-main); 
+          border-bottom: 1px solid var(--border-low); 
+          height: 60px;
         }
-        .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
         
-        .desktop-links { display: flex; gap: 0.5rem; align-items: center; }
-        .nav-pill { 
-          color: rgba(232, 223, 200, 0.75); 
-          font-size: 0.82rem; 
+        .desktop-links { display: flex; gap: 1rem; align-items: center; }
+        .nav-link { 
+          color: var(--text-muted); 
+          font-size: 0.88rem; 
           text-decoration: none; 
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
-          border: 1px solid rgba(106, 191, 138, 0.1); 
-          padding: 0.35rem 1rem; 
-          border-radius: 980px; 
-          white-space: nowrap; 
-          background: rgba(106, 191, 138, 0.02); 
+          transition: color 0.2s; 
           font-weight: 500;
         }
-        .nav-pill:hover { 
-          color: var(--ios-text); 
-          border-color: hsla(var(--sage-accent), 0.4); 
-          background: hsla(var(--sage-accent), 0.08); 
-          transform: translateY(-1px);
-        }
+        .nav-link:hover { color: var(--text-main); }
         
         .lang-trigger { 
-          background: rgba(106, 191, 138, 0.04); 
-          border: 1px solid rgba(106, 191, 138, 0.15); 
-          color: rgba(232, 223, 200, 0.8); 
-          padding: 0.35rem 1rem; 
-          border-radius: 980px; 
+          background: var(--surface-low); 
+          border: 1px solid var(--border-low); 
+          color: var(--text-muted); 
+          padding: 0.4rem 0.8rem; 
+          border-radius: 8px; 
           font-size: 0.8rem; 
           cursor: pointer; 
-          transition: all 0.25s; 
+          transition: all 0.2s; 
           display: flex; 
           align-items: center; 
           gap: 0.5rem; 
-          white-space: nowrap; 
           font-family: inherit; 
         }
         .lang-trigger:hover { 
-          border-color: hsla(var(--sage-accent), 0.4); 
-          color: var(--ios-text); 
-          background: hsla(var(--sage-accent), 0.08); 
+          border-color: var(--border-mid); 
+          color: var(--text-main); 
         }
         
         /* Bottom Tab Bar for Mobile */
         .bottom-tab-bar { 
           display: none; position: fixed; bottom: 0; left: 0; right: 0; 
-          z-index: 199; background: hsla(var(--sage-deep), 0.82); 
-          backdrop-filter: blur(20px) saturate(180%); 
-          -webkit-backdrop-filter: blur(20px) saturate(180%); 
-          border-top: 1px solid hsla(var(--sage-accent), 0.1); 
+          z-index: 100; background: var(--bg-main); 
+          border-top: 1px solid var(--border-low); 
           padding-bottom: env(safe-area-inset-bottom); 
-          padding-top: 0.6rem; justify-content: space-around; align-items: center; 
-          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+          padding-top: 0.75rem; justify-content: space-around; align-items: center; 
         }
         .tab-item { 
-          display: flex; flexDirection: column; align-items: center; 
-          justify-content: center; color: rgba(232, 223, 200, 0.45); 
-          text-decoration: none; font-size: 0.68rem; gap: 0.25rem; 
-          margin-bottom: 0.6rem; transition: all 0.2s; 
+          display: flex; flex-direction: column; align-items: center; 
+          justify-content: center; color: var(--text-muted); 
+          text-decoration: none; font-size: 0.7rem; gap: 0.3rem; 
+          margin-bottom: 0.7rem; transition: color 0.2s; 
         }
-        .tab-item:active { opacity: 0.7; transform: scale(0.95); }
-        .tab-icon { font-size: 1.35rem; }
+        .tab-item:active { opacity: 0.8; }
+        .tab-icon { font-size: 1.25rem; }
         .tab-label { font-weight: 500; }
         
-        .picker-overlay { position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+        .picker-overlay { position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.6); }
         .picker-box { 
           position: fixed; top: 72px; right: 1.5rem; 
-          background: rgba(10, 26, 15, 0.98); 
-          border: 1px solid rgba(106, 191, 138, 0.15); 
-          border-radius: 20px; width: 300px; overflow: hidden; 
-          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7); 
-          backdrop-filter: blur(32px); z-index: 9999; 
-          animation: pickerIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes pickerIn {
-          from { opacity: 0; transform: translateY(-10px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
+          background: var(--surface-mid); 
+          border: 1px solid var(--border-mid); 
+          border-radius: 12px; width: 300px; overflow: hidden; 
+          z-index: 9999; 
         }
         .picker-search { 
-          width: 100%; background: rgba(255,255,255,0.03); 
-          border: none; border-bottom: 1px solid rgba(106, 191, 138, 0.08); 
-          color: #e8dfc8; padding: 1rem 1.25rem; font-size: 0.9rem; 
+          width: 100%; background: var(--surface-low); 
+          border: none; border-bottom: 1px solid var(--border-low); 
+          color: var(--text-main); padding: 1rem; font-size: 0.9rem; 
           outline: none; font-family: inherit; 
         }
-        .picker-search::placeholder { color: rgba(232, 223, 200, 0.2); }
-        .picker-list { max-height: 380px; overflow-y: auto; padding: 0.5rem; }
-        .picker-list::-webkit-scrollbar { width: 4px; }
-        .picker-list::-webkit-scrollbar-thumb { background: rgba(106, 191, 138, 0.15); border-radius: 2px; }
+        .picker-search::placeholder { color: var(--text-muted); }
+        .picker-list { max-height: 400px; overflow-y: auto; padding: 0.5rem; }
         .lang-item { 
           display: flex; align-items: center; justify-content: space-between; 
-          padding: 0.75rem 1rem; cursor: pointer; transition: all 0.15s; 
-          border-radius: 12px; margin-bottom: 0.2rem;
+          padding: 0.75rem 1rem; cursor: pointer; transition: background 0.2s; 
+          border-radius: 8px; margin-bottom: 0.1rem;
         }
-        .lang-item:hover { background: rgba(106, 191, 138, 0.08); }
-        .lang-item.active { background: rgba(106, 191, 138, 0.12); }
+        .lang-item:hover { background: var(--surface-low); }
+        .lang-item.active { background: var(--surface-high); }
         @media(max-width:768px) { 
-          .nav-root { padding: 0 1.25rem; height: 60px; } 
-          .picker-box { right: 0.75rem; width: calc(100vw - 1.5rem); top: 64px; } 
+          .nav-root { padding: 0 1rem; } 
           .desktop-links { display: none; }
           .bottom-tab-bar { display: flex; }
         }
@@ -212,17 +186,17 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
           
           <div className="desktop-links">
             {defaultLinks.map(link => (
-              <Link key={link.href} href={link.href} className="nav-pill">{link.label}</Link>
+              <Link key={link.href} href={link.href} className="nav-link">{link.label}</Link>
             ))}
           </div>
           
           <div style={{ marginLeft: '0.5rem', display: 'flex', alignItems: 'center', height: 32 }}>
             {isLoaded ? (
               isSignedIn ? (
-                <SafeUserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
+                <SafeUserButton appearance={{ elements: { avatarBox: { width: 32, height: 32, borderRadius: '8px' } } }} />
               ) : (
                 <SafeSignInButton mode="modal">
-                  <button className="nav-pill" style={{ background: 'hsl(var(--sage-accent))', color: 'hsl(var(--sage-deep))', border: 'none', fontWeight: 600, cursor: 'pointer' }}>Sign In</button>
+                  <button className="btn-primary" style={{ fontSize: '0.88rem', padding: '0.5rem 1rem' }}>Sign In</button>
                 </SafeSignInButton>
               )
             ) : null}

@@ -15,30 +15,30 @@ const baseStyle: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: '0.4rem',
-  padding: '0.9rem 1.2rem',
-  borderRadius: 999,
+  padding: '0.8rem 1.4rem',
+  borderRadius: '12px',
   width: '100%',
-  fontSize: '0.95rem',
+  fontSize: '0.9rem',
   fontWeight: 600,
   textDecoration: 'none',
   cursor: 'pointer',
-  transition: 'all 0.22s ease',
+  transition: 'opacity 0.2s',
   border: '1px solid transparent',
 }
 
 const variants: Record<'primary' | 'secondary', CSSProperties> = {
   primary: {
-    background: 'linear-gradient(135deg, #1a4d2e, #2d7a45)',
-    color: 'var(--ios-text)',
-    borderColor: 'rgba(106,191,138,0.34)',
-    boxShadow: 'var(--ios-shadow-md)',
+    background: 'var(--accent-main)',
+    color: 'var(--bg-main)',
+    borderColor: 'var(--accent-main)',
   },
   secondary: {
-    background: 'rgba(255,255,255,0.02)',
-    color: 'rgba(232,223,200,0.8)',
-    borderColor: 'var(--ios-stroke)',
+    background: 'transparent',
+    color: 'var(--text-main)',
+    borderColor: 'var(--border-mid)',
   },
 }
+
 
 export default function IOSButton({ children, href, onClick, variant = 'primary', style, className }: IOSButtonProps) {
   const merged = { ...baseStyle, ...variants[variant], ...style }
