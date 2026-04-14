@@ -34,6 +34,13 @@ export function CheckoutContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [currency] = useState<'INR' | 'USD'>('INR') // Always INR for Razorpay
+  const [isCapacitor, setIsCapacitor] = useState(false)
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).Capacitor) {
+      setIsCapacitor(true)
+    }
+  }, [])
 
   const tierInfo: Record<string, { name: string; priceINR: number; priceUSD: number }> = {
     premium: { name: 'Premium', priceINR: 399, priceUSD: 4.99 },
@@ -245,13 +252,13 @@ export function CheckoutContent() {
               onClick={handleRazorpayPayment}
               disabled={loading || !email}
             >
-              {loading ? 'Processing...' : `Pay ${displayCurrency}${displayPrice} with Razorpay`}
+              {loading ? 'Processing...' : (isCapacitor ? 'Complete Secure Upgrade' : `Pay ${displayCurrency}${displayPrice} with Razorpay`)}
             </button>
 
             <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(106,191,138,0.1)', textAlign: 'center', fontSize: '0.85rem', color: 'rgba(232,223,200,0.5)' }}>
-              <p style={{ marginBottom: '0.5rem' }}>🔒 Secure payment processing</p>
+              <p style={{ marginBottom: '0.5rem' }}>🔒 Secure clinical payment processing</p>
               <p>Your payment information is encrypted and secure</p>
-              <p style={{ marginTop: '1rem', fontSize: '0.8rem' }}>Powered by Razorpay • UPI, NetBanking, Cards, Wallets</p>
+              {!isCapacitor && <p style={{ marginTop: '1rem', fontSize: '0.8rem' }}>Powered by Razorpay • UPI, NetBanking, Cards, Wallets</p>}
             </div>
           </div>
         </div>
