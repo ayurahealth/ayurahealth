@@ -14,7 +14,14 @@ import {
   ArrowRight,
   User,
   Users,
-  Compass
+  Compass,
+  Wind,
+  Flame,
+  Droplets,
+  Activity,
+  CheckCircle2,
+  Brain,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function OnboardingPage() {

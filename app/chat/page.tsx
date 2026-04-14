@@ -9,6 +9,17 @@ import Logo from '../../components/Logo'
 import ChatSidebar from '../../components/chat/ChatSidebar'
 import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
+import { 
+  ShieldCheck, 
+  Sparkles, 
+  Brain, 
+  Activity, 
+  History, 
+  Settings, 
+  Share2, 
+  Maximize2,
+  Globe
+} from 'lucide-react'
 
 import VedicOraclePanel from '../../components/vedic/VedicOraclePanel'
 import { vaidyaVoice } from '@/lib/vaidyaVoice'
