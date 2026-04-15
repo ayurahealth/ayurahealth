@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# AyuraHealth - Antigravity Deployment Setup Script
-# This script automates the setup process for deploying to Antigravity
+# ----------------------------------------------------
+# Ayura Intelligence Lab - Antigravity Setup Script
+# ----------------------------------------------------
 
 set -e
 
-echo "🚀 AyuraHealth - Antigravity Deployment Setup"
-echo "=============================================="
+echo "🚀 Ayura Intelligence Lab - Deployment Setup"
+echo "----------------------------------------------------"
 echo ""
 
 # Color codes

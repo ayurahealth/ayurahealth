@@ -22,7 +22,6 @@ const nextConfig: NextConfig = {
 
   skipTrailingSlashRedirect: true,
 
-  /*
   async headers() {
     const csp = [
       "default-src 'self'",
@@ -50,8 +49,10 @@ const nextConfig: NextConfig = {
         "https://www.google-analytics.com",
         "https://vitals.vercel-insights.com",
         "https://va.vercel-scripts.com",
+        "https://ayura.ai",
+        "https://www.ayura.ai",
       ].join(' '),
-      "frame-src https://api.razorpay.com",
+      "frame-src https://api.razorpay.com https://checkout.razorpay.com",
       "frame-ancestors 'none'",
       "worker-src 'self' blob:",
     ].join('; ')
@@ -61,7 +62,7 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: [
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31104000; includeSubDomains; preload' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -72,15 +73,14 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  */
-  /*
+
   async redirects() {
     return [
       { source: '/home', destination: '/', permanent: true },
       { source: '/blog', destination: '/', permanent: true },
     ]
   },
-  */
 }
 
 export default nextConfig
+准确

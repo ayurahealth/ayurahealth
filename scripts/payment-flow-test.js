@@ -373,13 +373,13 @@ function generateReport() {
   const reportPath = path.join(process.cwd(), '.payment-flow-report.json');
   fs.writeFileSync(reportPath, JSON.stringify(results, null, 2));
   log(`\nReport saved to: ${reportPath}`, 'cyan');
-  
-  process.exit(results.status === 'PASS' ? 0 : 1);
-}
+  /**
+ * Ayura Intelligence Lab Automated Payment Flow Validation Script
+ * ----------------------------------------------------
+ */
 
-// Run all tests
-async function runTests() {
-  log('\n💳 Starting AyuraHealth Payment Flow Validation...', 'cyan');
+async function main() {
+  log('\n💳 Starting Ayura Intelligence Lab Payment Flow Validation...', 'cyan');
   log(`Time: ${new Date().toLocaleString()}`, 'cyan');
   log(`Testing: ${config.baseUrl}`, 'cyan');
   
