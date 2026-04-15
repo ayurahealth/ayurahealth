@@ -12,10 +12,10 @@ const nextConfig: NextConfig = {
   
   // Enforce build resilience during production stabilization
   typescript: {
-    ignoreBuildErrors: true, 
+    ignoreBuildErrors: false, 
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   /* config options here */
