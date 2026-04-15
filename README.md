@@ -27,10 +27,10 @@ AyuraHealth is a personal holistic health companion that combines **Ayurveda, Tr
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22.0.0+ (Mandatory for Capacitor 8 & Native builds)
 - A Razorpay account
 - A Clerk project
-- A Prisma-supported database
+- A Prisma-supported database (Supabase recommended)
 
 ### Installation
 
