@@ -1,5 +1,5 @@
 // ============================================================
-// AYURAHEALTH — VEDIC INTELLIGENCE TYPES
+// AYURA INTELLIGENCE — VEDIC INTELLIGENCE TYPES
 // Complete type system for Jyotish, Vedic Math & Vedic Science
 // ============================================================
 

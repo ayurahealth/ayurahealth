@@ -79,8 +79,8 @@ export class OpenRouterProvider implements LLMProvider {
     return {
       Authorization: `Bearer ${getApiKey()}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://ayurahealth.com',
-      'X-Title': 'AyuraHealth VAIDYA',
+      'HTTP-Referer': 'https://ayura.ai',
+      'X-Title': 'Ayura Intelligence VAIDYA',
     }
   }
 

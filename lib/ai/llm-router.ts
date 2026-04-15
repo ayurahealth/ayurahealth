@@ -1,5 +1,5 @@
 /**
- * LLM Router — Central AI orchestration engine for AyuraHealth.
+ * LLM Router — Central AI orchestration engine for Ayura Intelligence Lab.
  * 
  * Routes requests to the optimal provider based on:
  * 1. User's model preference

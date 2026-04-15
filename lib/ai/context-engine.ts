@@ -180,7 +180,7 @@ export async function fetchWebSearchResults(query: string): Promise<WebSearchRes
     const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; AyuraHealthBot/1.0; +https://ayurahealth.com)',
+        'User-Agent': 'Mozilla/5.0 (compatible; AyuraIntelligenceBot/1.0; +https://ayura.ai)',
       },
       signal: AbortSignal.timeout(8000),
     })

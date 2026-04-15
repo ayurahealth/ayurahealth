@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV,
-      service: 'ayurahealth-api',
+      service: 'ayuraintelligence-api',
     }
 
     const vaidya = getVaidyaCheck()

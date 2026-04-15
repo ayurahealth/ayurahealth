@@ -31,7 +31,7 @@ export default function CancelPage() {
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 2rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(5,16,10,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(106,191,138,0.15)' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
           <Logo size={48} showText={false} />
-          <span style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.35rem', fontWeight: 600, color: '#e8dfc8' }}>AyuraHealth</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--accent-main)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ayura Intelligence</span>
         </Link>
       </nav>
 
@@ -53,7 +53,7 @@ export default function CancelPage() {
               </div>
               <div className="faq-item">
                 <strong>Have questions?</strong>
-                <p>Our support team is here to help. Email us at support@ayurahealth.com</p>
+                <p>Our support team is here to help. Email us at support@ayura.ai</p>
               </div>
               <div className="faq-item">
                 <strong>Want a different plan?</strong>
@@ -72,7 +72,7 @@ export default function CancelPage() {
 
             {/* Support Info */}
             <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(106,191,138,0.1)', fontSize: '0.85rem', color: 'rgba(232,223,200,0.5)' }}>
-              <p>Questions? Contact us at <strong>support@ayurahealth.com</strong></p>
+              <p>Questions? Contact us at <strong>support@ayura.ai</strong></p>
             </div>
           </div>
         </div>

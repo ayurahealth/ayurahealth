@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
-const BASE_URL = 'https://ayurahealth.com'
+const BASE_URL = 'https://ayura.ai'
 
 export const viewport: Viewport = {
   themeColor: '#1a4d2e',
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 
   title: {
-    default: 'AyuraHealth — Traditional Healing for Modern Life',
-    template: '%s | AyuraHealth',
+    default: 'Ayura Intelligence — Clinical Reasoning & Synthesis',
+    template: '%s | Ayura Intelligence',
   },
   icons: {
     icon: [
@@ -35,18 +35,18 @@ export const metadata: Metadata = {
   keywords: [
     'ayurveda', 'holistic health', 'dosha quiz', 'vata pitta kapha',
     'TCM', 'Chinese medicine', 'natural healing', 'AI health',
-    'Charaka Samhita', 'Huangdi Neijing', 'AyuraHealth',
+    'Charaka Samhita', 'Huangdi Neijing', 'Ayura Intelligence',
   ],
-  authors: [{ name: 'AyuraHealth', url: BASE_URL }],
-  creator: 'AyuraHealth',
-  publisher: 'AyuraHealth',
+  authors: [{ name: 'Ayura Intelligence Lab', url: BASE_URL }],
+  creator: 'Ayura Intelligence',
+  publisher: 'Ayura Intelligence',
 
   // ─── Open Graph (WhatsApp · Line · Telegram · Facebook · LinkedIn · Slack · Discord) ───
   openGraph: {
     type: 'website',
     url: BASE_URL,
-    siteName: 'AyuraHealth',
-    title: 'AyuraHealth — Traditional Healing Systems',
+    siteName: 'Ayura Intelligence',
+    title: 'Ayura Intelligence — Clinical Synthesis & Longevity',
     description: 'Personalized health guidance from 8 ancient healing traditions. Rooted in classical wisdom, designed for modern health.',
     locale: 'en_US',
     images: [
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
         url: `${BASE_URL}/og-image.svg`,
         width: 1200,
         height: 630,
-        alt: 'AyuraHealth',
+        alt: 'Ayura Intelligence',
         type: 'image/png',
       },
     ],
@@ -63,10 +63,10 @@ export const metadata: Metadata = {
   // ─── Twitter / X ───
   twitter: {
     card: 'summary_large_image',
-    site: '@ayurahealth',
-    creator: '@ayurahealth',
-    title: 'AyuraHealth — Traditional Healing Systems',
-    description: 'Personalized health guidance from 8 ancient healing traditions.',
+    site: '@ayura_intelligence',
+    creator: '@ayura_intelligence',
+    title: 'Ayura Intelligence — Strategic Health Synthesis',
+    description: 'Autonomous neural synthesis for traditional medical systems.',
     images: [`${BASE_URL}/og-image.svg`],
   },
 
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'AyuraHealth',
+    title: 'Ayura Intelligence',
   },
 
   // ─── SEO ───
@@ -89,13 +89,12 @@ export const metadata: Metadata = {
 
 import ClerkWrapper from '../components/ClerkWrapper'
 import ConsentBanner from '../components/ConsentBanner'
-import { Cormorant_Garamond, DM_Sans } from 'next/font/google'
+import { Outfit, DM_Sans } from 'next/font/google'
 
-const cormorant = Cormorant_Garamond({
+const outfit = Outfit({
   subsets: ['latin'],
-  weight: ['300', '400', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-outfit',
   display: 'swap',
 })
 
@@ -108,7 +107,7 @@ const dmSans = DM_Sans({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${dmSans.variable}`}>
       <head>
         {/* Favicon */}
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -120,20 +119,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:alt" content="AyuraHealth — Ancient Wisdom, Modern AI" />
+        <meta property="og:image:alt" content="Ayura Intelligence — Ancient Wisdom, Neural Synthesis" />
 
         {/* iMessage / Apple */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="AyuraHealth" />
+        <meta name="apple-mobile-web-app-title" content="Ayura Int" />
 
         {/* ─── LINE specific ─── */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content={BASE_URL} />
-        <meta property="og:site_name" content="AyuraHealth" />
+        <meta property="og:site_name" content="Ayura Intelligence" />
 
         {/* ─── WhatsApp forces this exact format ─── */}
-        <meta property="og:title" content="AyuraHealth — Ancient Wisdom, Modern AI" />
+        <meta property="og:title" content="Ayura Intelligence — Ancient Wisdom, Neural Synthesis" />
         <meta property="og:description" content="Discover your Ayurvedic dosha. Personalized health guidance from 8 ancient healing traditions. Free forever." />
 
         {/* Schema.org for Google rich results */}
@@ -141,7 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "AyuraHealth",
+            "name": "Ayura Intelligence",
             "url": BASE_URL,
             "logo": {
               "@type": "ImageObject",
@@ -150,22 +149,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "height": 512
             },
             "sameAs": [
-              "https://x.com/ayurahealth",
-              "https://reddit.com/r/AyuraHealth"
+              "https://x.com/ayura_intel",
+              "https://reddit.com/r/AyuraIntelligence"
             ]
           },
           {
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "AyuraHealth",
+            "name": "Ayura Intelligence Lab",
             "url": BASE_URL,
-            "description": "AI-powered holistic health companion combining Ayurveda, TCM, and 6 other healing traditions",
+            "description": "High-fidelity clinical reasoning engine combining 8 ancient healing traditions via neural synthesis",
             "applicationCategory": "HealthApplication",
             "operatingSystem": "Any",
             "inLanguage": ["en", "ja", "hi", "zh", "ko", "ar", "sa"],
             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
             "image": `${BASE_URL}/og-image.svg`,
-            "author": { "@type": "Organization", "name": "AyuraHealth", "url": BASE_URL },
+            "author": { "@type": "Organization", "name": "Ayura Intelligence", "url": BASE_URL },
           }
         ])}} />
       </head>

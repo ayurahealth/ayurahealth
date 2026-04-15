@@ -57,10 +57,10 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
   )
 
   const defaultLinks = links || [
-    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { label: 'Intelligence Suite', href: '/dashboard', icon: LayoutDashboard },
+    { label: 'Synergy Lab', href: '/diet', icon: Leaf },
+    { label: 'Intelligence Console', href: '/clinic', icon: Hospital },
     { label: 'Pricing', href: '/pricing', icon: CreditCard },
-    { label: 'Clinic Portal', href: '/clinic', icon: Hospital },
-    { label: 'Dietary Protocol', href: '/diet', icon: Leaf },
   ]
 
   useEffect(() => {

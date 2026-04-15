@@ -239,8 +239,8 @@ export async function POST(req: NextRequest) {
             : 'https://openrouter.ai/api/v1/chat/completions'
           const headers: Record<string, string> = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }
           if (routing.provider.name === 'OpenRouter') {
-            headers['HTTP-Referer'] = 'https://ayurahealth.com'
-            headers['X-Title'] = 'AyuraHealth VAIDYA'
+            headers['HTTP-Referer'] = 'https://ayura.ai'
+            headers['X-Title'] = 'Vaidya Intelligence — Ayura Intelligence Lab'
           }
           const result = await orchestrateAgents({
             userQuery,

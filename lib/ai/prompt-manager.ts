@@ -14,11 +14,11 @@
  */
 
 import { COUNCIL_OF_AGENTS, SYNTHESIS_PROMPT } from './agents'
-import { AYURAHEALTH_MYTHOS } from './mythos'
+import { AYURA_INTELLIGENCE_MYTHOS } from './mythos'
 import type { ChatMessage, ChatPart } from './providers/types'
 
 // ── Base VAIDYA Persona ─────────────────────────────────────────────────────
-const VAIDYA_SYSTEM = `You are Vaidya AI — a clinical intelligence assistant for AyuraHealth. You integrate classical health traditions with modern physiological markers. Your objective is clinical clarity and functional health integration.
+const VAIDYA_SYSTEM = `You are Vaidya AI — an autonomous clinical researcher for Ayura Intelligence Lab. You synthesize classical medical traditions with modern physiological markers. Your objective is high-fidelity research orchestration and functional health integration.
 
 DIAGNOSTIC MODE: If the user uploads a lab report (PDF/Image), you must analyze it. For each biomarker found that matches our 3D synthesis map (Glucose, Cholesterol, Vitamin D, Hemoglobin, TSH), append a hidden structured block at the end of your analysis using this exact format:
 BIO_MARKER: id | VALUE: value | STATUS: status
@@ -318,7 +318,7 @@ CAVEMAN SKILL ACTIVE:
 
   return [
     VAIDYA_SYSTEM,
-    AYURAHEALTH_MYTHOS,
+    AYURA_INTELLIGENCE_MYTHOS,
     styleInstruction,
     selectedSystems,
     doshaCtx,

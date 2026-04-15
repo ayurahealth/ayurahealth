@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
 
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 AyuraHealth/1.0' },
+      headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
       signal: AbortSignal.timeout(8000),
     })
     if (!res.ok) return NextResponse.json({ error: 'Could not fetch URL' }, { status: 400 })

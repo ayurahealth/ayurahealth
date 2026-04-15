@@ -15,7 +15,7 @@ export default function ConsentBanner() {
   }, [])
 
   const accept = () => {
-    localStorage.setItem('ayura_consent_v1', 'accepted')
+    localStorage.setItem('ayura_intel_consent_v1', 'accepted')
     setShow(false)
   }
 
@@ -51,7 +51,7 @@ export default function ConsentBanner() {
       
       <div style={{ flex: 1 }}>
         <p style={{ color: '#e8dfc8', fontSize: '0.85rem', lineHeight: 1.5, opacity: 0.8 }}>
-          By using AyuraHealth, you agree to our <Link href="/privacy" style={{ color: '#6abf8a', textDecoration: 'none', borderBottom: '1px solid rgba(106, 191, 138, 0.3)' }}>Privacy Policy</Link> and <Link href="/terms" style={{ color: '#6abf8a', textDecoration: 'none', borderBottom: '1px solid rgba(106, 191, 138, 0.3)' }}>Terms of Service</Link>. We use cookies to enhance your experience.
+          By using Ayura Intelligence, you agree to our <Link href="/privacy" style={{ color: 'var(--accent-main)', textDecoration: 'none', borderBottom: '1px solid hsla(var(--accent-main-hsl), 0.3)' }}>Privacy Policy</Link> and <Link href="/terms" style={{ color: 'var(--accent-main)', textDecoration: 'none', borderBottom: '1px solid hsla(var(--accent-main-hsl), 0.3)' }}>Terms of Service</Link>. We use cookies to enhance your experience.
         </p>
       </div>
 

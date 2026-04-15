@@ -15,7 +15,7 @@ export const ratelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.slidingWindow(20, "60 s"),
   analytics: true,
-  prefix: "@ayurahealth-ratelimit",
+  prefix: "@ayuraintelligence-ratelimit",
 })
 
 /**

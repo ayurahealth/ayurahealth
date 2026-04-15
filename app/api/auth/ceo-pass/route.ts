@@ -4,7 +4,7 @@ export const dynamic = 'force-static'
 
 
 /**
- * AyuraHealth CEO Frictionless Access
+ * Ayura Intelligence CEO Frictionless Access
  * Securely sets a cookie to bypass Clerk login for the owner/CEO.
  * USAGE: /api/auth/ceo-pass?key=YOUR_SECRET_KEY
  */

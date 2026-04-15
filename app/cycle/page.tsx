@@ -92,7 +92,7 @@ export default function CyclePage() {
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
           <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>🌿</span>
-            <span style={{ fontWeight: 700, letterSpacing: '0.05em', fontSize: '0.9rem' }}>AYURAHEALTH</span>
+            <span style={{ fontWeight: 700, letterSpacing: '0.05em', fontSize: '0.9rem' }}>AYURA INTELLIGENCE</span>
           </div>
           {user ? (
             <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Hi, {user.firstName}</div>

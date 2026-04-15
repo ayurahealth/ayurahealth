@@ -1,5 +1,5 @@
 /**
- * Structured Logger for AyuraHealth.
+ * Structured Logger for Ayura Intelligence Lab.
  * 
  * Outputs JSON-structured logs for observability.
  * In production, these can be consumed by Vercel Logs, Datadog, etc.

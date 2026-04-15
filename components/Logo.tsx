@@ -27,22 +27,23 @@ export default function Logo({ size = 36, showText = true, href = '/' }: LogoPro
     >
       <Image
         src="/favicon.svg"
-        alt="AyuraHealth"
+        alt="Ayura Intelligence"
         width={size}
         height={size}
         style={{ width: size, height: size, display: 'block', flexShrink: 0 }}
       />
       {showText && (
         <span style={{
-          fontFamily: '"Cormorant Garamond", Georgia, serif',
+          fontFamily: 'var(--font-display)',
           fontSize: `${Math.round(size * 0.42)}px`,
           fontWeight: 700,
           color: 'var(--accent-main)',
-          letterSpacing: '0.025em',
+          letterSpacing: '0.04em',
           lineHeight: 1,
           whiteSpace: 'nowrap',
+          textTransform: 'uppercase',
         }}>
-          AyuraHealth
+          AYURA Intelligence
         </span>
       )}
     </Link>

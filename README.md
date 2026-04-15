@@ -1,92 +1,68 @@
-# AyuraHealth — Ancient Wisdom, Modern AI
+# Ayura Intelligence Lab — Neural Synthesis & Strategic Health
 
-AyuraHealth is a personal holistic health companion that combines **Ayurveda, Traditional Chinese Medicine (TCM), and 6 other healing traditions** with modern NVIDIA-powered AI to provide personalized wellness guidance.
+Ayura Intelligence is a high-performance clinical synthesis platform that combines **traditional medical reasoning (8 traditions)** with deep-reasoning neural architectures to provide institutional-grade health synthesis.
 
-![AyuraHealth Logo](./public/favicon.svg)
+![Ayura Intelligence Mark](./public/favicon.svg)
 
-## 🌟 Key Features
+## 🌟 Strategic Features
 
-- **Dosha Quiz**: Discover your Ayurvedic mind-body type in minutes.
-- **Multilingual Support**: Available in English, Hindi, Japanese, Arabic, and more.
-- **8 Healing Traditions**: Integrates Ayurveda, TCM, Tibetan, Unani, Siddha, Homeopathy, Naturopathy, and Western Medicine.
-- **Privacy-First**: Health data stays in your browser's local storage.
-- **Razorpay Integration**: Seamless premium subscriptions with regional (INR) support.
+- **Intelligence Console**: Centralized management for institutional health synthesis.
+- **Neural Reasoning Trace**: Deep-reasoning transparency for traditional medical citations.
+- **8 Classical Traditions**: Synthesized logic from Ayurveda, TCM, Tibetan, Unani, Siddha, Homeopathy, Naturopathy, and Western Functional Medicine.
+- **Data Sovereignty**: Privacy-first edge processing where sensitive health data remains under institutional control.
+- **Intelligence Suite**: Multilingual orchestration in 50+ languages.
 
 ## 🛠 Tech Stack
 
 - **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS + Framer Motion (Rich UI/UX)
+- **Styling**: Vanilla CSS (High-Performance Design System) + Framer Motion
 - **Authentication**: [Clerk](https://clerk.com/)
 - **Database**: [Prisma](https://www.prisma.io/) + Supabase
-- **Payments**: [Razorpay](https://razorpay.com/)
-- **AI**: NVIDIA Nemotron via Groq/OpenRouter
+- **Billing**: Razorpay & Stripe
+- **AI**: NVIDIA Nemotron & Llama 4 Scout via Groq/OpenRouter
 - **Deployment**: [Vercel](https://vercel.com/)
 
-## 🚀 Getting Started
+## 🚀 Deployment Protocol
 
 ### Prerequisites
 
-- Node.js 22.0.0+ (Mandatory for Capacitor 8 & Native builds)
-- A Razorpay account
-- A Clerk project
-- A Prisma-supported database (Supabase recommended)
+- **Node.js 22.0.0+** (Mandatory for Capacitor 8 & Neural pipeline architecture)
+- Professional credentials for Razorpay/Stripe, Clerk, and AI orchestration providers.
 
 ### Installation
 
-1. **Clone the repository**:
+1. **Initialize Environment**:
    ```bash
-   git clone https://github.com/ayurahealth/ayurahealth.git
-   cd ayurahealth
+   git clone https://github.com/ayuraintelligence/lab.git
+   cd ayuraintelligence
    ```
 
-2. **Install dependencies**:
+2. **Sync Dependencies**:
    ```bash
-   npm install
+   npm install --legacy-peer-deps
    ```
 
-3. **Set up Environment Variables**:
-   Create a `.env.local` file with the following:
-   ```env
-   # Database
-   DATABASE_URL="your_prisma_db_url"
+3. **Neural Activation**:
+   Initialize your `.env.local` with the required institutional keys.
 
-   # Clerk
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
-   CLERK_SECRET_KEY=...
-
-   # Razorpay
-   RAZORPAY_KEY_ID=...
-   RAZORPAY_KEY_SECRET=...
-
-   # AI APIs
-   GROQ_API_KEY=...
-   OPENROUTER_API_KEY=...
-   ```
-
-4. **Initialize Database**:
+4. **Initialize Intelligence Core**:
    ```bash
    npx prisma generate
-   npx prisma db push
-   ```
-
-5. **Run the Development Server**:
-   ```bash
    npm run dev
    ```
 
-## 🔒 Security & Privacy
+## 🔒 Security & Integrity
 
-AyuraHealth implements industry-standard security practices:
-- **Rate Limiting**: Protected API endpoints to prevent abuse.
-- **Signature Verification**: HMAC validation for all payment webhooks.
-- **Audit Logs**: Regular security and deployment audits.
-- **No-Tracking**: No invasive tracking cookies or 3rd party advertising networks.
+Ayura Intelligence Lab implements extreme architectural security:
+- **Rate Limiting & Auth Guard**: Protected API endpoints to ensure system integrity.
+- **Signature Verification**: HMAC-SHA256 validation for all billing webhooks.
+- **Neural Transparency**: CITATION-Gated responses to ensure medical logic traceability.
 
-## 🌐 Deploy on Vercel
+## 🌐 Institutional Deployment
 
-The production version is hosted on Vercel. Automatic deployments are enabled via GitHub Actions.
+The production version is orchestrated on Vercel. Continuous deployment pipelines are hardened for the `deploy/production-gold` branch.
 
 ---
 
-© 2026 AyuraHealth · Tokyo, Japan
+© 2026 Ayura Intelligence Lab · Tokyo, Japan

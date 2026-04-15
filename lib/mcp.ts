@@ -2,11 +2,11 @@ import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mc
 import { z } from 'zod'
 
 /**
- * AyuraHealth MCP Server Instance
- * Exposes 5,000 years of Ayurveda and TCM wisdom to external AI agents.
+ * Ayura Intelligence MCP Server Instance
+ * Exposes 5,000 years of Ayurveda and TCM wisdom to external AI researchers.
  */
 export const mcpServer = new McpServer({
-  name: 'AyuraHealth',
+  name: 'Ayura Intelligence',
   version: '1.0.0',
 })
 

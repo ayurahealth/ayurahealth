@@ -81,8 +81,8 @@ export default function ChatMessagesPanel({
       <div className="clinical-report-header" style={{ display: 'none' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h1 style={{ fontSize: '1.8rem', color: '#1a4d2e', margin: 0 }}>AyuraHealth Clinical Report</h1>
-            <p style={{ fontSize: '0.85rem', color: '#666' }}>Artificial Intelligence x Integrative Health Synthesis</p>
+            <h1 style={{ fontSize: '1.8rem', color: '#1a4d2e', margin: 0 }}>Ayura Intelligence — Synthesis Report</h1>
+            <p style={{ fontSize: '0.85rem', color: '#666' }}>Artificial Intelligence x Integrative Health Synthesis Lab</p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <p style={{ fontWeight: 600, margin: 0 }}>Date: {currentDate}</p>
@@ -104,8 +104,8 @@ export default function ChatMessagesPanel({
             <p style={{ fontSize: '0.85rem' }}>{conditions.length > 0 ? conditions.join(', ') : 'None Reported'}</p>
           </div>
           <div>
-            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '0.25rem' }}>Consultation Mode</p>
-            <p style={{ fontSize: '0.85rem' }}>Vaidya AI Neural Synthesis</p>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '0.25rem' }}>Synthesis Mode</p>
+            <p style={{ fontSize: '0.85rem' }}>Ayura Intelligence Neural Synthesis</p>
           </div>
         </div>
       </div>
@@ -150,8 +150,8 @@ export default function ChatMessagesPanel({
             transition={{ delay: 0.5 }}
             style={{ marginTop: '1rem' }}
           >
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--accent-secondary)', fontWeight: 500 }}>VAIDYA is ready.</p>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Describe a health observation or ask about traditional protocols.</p>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--accent-secondary)', fontWeight: 500 }}>Neural Link Active.</p>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Initialize a new clinical observation or synthesis request.</p>
           </motion.div>
         </div>
       )}
@@ -265,7 +265,7 @@ export default function ChatMessagesPanel({
       
       {/* Print-only Clinical Footer */}
       <div className="clinical-footer" style={{ display: 'none' }}>
-        <p>© 2026 AyuraHealth AI Intelligence Unit. This document was generated autonomously by VAIDYA. AyuraHealth provides educational information for wellness purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Verified by AyuraHealth Neural Compliance Engine.</p>
+        <p>© 2026 Ayura Intelligence Lab. This synthesis report was generated autonomously by Vaidya Intelligence. Information provided is for educational and research purposes only and does not constitute medical advice or substitute for professional clinical judgment. Verified by Ayura Neural Integrity Framework.</p>
       </div>
     </div>
   )

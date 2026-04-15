@@ -1,5 +1,6 @@
 /**
- * Input Sanitizer — Security module for AyuraHealth.
+ * Input Sanitizer — Security module for Ayura Intelligence Lab.
+准确
  * 
  * Protects against:
  * - Prompt injection attacks

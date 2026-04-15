@@ -1,39 +1,40 @@
-# AyuraHealth Deployment & Implementation Guide
+# Ayura Intelligence Lab Deployment & Implementation Guide
 
 **Current Status:** Ready for Production Deployment  
-**Date:** March 29, 2026  
-**Version:** 1.0
+**Date:** April 15, 2026  
+**Version:** 2.0 (Rebranded)
 
 ---
 
 ## 📋 Executive Summary
 
-AyuraHealth is a premium AI wellness platform with integrated payment processing (Stripe & Razorpay). The application has been security-hardened and is ready for production deployment.
+Ayura Intelligence Lab is a premium institutional AI wellness platform with integrated payment orchestration (Razorpay). The application has been security-hardened and is ready for institutional-grade production deployment.
 
 **Key Achievements:**
-- ✅ Fixed build issues (Next.js 15 downgrade)
+- ✅ Fixed build issues (Next.js 15 sync)
 - ✅ Secured all API endpoints (backend authentication)
 - ✅ Removed all console logs (no error exposure)
 - ✅ Fixed npm vulnerabilities (0 remaining)
 - ✅ Implemented security headers
-- ✅ Created professional branding with leaf logo
+- ✅ Created institutional branding with golden leaf logo
 - ✅ Comprehensive payment flow validation
+- ✅ Domain synchronized to ayura.ai
 
 ---
 
 ## 🚀 Deployment Instructions
 
-### Option 1: Use Last Working Deployment (Recommended)
+### Option 1: Institutional Production URL (Recommended)
 
-**Live URL:** `https://ayurahealth-2ivf55vyv-abhishek0333xs-projects.vercel.app`
+**Production URL:** `https://ayura.ai`
 
-This deployment is fully functional with all payment features working. You can use this immediately while we resolve the Vercel build issues.
+This deployment is the final institutional version with all payment features synchronized to the ayura.ai domain.
 
 ### Option 2: Deploy Fresh Build
 
 **Prerequisites:**
-- Node.js 18+ installed
-- Next.js 15 (already configured)
+- Node.js 22+ installed
+- Next.js 15 (synchronized)
 - Vercel account with project linked
 - Environment variables configured
 
@@ -41,9 +42,8 @@ This deployment is fully functional with all payment features working. You can u
 
 1. **Push to GitHub:**
 ```bash
-cd /home/ubuntu/ayurahealth
 git add -A
-git commit -m "🚀 Production deployment"
+git commit -m "🚀 Institutional Production Deployment"
 git push origin main
 ```
 
@@ -65,29 +65,22 @@ vercel deploy --prod --yes
 Create a `.env.local` file or configure in Vercel dashboard:
 
 ```env
-# Stripe Configuration
-STRIPE_SECRET_KEY=sk_live_YOUR_STRIPE_SECRET_KEY
-NEXT_PUBLIC_STRIPE_PUBLIC_KEY=pk_live_YOUR_STRIPE_PUBLIC_KEY
-
 # Razorpay Configuration
 NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_YOUR_RAZORPAY_KEY_ID
 RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_KEY_SECRET
 
 # Application URLs
-NEXT_PUBLIC_APP_URL=https://ayurahealth.vercel.app
+NEXT_PUBLIC_APP_URL=https://ayura.ai
 
-# Clerk Authentication (if using)
+# Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_CLERK_KEY
 CLERK_SECRET_KEY=YOUR_CLERK_SECRET
-
-# Analytics (optional)
-NEXT_PUBLIC_ANALYTICS_ID=YOUR_ANALYTICS_ID
 ```
 
 ### How to Configure in Vercel
 
 1. Go to Vercel Dashboard
-2. Select "AyuraHealth" project
+2. Select "Ayura Intelligence Lab" project
 3. Click "Settings" → "Environment Variables"
 4. Add each variable above
 5. Click "Save"
@@ -97,25 +90,6 @@ NEXT_PUBLIC_ANALYTICS_ID=YOUR_ANALYTICS_ID
 
 ## 💳 Payment Gateway Setup
 
-### Stripe Configuration
-
-1. **Get API Keys:**
-   - Log in to Stripe Dashboard
-   - Navigate to Developers → API Keys
-   - Copy "Secret Key" (starts with `sk_live_`)
-   - Copy "Publishable Key" (starts with `pk_live_`)
-
-2. **Configure Webhook (Optional but Recommended):**
-   - Go to Developers → Webhooks
-   - Click "Add Endpoint"
-   - URL: `https://yourdomain.com/api/webhooks/stripe`
-   - Events to listen: `checkout.session.completed`, `charge.refunded`
-   - Copy Signing Secret
-
-3. **Test Mode:**
-   - Use `sk_test_*` and `pk_test_*` for testing
-   - Use `sk_live_*` and `pk_live_*` for production
-
 ### Razorpay Configuration
 
 1. **Get API Keys:**
@@ -123,15 +97,15 @@ NEXT_PUBLIC_ANALYTICS_ID=YOUR_ANALYTICS_ID
    - Go to Settings → API Keys
    - Copy "Key ID" and "Key Secret"
 
-2. **Configure Webhook (Optional but Recommended):**
+2. **Configure Webhook (Recommended):**
    - Go to Settings → Webhooks
    - Click "Add New Webhook"
-   - URL: `https://yourdomain.com/api/webhooks/razorpay`
+   - URL: `https://ayura.ai/api/webhooks/razorpay`
    - Events: `payment.authorized`, `payment.failed`
 
 3. **Test Mode:**
-   - Use test credentials from Razorpay dashboard
-   - Switch to live mode when ready
+   - Use test credentials from Razorpay dashboard for staging
+   - Switch to live mode for ayura.ai production
 
 ---
 
@@ -139,7 +113,6 @@ NEXT_PUBLIC_ANALYTICS_ID=YOUR_ANALYTICS_ID
 
 ### 1. Local Testing
 ```bash
-cd /home/ubuntu/ayurahealth
 npm install
 npm run build
 npm run start
@@ -147,7 +120,6 @@ npm run start
 
 ### 2. Payment Flow Testing
 Follow the comprehensive testing guide in `PAYMENT_FLOW_TEST.md`:
-- Test successful Stripe payment
 - Test successful Razorpay payment
 - Test failed payment scenarios
 - Test security measures
@@ -159,6 +131,7 @@ Review `SECURITY_AUDIT.md` for:
 - ✅ No API keys hardcoded
 - ✅ Security headers configured
 - ✅ Backend authentication implemented
+- ✅ Institutional CORS whitelist (ayura.ai)
 
 ---
 
@@ -171,83 +144,28 @@ Review `SECURITY_AUDIT.md` for:
 - Monitor: Build times, deployment status, error rates
 
 **Payment Monitoring:**
-- Stripe Dashboard: https://dashboard.stripe.com
 - Razorpay Dashboard: https://dashboard.razorpay.com
 - Monitor: Transaction volume, success rates, failed payments
 
 ### Error Tracking (Recommended)
 
-Implement one of these services for production:
-- **Sentry:** https://sentry.io
-- **LogRocket:** https://logrocket.com
-- **Datadog:** https://www.datadoghq.com
-
-### Logging Strategy
-
-Since console logs are disabled for security:
-1. Use server-side logging service (Sentry/LogRocket)
-2. Log to file system with rotation
-3. Monitor error rates and patterns
-4. Set up alerts for critical errors
+Implement for production:
+- **LogRocket:** https://logrocket.com (Synchronized)
 
 ---
 
 ## 🎯 Post-Deployment Checklist
 
 ### Immediate (Day 1)
-- [ ] Verify deployment successful
+- [ ] Verify deployment successful at ayura.ai
 - [ ] Test payment flows in production
 - [ ] Monitor error rates
 - [ ] Verify no console errors
-- [ ] Check security headers
 
 ### Week 1
 - [ ] Monitor payment success rates
 - [ ] Check customer feedback
-- [ ] Verify subscription activations
-- [ ] Monitor server performance
-- [ ] Review security logs
-
-### Month 1
-- [ ] Analyze payment metrics
-- [ ] Review customer support tickets
-- [ ] Optimize performance
-- [ ] Plan next features
-- [ ] Security audit
-
----
-
-## 🔄 Continuous Deployment
-
-### GitHub Actions Setup (Recommended)
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to Vercel
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: vercel/action@master
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-```
-
-### Manual Deployment
-
-Push to main branch and Vercel auto-deploys:
-```bash
-git push origin main
-```
+- [ ] Verify institutional domain synchronization
 
 ---
 
@@ -259,81 +177,33 @@ git push origin main
 
 **Solution:**
 1. Check environment variables are set
-2. Verify Next.js version: `npm list next`
-3. Clear Vercel cache: Project Settings → Git → Clear Cache
-4. Redeploy
+2. Clear Vercel cache
+3. Redeploy
 
 ### Payment Processing Fails
 
 **Issue:** "Failed to create checkout session"
 
 **Solution:**
-1. Verify Stripe/Razorpay API keys in environment
-2. Check API key permissions
-3. Verify test vs. live mode
-4. Check payment gateway status page
-
-### No Errors Visible
-
-**Issue:** Can't debug because console logs removed
-
-**Solution:**
-1. Set up server-side logging (Sentry/LogRocket)
-2. Check Vercel deployment logs
-3. Monitor payment gateway dashboards
-4. Review security audit log
+1. Verify Razorpay API keys in environment
+2. Check CORS allowedOrigins in `app/api/razorpay/create-order/route.ts`
 
 ---
 
 ## 📞 Support Resources
 
-### Payment Gateway Support
-- **Stripe Support:** https://support.stripe.com
-- **Razorpay Support:** https://razorpay.com/support
-- **Vercel Support:** https://vercel.com/support
-
-### Documentation
-- **Next.js Docs:** https://nextjs.org/docs
-- **Stripe API Docs:** https://stripe.com/docs/api
-- **Razorpay API Docs:** https://razorpay.com/docs
-
 ### Emergency Contacts
-- **Security Issues:** security@ayurahealth.com
-- **Payment Issues:** payments@ayurahealth.com
-- **Technical Support:** support@ayurahealth.com
-
----
-
-## 📈 Success Metrics
-
-Track these metrics to measure success:
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Payment Success Rate | > 95% | TBD |
-| Average Response Time | < 2s | TBD |
-| Uptime | > 99.9% | TBD |
-| Error Rate | < 0.1% | TBD |
-| Customer Satisfaction | > 4.5/5 | TBD |
+- **Security Issues:** security@ayura.ai
+- **Payment Issues:** payments@ayura.ai
+- **Technical Support:** support@ayura.ai
 
 ---
 
 ## 🎓 Next Steps
 
-### Phase 1: Launch (Week 1)
-- Deploy to production
-- Monitor payment flows
-- Gather customer feedback
-
-### Phase 2: Optimize (Week 2-4)
-- Analyze payment metrics
-- Optimize performance
-- Improve user experience
-
-### Phase 3: Scale (Month 2+)
-- Add more payment methods
-- Implement advanced features
-- Scale infrastructure
+### Phase 1: Launch (Ayura AI Transition)
+- Deploy to ayura.ai
+- Gather institutional feedback
 
 ---
 
@@ -342,9 +212,9 @@ Track these metrics to measure success:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | Mar 29, 2026 | Initial deployment guide |
+| 2.0 | Apr 15, 2026 | Institutional Rebranding to Ayura Intelligence Lab |
 
 ---
 
-**Last Updated:** March 29, 2026  
-**Next Review:** April 29, 2026  
-**Maintained By:** AyuraHealth Team
+**Last Updated:** April 15, 2026  
+**Maintained By:** Ayura Intelligence Lab Team

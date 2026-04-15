@@ -1,17 +1,17 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
-  appId: 'com.ayurahealth.app',
-  appName: 'AyuraHealth',
+  appId: 'com.ayuraintelligence.app',
+  appName: 'Ayura Intelligence',
   webDir: 'out',
   server: {
-    url: 'https://ayurahealth.com',
+    url: 'https://ayura.ai',
     cleartext: false,
   },
   ios: {
     contentInset: 'always',
     scrollEnabled: true,
-    backgroundColor: '#05100a',
+    backgroundColor: '#010101',
     limitsNavigationsToAppBoundDomains: true,
   },
 }

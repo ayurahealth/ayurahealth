@@ -5,7 +5,7 @@
  * This helper ensures we use the absolute production URL when running as an app.
  */
 
-const PRODUCTION_URL = 'https://ayurahealth.com';
+const PRODUCTION_URL = 'https://ayura.ai';
 
 // Check if running in a native Capacitor environment
 const isNative = typeof window !== 'undefined' && (window as unknown as { Capacitor?: { isNative: boolean } }).Capacitor?.isNative;

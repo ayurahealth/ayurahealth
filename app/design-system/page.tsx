@@ -20,7 +20,7 @@ export default function DesignSystemPage() {
           <Logo size={34} showText={true} href="/" />
         </div>
         <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.1rem', marginBottom: '0.25rem' }}>Design System Preview</h1>
-        <p className="ios-muted" style={{ marginBottom: '1.2rem' }}>AyuraHealth iOS-inspired tokens and components</p>
+        <p className="ios-muted" style={{ marginBottom: '1.2rem' }}>Ayura Intelligence design tokens and high-performance components</p>
 
         <Surface style={{ padding: '1rem', marginBottom: '1rem' }}>
           <h2 style={{ marginBottom: '0.75rem', fontSize: '1rem' }}>Buttons</h2>

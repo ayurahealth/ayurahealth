@@ -1,96 +1,66 @@
-import Link from 'next/link'
-import Logo from '../../components/Logo'
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Safety & Scope — AyuraHealth',
-  description:
-    'Understand what AyuraHealth does and does not do. Educational wellness guidance only, with clear medical safety boundaries.',
-}
-
-const sections = [
-  {
-    title: '1) Platform Scope',
-    body: 'AyuraHealth provides educational wellness guidance inspired by Ayurveda, Traditional Chinese Medicine, and other traditional systems. It is designed for lifestyle education, habit support, and wellness awareness.',
-  },
-  {
-    title: '2) Not Medical Advice',
-    body: 'AyuraHealth does not provide diagnosis, treatment, prescriptions, or emergency care. Content is informational only and should not replace a licensed medical professional.',
-  },
-  {
-    title: '3) When to Seek Medical Care Immediately',
-    body: 'Call local emergency services or seek urgent care for chest pain, severe breathing issues, stroke symptoms, major bleeding, loss of consciousness, suicidal thoughts, severe allergic reaction, or any rapidly worsening condition.',
-  },
-  {
-    title: '4) Responsible Use',
-    body: 'Always verify recommendations with a qualified practitioner, especially if you are pregnant, breastfeeding, on medication, have chronic illness, or are planning major dietary/supplement changes.',
-  },
-  {
-    title: '5) Data and Privacy Boundary',
-    body: 'Do not upload national IDs, financial details, or unnecessary identifying information. Use only the minimum health information required for educational guidance.',
-  },
-]
+'use client'
+import React from 'react'
+import Nav from '../../components/Nav'
+import { motion } from 'framer-motion'
+import { ShieldCheck, Info, AlertTriangle, CheckCircle2 } from 'lucide-react'
 
 export default function SafetyPage() {
+  const boundaries = [
+    {
+      title: 'Neural Integrity Scope',
+      icon: ShieldCheck,
+      body: 'Ayura Intelligence provides high-fidelity research synthesis inspired by traditional medical systems. Our models are trained to extract technical logic from classical texts for educational awareness.',
+    },
+    {
+      title: 'Clinical Boundaries',
+      icon: Info,
+      body: 'The platform does not provide diagnosis, treatment, or clinical prescriptions. Ayura Intelligence is a synthesis engine, not a licensed medical professional.',
+    },
+    {
+      title: 'Verified Tracing',
+      icon: CheckCircle2,
+      body: 'Every intelligence output aims for citation accuracy. However, users must verify any synthesis with a qualified practitioner before implementation.',
+    },
+  ]
+
   return (
-    <main style={{ background: '#05100a', minHeight: '100vh', color: '#e8dfc8' }}>
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          padding: '0 1.2rem',
-          height: 58,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'rgba(5,16,10,0.94)',
-          borderBottom: '1px solid rgba(106,191,138,0.12)',
-          backdropFilter: 'blur(16px)',
-        }}
-      >
-        <Logo size={30} showText={true} href="/" />
-        <Link href="/" style={{ color: 'rgba(232,223,200,0.65)', textDecoration: 'none', fontSize: '0.84rem' }}>
-          Back to Home
-        </Link>
-      </nav>
+    <main style={{ minHeight: '100dvh', background: 'var(--bg-main)', color: 'var(--text-main)', position: 'relative' }}>
+      <Nav showLangPicker={false} />
 
-      <section style={{ maxWidth: 760, margin: '0 auto', padding: '3rem 1.25rem 4rem' }}>
-        <h1
-          style={{
-            fontFamily: '"Cormorant Garamond", serif',
-            fontWeight: 400,
-            fontSize: 'clamp(2rem, 5vw, 3rem)',
-            color: '#c9a84c',
-            marginBottom: '0.8rem',
-          }}
-        >
-          Safety & Scope
-        </h1>
-        <p style={{ color: 'rgba(232,223,200,0.62)', lineHeight: 1.75, marginBottom: '2rem' }}>
-          AyuraHealth is built for educational wellness support. This page explains clear boundaries so users can benefit safely and responsibly.
-        </p>
-
-        {sections.map((item) => (
-          <article
-            key={item.title}
-            style={{
-              marginBottom: '1rem',
-              padding: '1rem 1.1rem',
-              borderRadius: 14,
-              border: '1px solid rgba(106,191,138,0.14)',
-              background: 'rgba(255,255,255,0.02)',
-            }}
-          >
-            <h2 style={{ fontSize: '1rem', color: '#6abf8a', marginBottom: '0.45rem' }}>{item.title}</h2>
-            <p style={{ color: 'rgba(232,223,200,0.62)', lineHeight: 1.7 }}>{item.body}</p>
-          </article>
-        ))}
-
-        <div style={{ marginTop: '1.8rem', color: 'rgba(232,223,200,0.36)', fontSize: '0.84rem' }}>
-          Last updated: April 2026
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '10rem 1.5rem 6rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
+          <h1 style={{ fontSize: 'clamp(3rem, 6vw, 4rem)', fontWeight: 700, marginBottom: '1.5rem', letterSpacing: '-0.03em' }}>Safety & Neural Scope</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: 600, margin: '0 auto' }}>
+            Understanding the clinical boundaries of Ayura Intelligence Lab.
+          </p>
         </div>
-      </section>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '6rem' }}>
+          {boundaries.map((b, i) => (
+            <div key={i} style={{ border: '1px solid var(--border-low)', borderRadius: '24px', padding: '2.5rem', background: 'var(--surface-low)' }}>
+              <div style={{ color: 'var(--accent-main)', marginBottom: '1.5rem' }}>
+                <b.icon size={32} />
+              </div>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 600, marginBottom: '1rem' }}>{b.title}</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: 1.7 }}>{b.body}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: 'hsla(30, 80%, 50%, 0.05)', border: '1px solid hsla(30, 80%, 50%, 0.2)', borderRadius: '32px', padding: '4rem 3rem', textAlign: 'center' }}>
+          <div style={{ color: 'var(--accent-secondary)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+            <AlertTriangle size={48} />
+          </div>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>Clinical Synthesis Restriction</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: 1.7, maxWidth: 600, margin: '0 auto' }}>
+            Ayura Intelligence reports are intended for research curiosity and institutional analysis. If you are experiencing a medical emergency, please contact 911 (USA) or your local emergency response unit immediately.
+          </p>
+        </div>
+      </div>
+
+      <footer style={{ padding: '5rem 2rem', textAlign: 'center', borderTop: '1px solid var(--border-low)' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>© 2026 Ayura Intelligence Lab · Verified Clinical Scope</p>
+      </footer>
     </main>
   )
 }

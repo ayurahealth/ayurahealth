@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>AyuraHealth</string>
+	<string>Ayura Intelligence</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -27,13 +27,13 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>AyuraHealth uses camera access so you can attach report images for analysis.</string>
+	<string>Ayura Intelligence uses camera access so you can attach report images for autonomous analysis.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>AyuraHealth uses microphone access for voice consultation input.</string>
+	<string>Ayura Intelligence uses microphone access for neural voice consultation input.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>AyuraHealth saves generated health cards to your photo library when you choose to share them.</string>
+	<string>Ayura Intelligence saves generated synthesis reports to your photo library when you choose to export them.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>AyuraHealth uses photo library access so you can attach health report images.</string>
+	<string>Ayura Intelligence uses photo library access so you can attach clinical report images for processing.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -59,8 +59,8 @@
 	<true/>
 	<key>WKAppBoundDomains</key>
 	<array>
-		<string>ayurahealth.com</string>
-		<string>www.ayurahealth.com</string>
+		<string>ayura.ai</string>
+		<string>www.ayura.ai</string>
 	</array>
 </dict>
 </plist>

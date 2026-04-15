@@ -55,7 +55,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
@@ -87,5 +88,5 @@ jobs:
     steps:
       - name: Check Health API Readiness
         run: |
-          curl -fsSL --retry 3 https://ayurahealth.com/api/health > /tmp/health.json
+          curl -fsSL --retry 3 https://ayura.ai/api/health > /tmp/health.json
           grep -q '"status":"healthy"' /tmp/health.json || echo "Site degraded but reachable."

@@ -261,7 +261,7 @@ export default function PricingPage() {
             <Link key={label} href={`/${label.toLowerCase().replace(' ', '-')}`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '1rem', fontWeight: 500 }}>{label}</Link>
           ))}
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', opacity: 0.4 }}>© 2026 AyuraHealth Clinical Suite · Verified Professional Protocol</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', opacity: 0.4 }}>© 2026 Ayura Intelligence Lab · Verified Neural Protocol</p>
       </footer>
     </main>
   )

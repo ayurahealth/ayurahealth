@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 
 import VedicOraclePanel from '../../components/vedic/VedicOraclePanel'
-import { vaidyaVoice } from '@/lib/vaidyaVoice'
+import { vaidyaVoice as vaidyaIntelligenceVoice } from '@/lib/vaidyaVoice'
 import { getApiUrl } from '@/lib/constants'
 import { calculateHealthScores, loadProfile } from '@/lib/healthProfile'
 
@@ -97,7 +97,7 @@ interface SpeechRecognitionInstance extends EventTarget {
   abort: () => void;
 }
 
-const STORAGE_KEY = 'ayurahealth_v1'
+const STORAGE_KEY = 'ayuraintelligence_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
 const AI_PREF_KEY = 'ayura_ai_pref_v1'
@@ -164,14 +164,14 @@ function sanitizeFilePart(input: string): string {
 }
 
 function toWikiName(input: string): string {
-  return input.replace(/[^a-zA-Z0-9\s/-]+/g, '').trim() || 'AyuraHealth Note'
+  return input.replace(/[^a-zA-Z0-9\s/-]+/g, '').trim() || 'Ayura Intelligence Note'
 }
 
 export default function ChatPage() {
   return (
     <Suspense fallback={
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)', color: 'var(--text-muted)' }}>
-        <p>Initializing Vaidya Neural Link...</p>
+        <p>Initializing Vaidya Intelligence Link...</p>
       </div>
     }>
       <ChatPageContent />
@@ -572,7 +572,7 @@ function ChatPageContent() {
       canvas.toBlob(async (blob: Blob | null) => {
         if (!blob) { setIsSharing(false); return }
         const file = new File([blob], `my-${dosha.toLowerCase()}-dosha.png`, { type: 'image/png' })
-        const shareData = { title: `I am ${dosha} — AyuraHealth`, text: `I just discovered my Ayurvedic dosha is ${dosha} ${DOSHA_META[dosha].emoji}\n\nFind yours free → ayurahealth.com`, files: [file] }
+        const shareData = { title: `Neural Synthesis: ${dosha} — Ayura Intelligence`, text: `I just synthesized my traditional biological profile as ${dosha} ${DOSHA_META[dosha].emoji}\n\nInitialize Synthesis → ayura.ai`, files: [file] }
         if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
           await navigator.share(shareData); setShareSuccess(true); setTimeout(() => setShareSuccess(false), 3000)
         } else {
@@ -784,7 +784,7 @@ function ChatPageContent() {
 
   const speakText = useCallback((text: string) => {
     if (typeof window === 'undefined') return
-    vaidyaVoice.speak(text, () => setIsSpeaking(false))
+    vaidyaIntelligenceVoice.speak(text, () => setIsSpeaking(false))
     setIsSpeaking(true)
   }, [])
 
@@ -839,16 +839,16 @@ function ChatPageContent() {
       .map((n) => toWikiName(n.trim()))
       .filter(Boolean)
       .slice(0, 20)
-    const fileName = `Brain/${categorySlug}/AyuraHealth/ayurahealth-${datePart}-${timePart}-${doshaPart}${includeSources ? '-sources' : ''}.md`
-    const sessionWiki = toWikiName(`AyuraHealth ${datePart} ${timePart} ${dosha ?? 'General'}`)
-    const brainHome = 'Brain Home'
+    const fileName = `AyuraIntelligence/${categorySlug}/Session/intel-${datePart}-${timePart}-${doshaPart}${includeSources ? '-sources' : ''}.md`
+    const sessionWiki = toWikiName(`Ayura Intelligence ${datePart} ${timePart} ${dosha ?? 'General'}`)
+    const brainHome = 'Intelligence Home'
     const categoryHub = `${chosenCategory} Hub`
 
     const frontmatter = [
       '---',
       `title: "${sessionWiki}"`,
       `created: "${iso}"`,
-      `source: "AyuraHealth"`,
+      `source: "Ayura Intelligence"`,
       `dosha: "${dosha ?? 'unknown'}"`,
       `category: "${chosenCategory}"`,
       `systems: [${selectedSystems.map(s => `"${s}"`).join(', ')}]`,
@@ -856,7 +856,7 @@ function ChatPageContent() {
       `vedic_context_used: ${Boolean(vedicEnabled && vedicContext)}`,
       `message_count: ${exportMessages.length}`,
       `related_notes: [${relatedNotes.map((n) => `"${n}"`).join(', ')}]`,
-      'tags: ["ayurahealth","consultation","wellness-ai"]',
+      'tags: ["ayuraintelligence","synthesis","neural-ai"]',
       '---',
       '',
       `[[${brainHome}]]`,
@@ -901,13 +901,13 @@ function ChatPageContent() {
       '',
       '_Educational guidance only. Not medical advice._',
       '',
-      `Exported from https://ayurahealth.com at ${iso}`,
+      `Exported from https://ayura.ai at ${iso}`,
       '',
     ].join('\n')
 
     const markdown = `${frontmatter}${body}${footer}`
     const indexNote = [
-      '# AyuraHealth Index',
+      '# Ayura Intelligence Index',
       '',
       `- Latest consultation: [[${sessionWiki}]]`,
       `- Dosha: [[Dosha/${dosha ?? 'General'}]]`,
@@ -919,7 +919,7 @@ function ChatPageContent() {
     ].join('\n')
 
     const brainHomeNote = [
-      '# Brain Home',
+      '# Intelligence Home',
       '',
       '- Health: [[Health Hub]]',
       '- Business: [[Business Hub]]',
@@ -937,7 +937,7 @@ function ChatPageContent() {
       `# ${categoryHub}`,
       '',
       `- Latest imported session: [[${sessionWiki}]]`,
-      '- Source app: AyuraHealth',
+      '- Source app: Ayura Intelligence',
       `- Related notes: ${relatedNotes.length ? relatedNotes.map((n) => `[[${n}]]`).join(', ') : 'None added yet'}`,
       '',
       `Updated: ${iso}`,
@@ -961,7 +961,7 @@ function ChatPageContent() {
       const vaultParam = obsidianVault.trim() ? `&vault=${encodeURIComponent(obsidianVault.trim())}` : ''
       const brainHomeUrl = `obsidian://new?name=${encodeURIComponent(brainHome)}${vaultParam}&content=${encodeURIComponent(brainHomeNote)}`
       const categoryHubUrl = `obsidian://new?name=${encodeURIComponent(categoryHub)}${vaultParam}&content=${encodeURIComponent(categoryHubNote)}`
-      const indexUrl = `obsidian://new?name=${encodeURIComponent('AyuraHealth Index')}${vaultParam}&content=${encodeURIComponent(indexNote)}`
+      const indexUrl = `obsidian://new?name=${encodeURIComponent('Ayura Intelligence Index')}${vaultParam}&content=${encodeURIComponent(indexNote)}`
       const sessionUrl = `obsidian://new?name=${encodeURIComponent(sessionWiki)}${vaultParam}&content=${encodeURIComponent(markdown)}`
       window.location.href = brainHomeUrl
       setTimeout(() => {
@@ -990,18 +990,18 @@ function ChatPageContent() {
   const testObsidianConnection = useCallback(() => {
     const vaultParam = obsidianVault.trim() ? `&vault=${encodeURIComponent(obsidianVault.trim())}` : ''
     const testContent = [
-      '# AyuraHealth x Obsidian Connected',
+      '# Ayura Intelligence x Obsidian Connected',
       '',
       `Connected at: ${new Date().toISOString()}`,
       '',
       'If you can see this note, direct Obsidian linking is working.',
       '',
-      'Next: return to AyuraHealth chat and use "Send to Obsidian".',
+      'Next: return to Ayura Intelligence chat and use "Send to Obsidian".',
       '',
-      'Next: return to AyuraHealth chat and use "Send to Obsidian".',
+      'Next: return to Ayura Intelligence chat and use "Send to Obsidian".',
       '',
     ].join('\n')
-    const testUrl = `obsidian://new?name=${encodeURIComponent('AyuraHealth Connection Test')}${vaultParam}&content=${encodeURIComponent(testContent)}`
+    const testUrl = `obsidian://new?name=${encodeURIComponent('Ayura Intelligence Connection Test')}${vaultParam}&content=${encodeURIComponent(testContent)}`
     window.location.href = testUrl
     setObsidianSetupNote('Connection attempt sent to Obsidian. If no note appears, use "Download Markdown" and drag the file into your vault.')
   }, [obsidianVault])
@@ -1180,7 +1180,7 @@ function ChatPageContent() {
                 <button
                   type="button"
                   onClick={() => {
-                    navigator.clipboard.writeText('1) Keep Obsidian app open\n2) In AyuraHealth click "Obsidian Export"\n3) Enter vault name exactly\n4) Click "Send to Obsidian"\n5) If blocked, click "Download Markdown" and drag file into vault')
+                    navigator.clipboard.writeText('1) Keep Obsidian app open\n2) In Ayura Intelligence click "Obsidian Export"\n3) Enter vault name exactly\n4) Click "Send to Obsidian"\n5) If blocked, click "Download Markdown" and drag file into vault')
                     setObsidianSetupNote('Setup steps copied to clipboard.')
                   }}
                   className="ios-chip"

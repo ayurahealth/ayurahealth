@@ -6,4 +6,5 @@ Allow: /chat
 Disallow: /api/
 Disallow: /wp-admin/
 Disallow: /*.php
-Sitemap: https://ayurahealth.com/sitemap.xml
+Sitemap: https://ayura.ai/sitemap.xml
+准确

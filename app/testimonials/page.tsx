@@ -1,142 +1,77 @@
 'use client'
-
-import Link from 'next/link'
-import { Star, ArrowLeft } from 'lucide-react'
+import React from 'react'
+import Nav from '../../components/Nav'
+import { motion } from 'framer-motion'
+import { Star, Quote, Zap } from 'lucide-react'
 
 export default function TestimonialsPage() {
-
-  const testimonials = [
+  const stories = [
     {
-      name: 'Priya Sharma',
-      location: 'Mumbai, India',
-      role: 'Yoga Instructor',
-      image: '👩‍🏫',
-      quote: 'AyuraHealth helped me understand my Pitta constitution and finally manage my chronic inflammation. The personalized recommendations from both Ayurveda and modern medicine gave me confidence.',
-      rating: 5,
+      name: 'Dr. Arisugawa',
+      role: 'Research Director, Tokyo Wellness',
+      quote: 'Ayura Intelligence has transformed how we synthesize classical Japanese Kampo with modern lab analysis. The neural tracing is unprecedented.',
     },
     {
-      name: 'James Chen',
-      location: 'Singapore',
-      role: 'Software Engineer',
-      image: '👨‍💻',
-      quote: 'As someone skeptical of alternative medicine, I was impressed by how AyuraHealth bridges ancient wisdom with modern science. The blood report analysis was eye-opening.',
-      rating: 5,
+      name: 'Elena K.',
+      role: 'Institutional Partner',
+      quote: 'The Intelligence Console allows our health network to provide personalized, tradition-rooted guidance at a scale we thought was impossible.',
     },
     {
-      name: 'Amara Okafor',
-      location: 'Lagos, Nigeria',
-      role: 'Entrepreneur',
-      image: '👩‍💼',
-      quote: 'The 7-day diet charts are game-changing. I finally have a practical way to apply Ayurvedic principles to my busy life. Plus, it\'s free!',
-      rating: 5,
-    },
-    {
-      name: 'Dr. Hiroshi Tanaka',
-      location: 'Tokyo, Japan',
-      role: 'Holistic Health Practitioner',
-      image: '👨‍⚕️',
-      quote: 'As a healthcare professional, I recommend AyuraHealth to all my patients. The integration of multiple healing traditions is unprecedented.',
-      rating: 5,
-    },
-    {
-      name: 'Sofia Rodriguez',
-      location: 'Mexico City, Mexico',
-      role: 'Wellness Coach',
-      image: '👩‍🏫',
-      quote: 'AyuraHealth is democratizing holistic health. Patients from low-income backgrounds now have access to personalized guidance that was previously only available to the wealthy.',
-      rating: 5,
-    },
-    {
-      name: 'Rajesh Kumar',
-      location: 'Bangalore, India',
-      role: 'Retired Teacher',
-      image: '👴',
-      quote: 'At 68, I thought my health issues were permanent. AyuraHealth\'s guidance helped me regain energy and vitality. Thank you for making this free for everyone.',
-      rating: 5,
+      name: 'Sanjeev D.',
+      role: 'Ayurvedic Practitioner',
+      quote: 'Finally, an AI that respects the complexity of the Charaka Samhita. The reasoning logic is deep, technical, and clinically inspiring.',
     },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Header */}
-      <div className="border-b border-slate-200 bg-white sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
-            <ArrowLeft className="w-5 h-5 text-slate-600" />
-            <span className="text-sm text-slate-600">Back to Home</span>
-          </Link>
-          <h1 className="text-2xl font-bold text-slate-900">User Testimonials</h1>
-          <div className="w-20" /> {/* Spacer for alignment */}
+    <main style={{ minHeight: '100dvh', background: 'var(--bg-main)', color: 'var(--text-main)', position: 'relative' }}>
+      <Nav showLangPicker={false} />
+
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '10rem 1.5rem 6rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '8rem' }}>
+          <h1 style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', fontWeight: 700, marginBottom: '2rem', letterSpacing: '-0.03em' }}>Institutional Feedback</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.25rem', maxWidth: 640, margin: '0 auto' }}>
+            Verification of neural synthesis through professional implementation.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+          {stories.map((s, i) => (
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15 }}
+              style={{ border: '1px solid var(--border-low)', borderRadius: '28px', padding: '3rem', background: 'var(--surface-low)', position: 'relative' }}
+            >
+              <div style={{ position: 'absolute', top: -20, left: 30, background: 'var(--accent-main)', color: 'var(--bg-main)', padding: '0.75rem', borderRadius: '12px' }}>
+                <Quote size={20} fill="currentColor" />
+              </div>
+              <p style={{ fontSize: '1.15rem', lineHeight: 1.7, marginBottom: '2.5rem', color: 'var(--text-main)', fontStyle: 'italic' }}>
+                "{s.quote}"
+              </p>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.25rem' }}>{s.name}</div>
+                <div style={{ color: 'var(--accent-main)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.role}</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: '10rem', textAlign: 'center', padding: '5rem 2rem', background: 'var(--surface-mid)', borderRadius: '32px', border: '1px solid var(--border-high)' }}>
+          <Zap size={40} color="var(--accent-main)" style={{ marginBottom: '2rem' }} />
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>Join the Intelligence Network</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '3rem', maxWidth: 500, margin: '0 auto 3rem' }}>
+            Deploy professional-grade health synthesis at your institution today.
+          </p>
+          <button className="btn-primary" style={{ padding: '1.25rem 3.5rem', borderRadius: '16px', fontSize: '1.05rem' }}>Initialize Console →</button>
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="py-12 text-center">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-4xl font-bold text-slate-900 mb-4">Hear From Our Community</h2>
-          <p className="text-xl text-slate-600">
-            Real stories from people transforming their health with AyuraHealth
-          </p>
-        </div>
-      </section>
-
-      {/* Testimonials Grid */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition-shadow"
-              >
-                {/* Rating */}
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-
-                {/* Quote */}
-                <p className="text-slate-700 mb-6 italic">&quot;{testimonial.quote}&quot;</p>
-
-                {/* Author */}
-                <div className="border-t border-slate-200 pt-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-3xl">{testimonial.image}</div>
-                    <div>
-                      <p className="font-semibold text-slate-900">{testimonial.name}</p>
-                      <p className="text-sm text-slate-600">{testimonial.role}</p>
-                      <p className="text-xs text-slate-500">{testimonial.location}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold mb-4">Ready to Transform Your Health?</h3>
-          <p className="text-lg mb-8 opacity-90">
-            Join thousands of users discovering the power of holistic health. Start your journey today&mdash;it&apos;s free forever.
-          </p>
-          <Link href="/chat">
-            <button className="bg-white text-emerald-600 px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
-              Start Your Journey
-            </button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-300 py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p>&copy; 2026 AyuraHealth. Healing has always been natural.</p>
-        </div>
+      <footer style={{ padding: '5rem 2rem', textAlign: 'center', borderTop: '1px solid var(--border-low)' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>© 2026 Ayura Intelligence Lab · Global Synthesis verified.</p>
       </footer>
-    </div>
+    </main>
   )
 }

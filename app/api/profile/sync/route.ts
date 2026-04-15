@@ -5,7 +5,7 @@ import { currentUser } from '@clerk/nextjs/server'
 export const dynamic = 'force-dynamic'
 
 /**
- * AYURAHEALTH CLINICAL MEMORY SYNC
+ * AYURA INTELLIGENCE CLINICAL MEMORY SYNC
  * Takes the local HealthProfile and persists it to UserProfile and UserMemory tables.
  */
 export async function POST(req: Request) {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       },
       create: {
         id: user.id,
-        email: user.emailAddresses?.[0]?.emailAddress || 'unknown@ayura.health',
+        email: user.emailAddresses?.[0]?.emailAddress || 'unknown@ayura.ai',
         conditions: profile.conditions || [],
         healthGoal: profile.goals?.[0] || undefined,
         subscriptionStatus: 'free'

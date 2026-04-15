@@ -102,7 +102,7 @@ export function CheckoutContent() {
               key: orderData.keyId,
               amount: orderData.amount,
               currency: orderData.currency,
-              name: 'AyuraHealth',
+              name: 'Ayura Intelligence Lab',
               description: `${info.name} Subscription`,
               image: `${window.location.origin}/og-image.svg`,
               order_id: orderData.orderId,
@@ -207,7 +207,7 @@ export function CheckoutContent() {
       }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
           <Logo size={48} showText={false} />
-          <span style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.35rem', fontWeight: 600, color: '#e8dfc8' }}>AyuraHealth</span>
+          <span style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.35rem', fontWeight: 600, color: '#e8dfc8' }}>Ayura Intelligence Lab</span>
         </Link>
         <Link href="/pricing" style={{ color: 'rgba(232,223,200,0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>← Back to Pricing</Link>
       </nav>

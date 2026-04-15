@@ -1,5 +1,5 @@
 /**
- * AYURAHEALTH BIOMARKER SYNTHESIS
+ * AYURA INTELLIGENCE BIOMARKER SYNTHESIS
  * Maps modern lab markers to Vedic Elemental (Pancha Bhuta) and Tissue (Dhatu) systems.
  */
 

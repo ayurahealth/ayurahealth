@@ -18,7 +18,7 @@ export interface HealthProfile {
   lastUpdated: number
 }
 
-const PROFILE_KEY = 'ayurahealth_profile_v1'
+const PROFILE_KEY = 'ayuraintelligence_profile_v1'
 
 export function loadProfile(): HealthProfile {
   try {
