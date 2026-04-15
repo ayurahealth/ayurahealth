@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/navigation'
+import Link from 'next/link'
 import Logo from '../../../components/Logo'
 import { motion } from 'framer-motion'
 import { Check, ArrowRight, Zap, Globe, Shield } from 'lucide-react'
