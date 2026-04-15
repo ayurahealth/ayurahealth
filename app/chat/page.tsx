@@ -1007,7 +1007,8 @@ function ChatPageContent() {
   }, [obsidianVault])
 
   // ── CEO Bypass Check ────────────────────────────────────────────────────────
-  const activeUser = user
+  const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
+  const activeUser = user || (isCeo ? { firstName: 'CEO', lastName: 'Owner', imageUrl: '/favicon.svg' } : null)
 
   // ── Lifecycle Guard ─────────────────────────────────────────────────────────
   if (!mounted) {
