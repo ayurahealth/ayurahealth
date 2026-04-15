@@ -212,7 +212,8 @@ function ChatPageContent() {
   const [isListening, setIsListening] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [thinkingDots, setThinkingDots] = useState('.')
-  const [savedState, setSavedState] = useState<SavedState | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [savedState, setSavedState] = useState<any | null>(null)
   const [showWelcomeBack, setShowWelcomeBack] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [selectedSource, setSelectedSource] = useState<ChatSource | null>(null)
@@ -314,7 +315,7 @@ function ChatPageContent() {
   const [obsidianIncludeSources, setObsidianIncludeSources] = useState(true)
   const [obsidianSelectedOnly, setObsidianSelectedOnly] = useState(false)
   const [obsidianSelectedCount, setObsidianSelectedCount] = useState(10)
-  const [obsidianCategory, setObsidianCategory] = useState<(typeof OBSIDIAN_CATEGORIES)[number]>('Health')
+  const [obsidianCategory, setObsidianCategory] = useState<string>('Health')
   const [obsidianRelatedNotes, setObsidianRelatedNotes] = useState('')
   const [obsidianSetupNote, setObsidianSetupNote] = useState('')
 
@@ -371,8 +372,8 @@ function ChatPageContent() {
       const raw = localStorage.getItem(OBSIDIAN_PREF_KEY)
       if (!raw) return
       const parsed = JSON.parse(raw) as { category?: string; relatedNotes?: string }
-      if (parsed.category && OBSIDIAN_CATEGORIES.includes(parsed.category as (typeof OBSIDIAN_CATEGORIES)[number])) {
-        setObsidianCategory(parsed.category as (typeof OBSIDIAN_CATEGORIES)[number])
+      if (parsed.category) {
+        setObsidianCategory(parsed.category)
       }
       if (typeof parsed.relatedNotes === 'string') {
         setObsidianRelatedNotes(parsed.relatedNotes)
@@ -415,7 +416,8 @@ function ChatPageContent() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (!raw) return
-      const s = JSON.parse(raw) as SavedState
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const s = JSON.parse(raw) as any
       if (Date.now() - s.savedAt < 7 * 24 * 60 * 60 * 1000) {
         setDosha(s.dosha)
         setMessages(s.messages)
@@ -448,7 +450,9 @@ function ChatPageContent() {
 
   useEffect(() => {
     if (incognito || messages.length === 0) return
-    saveState({ dosha, messages, selectedSystems, lang, savedAt: Date.now() })
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ dosha, messages, selectedSystems, lang, savedAt: Date.now() }))
+    }
   }, [messages, dosha, selectedSystems, lang, incognito])
 
   useEffect(() => {
@@ -459,10 +463,6 @@ function ChatPageContent() {
   }, [])
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, streaming])
-  useEffect(() => {
-    if (screen === 'result') setTimeout(() => setRevealed(true), 400)
-    else setRevealed(false)
-  }, [screen])
   useEffect(() => {
     if (!loading) return
     const interval = setInterval(() => setThinkingDots(d => d.length >= 3 ? '.' : d + '.'), 500)
@@ -560,7 +560,10 @@ function ChatPageContent() {
     setScreen('chat'); setShowWelcomeBack(false)
   }
 
-  const handleClearHistory = () => { clearState(); setMessages([]); setDosha(null); setShowClearConfirm(false); setScreen('landing') }
+  const handleClearHistory = () => {
+    if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEY)
+    setMessages([]); setDosha(null); setShowClearConfirm(false); setScreen('landing')
+  }
 
   const shareCard = async () => {
     if (!shareCardRef.current || !dosha) return
@@ -813,7 +816,7 @@ function ChatPageContent() {
     includeSources?: boolean
     selectedOnly?: boolean
     method?: 'download' | 'uri'
-    category?: (typeof OBSIDIAN_CATEGORIES)[number]
+    category?: string
     relatedNotes?: string
   }) => {
     if (messages.length === 0) return
@@ -1147,10 +1150,10 @@ function ChatPageContent() {
                 <span style={{ color: 'rgba(232,223,200,0.75)', fontSize: '0.76rem' }}>Brain category</span>
                 <select
                   value={obsidianCategory}
-                  onChange={(e) => setObsidianCategory(e.target.value as (typeof OBSIDIAN_CATEGORIES)[number])}
+                  onChange={(e) => setObsidianCategory(e.target.value)}
                   style={{ background: 'rgba(255,255,255,0.03)', color: '#e8dfc8', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.55rem 0.65rem' }}
                 >
-                  {OBSIDIAN_CATEGORIES.map((cat) => (
+                  {['Health', 'Research', 'Clinical', 'Personal'].map((cat) => (
                     <option key={cat} value={cat} style={{ background: '#0b1a11', color: '#e8dfc8' }}>
                       {cat}
                     </option>
@@ -1261,20 +1264,21 @@ function ChatPageContent() {
 
       {/* Welcome back */}
       {showWelcomeBack && savedState && (
-        <div style={{ position: 'fixed', top: 70, left: '50%', transform: 'translateX(-50%)', width: 'calc(100% - 2rem)', maxWidth: 480, background: 'rgba(10,25,15,0.95)', border: `1px solid ${savedState.dosha ? DOSHA_META[savedState.dosha].color + '50' : 'rgba(106,191,138,0.3)'}`, borderRadius: 20, padding: '1.25rem 1.25rem 1rem', backdropFilter: 'blur(20px)', boxShadow: '0 8px 40px rgba(0,0,0,0.5)', zIndex: 200, animation: 'slideDown 0.35s ease' }}>
+        <div style={{ position: 'fixed', top: 70, left: '50%', transform: 'translateX(-50%)', width: 'calc(100% - 2rem)', maxWidth: 480, background: 'rgba(10,25,15,0.95)', border: `1px solid ${savedState.dosha ? (DOSHA_META as Record<string, { color: string, emoji: string }>)[savedState.dosha].color + '50' : 'rgba(106,191,138,0.3)'}`, borderRadius: 20, padding: '1.25rem 1.25rem 1rem', backdropFilter: 'blur(20px)', boxShadow: '0 8px 40px rgba(0,0,0,0.5)', zIndex: 200, animation: 'slideDown 0.35s ease' }}>
           <button onClick={() => { setShowWelcomeBack(false); setSavedState(null) }} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', color: 'rgba(200,200,200,0.4)', fontSize: '1.2rem', cursor: 'pointer', lineHeight: 1 }}>×</button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-            <div style={{ fontSize: '2rem' }}>{savedState.dosha ? DOSHA_META[savedState.dosha].emoji : '🌿'}</div>
+            <div style={{ fontSize: '2rem' }}>{savedState.dosha ? (DOSHA_META as Record<string, { color: string, emoji: string }>)[savedState.dosha].emoji : '🌿'}</div>
             <div>
-              <div style={{ color: savedState.dosha ? DOSHA_META[savedState.dosha].color : '#6abf8a', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.1rem', fontWeight: 700 }}>Welcome back{savedState.dosha ? `, ${savedState.dosha} ✦` : '!'}</div>
+              <div style={{ color: savedState.dosha ? (DOSHA_META as Record<string, { color: string, emoji: string }>)[savedState.dosha].color : '#6abf8a', fontFamily: '"Cormorant Garamond", serif', fontSize: '1.1rem', fontWeight: 700 }}>Welcome back{savedState.dosha ? `, ${savedState.dosha} ✦` : '!'}</div>
               <div style={{ color: 'rgba(200,200,200,0.45)', fontSize: '0.75rem', marginTop: '0.1rem' }}>{savedState.messages.length - 1} messages · {timeAgo(savedState.savedAt)}</div>
             </div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '0.6rem 0.75rem', marginBottom: '0.75rem', fontSize: '0.8rem', color: 'rgba(200,200,200,0.5)', fontStyle: 'italic', lineHeight: 1.5, borderLeft: `2px solid ${savedState.dosha ? DOSHA_META[savedState.dosha].color + '40' : 'rgba(106,191,138,0.3)'}` }}>
-            &quot;{savedState.messages.filter(m => m.role === 'user').slice(-1)[0]?.content?.substring(0, 80) || 'Your consultation'}&quot;...
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '0.6rem 0.75rem', marginBottom: '0.75rem', fontSize: '0.8rem', color: 'rgba(200,200,200,0.5)', fontStyle: 'italic', lineHeight: 1.5, borderLeft: `2px solid ${savedState.dosha ? (DOSHA_META as Record<string, { color: string, emoji: string }>)[savedState.dosha].color + '40' : 'rgba(106,191,138,0.3)'}` }}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            &quot;{savedState.messages.filter((m: any) => m.role === 'user').slice(-1)[0]?.content?.substring(0, 80) || 'Your consultation'}&quot;...
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button onClick={resumeSession} style={{ flex: 1, padding: '0.65rem', background: savedState.dosha ? `${DOSHA_META[savedState.dosha].color}20` : 'rgba(106,191,138,0.15)', border: `1px solid ${savedState.dosha ? DOSHA_META[savedState.dosha].color + '40' : 'rgba(106,191,138,0.3)'}`, borderRadius: 12, color: savedState.dosha ? DOSHA_META[savedState.dosha].color : '#6abf8a', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Continue →</button>
+            <button onClick={resumeSession} style={{ flex: 1, padding: '0.65rem', background: savedState.dosha ? `${(DOSHA_META as Record<string, { color: string, emoji: string }>)[savedState.dosha].color}20` : 'rgba(106,191,138,0.15)', border: `1px solid ${savedState.dosha ? (DOSHA_META as Record<string, { color: string, emoji: string }>)[savedState.dosha].color + '40' : 'rgba(106,191,138,0.3)'}`, borderRadius: 12, color: savedState.dosha ? (DOSHA_META as Record<string, { color: string, emoji: string }>)[savedState.dosha].color : '#6abf8a', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Continue →</button>
             <button onClick={() => { setShowWelcomeBack(false); setSavedState(null) }} style={{ padding: '0.65rem 1rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: 'rgba(200,200,200,0.4)', fontSize: '0.85rem', cursor: 'pointer' }}>Start fresh</button>
           </div>
         </div>
@@ -1540,7 +1544,7 @@ function ChatPageContent() {
             <Logo size={24} showText={true} href="/" />
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ display: 'none', md: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }} className="hidden md:flex">
                 <ShieldCheck size={14} style={{ color: 'var(--accent-main)' }} />
                 <span style={{ fontSize: '0.7rem', color: 'var(--accent-secondary)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Clinical Synthesis Active</span>
               </div>
@@ -1740,8 +1744,8 @@ function ChatPageContent() {
                 onSelectSource={setSelectedSource}
                 messagesEndRef={messagesEndRef}
                 userName={user?.firstName || undefined}
-                primaryDosha={dbProfile?.primaryDosha || dosha || undefined}
-                conditions={dbProfile?.conditions || undefined}
+                primaryDosha={(dbProfile?.primaryDosha as string) || (dosha as string) || undefined}
+                conditions={(dbProfile?.conditions as string[]) || undefined}
               />
 
           {/* Input area */}

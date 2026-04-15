@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Activity, Beaker, BookOpen, BarChart2, Zap } from 'lucide-react'
@@ -98,7 +99,7 @@ export default function ClinicalMarkdown({
           ),
           li: ({ children, ...props }) => {
             // Check if it's an unordered list item
-            const isBullet = (React.isValidElement(children) && (children.props as { ordered?: boolean }).ordered === false) || !props.index
+            const isBullet = (React.isValidElement(children) && (children.props as { ordered?: boolean }).ordered === false) || !('index' in props && props.index)
             if (isBullet) {
               return (
                 <li style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>
