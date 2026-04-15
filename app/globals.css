@@ -186,6 +186,34 @@ input:focus, textarea:focus {
 
 @media (max-width: 768px) {
   .ds-container { padding: 0 1rem; }
+  .chat-sidebar-desktop { display: none !important; }
+}
+
+/* ── Mobile Scrolling Hardware Acceleration ── */
+.native-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+}
+
+.ios-surface {
+  background: var(--surface-low);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-low);
+}
+
+.chat-main {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 }
 
 /* ── Clinical Print Protocol — @media print ── */

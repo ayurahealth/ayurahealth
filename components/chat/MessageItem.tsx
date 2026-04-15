@@ -9,8 +9,7 @@ import {
   VolumeX, 
   ExternalLink,
   CheckCircle2,
-  AlertCircle,
-  Info
+  AlertCircle
 } from 'lucide-react'
 import { traditionIcons } from '../TraditionIcons'
 import ClinicalMarkdown from '../ui/ClinicalMarkdown'
@@ -55,7 +54,6 @@ interface MessageItemProps {
 export default function MessageItem({
   msg,
   doshaColor,
-  renderMarkdown,
   voiceSupported,
   isSpeaking,
   onSpeakText,

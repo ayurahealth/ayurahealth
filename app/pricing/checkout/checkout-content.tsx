@@ -37,7 +37,7 @@ export function CheckoutContent() {
   const [isCapacitor, setIsCapacitor] = useState(false)
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).Capacitor) {
+    if (typeof window !== 'undefined' && (window as unknown as { Capacitor?: unknown }).Capacitor) {
       setIsCapacitor(true)
     }
   }, [])

@@ -8,7 +8,7 @@
 const PRODUCTION_URL = 'https://ayurahealth.com';
 
 // Check if running in a native Capacitor environment
-const isNative = typeof window !== 'undefined' && (window as any).Capacitor?.isNative;
+const isNative = typeof window !== 'undefined' && (window as unknown as { Capacitor?: { isNative: boolean } }).Capacitor?.isNative;
 
 export const API_BASE_URL = isNative ? PRODUCTION_URL : '';
 

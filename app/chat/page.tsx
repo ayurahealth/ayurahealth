@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useSafeClerk as useClerk, useSafeUser as useUser } from '@/lib/clerk-client'
 import { t, type Lang } from '@/lib/translations'
 import { motion } from 'framer-motion'
@@ -11,13 +11,7 @@ import ChatComposer from '../../components/chat/ChatComposer'
 import ChatMessagesPanel from '../../components/chat/ChatMessagesPanel'
 import { 
   ShieldCheck, 
-  Sparkles, 
   Brain, 
-  Activity, 
-  History, 
-  Settings, 
-  Share2, 
-  Maximize2,
   Globe
 } from 'lucide-react'
 
@@ -57,7 +51,6 @@ interface Attachment {
 type Dosha = 'Vata' | 'Pitta' | 'Kapha'
 type Screen = 'landing' | 'welcome' | 'quiz' | 'result' | 'chat'
 type ModelPreference = 'auto' | 'claude' | 'gpt' | 'gemini' | 'deepseek' | 'mistral' | 'llama' | 'groq'
-type ThemeName = 'green' | 'gold' | 'forest' | 'ocean' | 'plum' | 'sunset' | 'slate' | 'rose'
 interface ChatSource {
   title: string
   content: string
@@ -107,26 +100,7 @@ interface SpeechRecognitionInstance extends EventTarget {
 const STORAGE_KEY = 'ayurahealth_v1'
 const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
-const THEME_PREF_KEY = 'ayura_theme_pref_v1'
 const AI_PREF_KEY = 'ayura_ai_pref_v1'
-const OBSIDIAN_CATEGORIES = ['Health', 'Business', 'Research', 'Ideas', 'Personal'] as const
-const THEME_OPTIONS: Array<{ id: ThemeName; label: string }> = [
-  { id: 'green', label: 'Dark Mode' },
-  { id: 'gold', label: 'Light Mode' },
-  { id: 'forest', label: 'Clinical' },
-]
-interface SavedState { dosha: Dosha | null; messages: Message[]; selectedSystems: string[]; lang: Lang; savedAt: number; userName?: string }
-function loadState(): SavedState | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as SavedState
-    if (Date.now() - parsed.savedAt > 7 * 24 * 60 * 60 * 1000) { localStorage.removeItem(STORAGE_KEY); return null }
-    return parsed
-  } catch { return null }
-}
-function saveState(s: SavedState) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)) } catch {} }
-function clearState() { try { localStorage.removeItem(STORAGE_KEY) } catch {} }
 
 const DOSHA_META = {
   Vata:  { emoji: '🌬️', color: 'var(--accent-main)', glow: 'hsla(var(--accent-main-hsl), 0.2)', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'vata_tagline', descKey: 'vata_desc', strengthsKey: 'vata_strengths', watchKey: 'vata_watch' },
@@ -194,6 +168,18 @@ function toWikiName(input: string): string {
 }
 
 export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)', color: 'var(--text-muted)' }}>
+        <p>Initializing Vaidya Neural Link...</p>
+      </div>
+    }>
+      <ChatPageContent />
+    </Suspense>
+  )
+}
+
+function ChatPageContent() {
   const { user, isLoaded: clerkLoaded } = useUser()
   const clerk = useClerk()
   
@@ -217,15 +203,12 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [sessionGuid, setSessionGuid] = useState('')
-  const [dbProfile, setDbProfile] = useState<any>(null)
+  const [dbProfile, setDbProfile] = useState<Record<string, unknown> | null>(null)
 
-  const { locale } = useSearchParams() as unknown as { locale?: string }
   const [loading, setLoading] = useState(false)
   const [streaming, setStreaming] = useState('')
   const [selectedSystems, setSelectedSystems] = useState(['ayurveda'])
   const [incognito] = useState(false)
-  const [revealed, setRevealed] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [thinkingDots, setThinkingDots] = useState('.')
@@ -238,26 +221,11 @@ export default function ChatPage() {
   const [labResults, setLabResults] = useState<Array<{ id: string; value: string; status: 'optimal' | 'low' | 'high' }>>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [attachLoading, setAttachLoading] = useState(false)
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
   const [showObsidianModal, setShowObsidianModal] = useState(false)
-  const [theme, setTheme] = useState<ThemeName>(() => {
-    if (typeof window === 'undefined') return 'green'
-    try {
-      const saved = localStorage.getItem(THEME_PREF_KEY)
-      const allowed: ThemeName[] = ['green', 'gold', 'forest', 'ocean', 'plum', 'sunset', 'slate', 'rose']
-      if (saved === 'dark') return 'green'
-      if (saved === 'light') return 'gold'
-      return saved && allowed.includes(saved as ThemeName) ? (saved as ThemeName) : 'green'
-    } catch {
-      return 'green'
-    }
-  })
   const [modelPreference, setModelPreference] = useState<ModelPreference>(() => {
     if (typeof window === 'undefined') return 'auto'
     try {
@@ -277,6 +245,17 @@ export default function ChatPage() {
       if (!raw) return false
       const parsed = JSON.parse(raw) as { webSearch?: boolean }
       return Boolean(parsed.webSearch)
+    } catch {
+      return false
+    }
+  })
+  const [cavemanMode, setCavemanMode] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      const raw = localStorage.getItem(AI_PREF_KEY)
+      if (!raw) return false
+      const parsed = JSON.parse(raw) as { cavemanMode?: boolean }
+      return Boolean(parsed.cavemanMode)
     } catch {
       return false
     }
@@ -310,7 +289,7 @@ export default function ChatPage() {
       return true
     }
   })
-  const [vedicPanelOpen, setVedicPanelOpen] = useState<boolean>(() => {
+  const [vedicPanelOpen] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false
     try {
       const raw = localStorage.getItem(VEDIC_PREF_KEY)
@@ -353,13 +332,6 @@ export default function ChatPage() {
     }
   }, [lang])
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      localStorage.setItem(THEME_PREF_KEY, theme)
-    } catch {}
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -367,10 +339,11 @@ export default function ChatPage() {
       localStorage.setItem(AI_PREF_KEY, JSON.stringify({
         model: modelPreference,
         webSearch: webSearchEnabled,
+        cavemanMode,
         responseMode,
       }))
     } catch {}
-  }, [modelPreference, webSearchEnabled, responseMode])
+  }, [modelPreference, webSearchEnabled, cavemanMode, responseMode])
 
 
   // Persist Vedic preferences
@@ -471,7 +444,7 @@ export default function ChatPage() {
       }
     }
     fetchProfile()
-  }, [user])
+  }, [user, dosha])
 
   useEffect(() => {
     if (incognito || messages.length === 0) return
@@ -639,6 +612,7 @@ export default function ChatPage() {
           lang: (typeof window !== 'undefined' ? localStorage.getItem('ayura_lang') || lang : lang),
           attachments: currentAttachments,
           vedicContext: vedicEnabled ? (vedicContext || undefined) : undefined,
+          cavemanMode,
         }),
       })
       if (!res.ok) {
@@ -1698,56 +1672,58 @@ export default function ChatPage() {
             />
 
             {/* Right conversation area */}
-            <section className="chat-main">
-              <div className="ios-surface" style={{ padding: '0.6rem 0.75rem', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      onClick={() => setVedicPanelOpen(v => !v)}
-                      className={`ios-chip ${vedicPanelOpen ? 'active' : ''}`}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.6rem', borderRadius: 12 }}
-                    >
-                      <span style={{ opacity: 0.9 }}>🔭</span>
-                      <span style={{ fontSize: '0.75rem', color: vedicPanelOpen ? '#c9a84c' : 'rgba(232,223,200,0.7)' }}>
-                        {vedicPanelOpen ? 'Hide Vedic Oracle' : 'Open Vedic Oracle'}
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setVedicEnabled(v => !v)}
-                      className={`ios-chip ${vedicEnabled ? 'active' : ''}`}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.6rem', borderRadius: 12 }}
-                      title="When off, VAIDYA will ignore Vedic personalization even if calculated."
-                    >
-                      <span style={{ opacity: 0.9 }}>{vedicEnabled ? '✅' : '⛔️'}</span>
-                      <span style={{ fontSize: '0.75rem', color: vedicEnabled ? '#c9a84c' : 'rgba(232,223,200,0.7)' }}>
-                        Use Vedic context
-                      </span>
-                    </button>
+            <section className="chat-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+              <div className="ios-surface" style={{ padding: '0.75rem 1rem', marginBottom: 0, borderBottom: '1px solid var(--border-low)', borderRadius: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <div style={{ 
+                      width: 10, height: 10, borderRadius: '50%', 
+                      background: loading ? 'var(--accent-main)' : 'var(--accent-secondary)',
+                      boxShadow: loading ? '0 0 10px var(--accent-main)' : 'none'
+                    }} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', letterSpacing: '0.02em' }}>
+                      {loading ? 'VAIDYA Thinking...' : 'VAIDYA Ready'}
+                    </span>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {vedicContext ? (
-                      <div className="chat-meta-text" style={{ color: vedicEnabled ? 'rgba(106,191,138,0.9)' : 'rgba(232,223,200,0.4)' }}>
-                        {vedicEnabled ? 'Vedic context ready' : 'Vedic context disabled'}
-                      </div>
-                    ) : (
-                      <div className="chat-meta-text" style={{ color: 'rgba(232,223,200,0.35)' }}>
-                        Optional personalization
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => setCavemanMode(!cavemanMode)}
+                      className={`ios-chip ${cavemanMode ? 'active' : ''}`}
+                      style={{ 
+                        padding: '0.4rem 0.75rem', borderRadius: 12, fontSize: '0.75rem',
+                        background: cavemanMode ? 'hsla(var(--accent-secondary-hsl), 0.15)' : 'transparent',
+                        color: cavemanMode ? 'var(--accent-secondary)' : 'var(--text-muted)'
+                      }}
+                      title="Saves 75% tokens with minimal speak."
+                    >
+                      🦴 Caveman {cavemanMode ? 'ON' : 'OFF'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVedicEnabled(!vedicEnabled)}
+                      className={`ios-chip ${vedicEnabled ? 'active' : ''}`}
+                      style={{ 
+                        padding: '0.4rem 0.75rem', borderRadius: 12, fontSize: '0.75rem',
+                        background: vedicEnabled ? 'hsla(var(--accent-main-hsl), 0.15)' : 'transparent',
+                        color: vedicEnabled ? 'var(--accent-main)' : 'var(--text-muted)'
+                      }}
+                    >
+                      ✨ Vedic {vedicEnabled ? 'ON' : 'OFF'}
+                    </button>
                   </div>
                 </div>
               </div>
 
               {vedicPanelOpen && (
-                <VedicOraclePanel
-                  initialDosha={dosha ?? 'Vata'}
-                  labResults={labResults}
-                  onContextReady={(context) => setVedicContext(context)}
-                />
+                <div style={{ padding: '0 1rem' }}>
+                  <VedicOraclePanel
+                    initialDosha={dosha ?? 'Vata'}
+                    labResults={labResults}
+                    onContextReady={(context) => setVedicContext(context)}
+                  />
+                </div>
               )}
 
               {/* Messages */}
@@ -1769,54 +1745,40 @@ export default function ChatPage() {
               />
 
           {/* Input area */}
-          <ChatComposer
-            attachments={attachments}
-            attachLoading={attachLoading}
-            showLinkInput={showLinkInput}
-            linkInput={linkInput}
-            voiceSupported={voiceSupported}
-            isListening={isListening}
-            input={input}
-            loading={loading}
-            placeholder={attachments.length > 0 ? 'Ask Vaidya about the attached file...' : dosha ? tx.chat_placeholder_dosha.replace('{dosha}', dosha) : tx.chat_placeholder}
-            fileInputRef={fileInputRef}
-            linkInputRef={linkInputRef}
-            textareaRef={textareaRef}
-            onFileSelect={handleFileSelect}
-            onRemoveAttachment={removeAttachment}
-            onToggleLinkInput={() => { setShowLinkInput(!showLinkInput); setTimeout(() => linkInputRef.current?.focus(), 50) }}
-            onLinkInputChange={setLinkInput}
-            onAddLink={handleAddLink}
-            onCancelLinkInput={() => { setShowLinkInput(false); setLinkInput('') }}
-            onStartListening={startListening}
-            onInputChange={handleTextarea}
-            onInputKeyDown={handleKey}
-            onSendMessage={() => sendMessage()}
-          />
-              {/* Clinical Compliance Disclaimer */}
-              <div style={{ 
-                marginTop: '1.5rem', 
-                padding: '1rem', 
-                textAlign: 'center', 
-                borderTop: '1px solid var(--border-low)',
-                fontSize: '0.75rem',
-                color: 'var(--text-muted)',
-                lineHeight: 1.5,
-                opacity: 0.8
-              }}>
-                <p>
-                  <strong>MEDICAL DISCLAIMER:</strong> AyuraHealth synthesis is for educational purposes based on traditional systems. 
-                  It is not a substitute for professional medical advice, diagnosis, or treatment. 
-                  Always seek the advice of your physician regarding medical conditions.
-                </p>
-                <p style={{ marginTop: '0.5rem', fontWeight: 600, color: 'var(--accent-main)' }}>
-                  SECURE_CLINICAL_INTAKE_ACTIVE • IYURA_V1.0_PROD
-                </p>
-              </div>
-            </section>
+          <div style={{ padding: '1rem', borderTop: '1px solid var(--border-low)', background: 'var(--bg-main)', paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
+            <ChatComposer
+              attachments={attachments}
+              attachLoading={attachLoading}
+              showLinkInput={showLinkInput}
+              linkInput={linkInput}
+              voiceSupported={voiceSupported}
+              isListening={isListening}
+              input={input}
+              loading={loading}
+              placeholder={attachments.length > 0 ? 'Ask Vaidya about the attached file...' : dosha ? tx.chat_placeholder_dosha.replace('{dosha}', dosha) : tx.chat_placeholder}
+              fileInputRef={fileInputRef}
+              linkInputRef={linkInputRef}
+              textareaRef={textareaRef}
+              onFileSelect={handleFileSelect}
+              onRemoveAttachment={removeAttachment}
+              onToggleLinkInput={() => { setShowLinkInput(!showLinkInput); setTimeout(() => linkInputRef.current?.focus(), 50) }}
+              onLinkInputChange={setLinkInput}
+              onAddLink={handleAddLink}
+              onCancelLinkInput={() => { setShowLinkInput(false); setLinkInput('') }}
+              onStartListening={startListening}
+              onInputChange={handleTextarea}
+              onInputKeyDown={handleKey}
+              onSendMessage={() => sendMessage()}
+            />
+            {/* Minimal Compliance Note for UI Simplicity */}
+            <p style={{ marginTop: '0.75rem', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', opacity: 0.7 }}>
+              Clinical synthesis for educational purposes only. Always consult a physician.
+            </p>
           </div>
-        </div>
-      )}
+        </section>
+      </div>
+    </div>
+  )}
 
     </main>
   )

@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getApiUrl } from '@/lib/constants';
 import { 
-  ChevronRight, 
-  ChevronLeft, 
   Heart, 
   Sparkles, 
   ShieldAlert, 
@@ -15,13 +13,7 @@ import {
   User,
   Users,
   Compass,
-  Wind,
-  Flame,
-  Droplets,
-  Activity,
-  CheckCircle2,
-  Brain,
-  ShieldCheck
+  Activity
 } from 'lucide-react';
 
 export default function OnboardingPage() {

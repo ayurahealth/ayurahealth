@@ -9,7 +9,7 @@ import { getApiUrl } from '@/lib/constants'
 export default function DashboardPage() {
   const { user, isLoaded, isSignedIn } = useUser()
   const router = useRouter()
-  const [dbProfile, setDbProfile] = useState<any>(null)
+  const [dbProfile, setDbProfile] = useState<Record<string, unknown> | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isFetching, setIsFetching] = useState(false)
 

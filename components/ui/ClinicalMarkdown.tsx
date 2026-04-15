@@ -26,7 +26,7 @@ export default function ClinicalMarkdown({
     .replace(/\*\*📚 Verified Lineage\*\*/g, '### 📚 EVIDENCE & PROOF')
 
   return (
-    <div className={`clinical-markdown clinical-report ${className}`} style={{ '--markdown-accent': doshaColor } as any}>
+    <div className={`clinical-markdown clinical-report ${className}`} style={{ '--markdown-accent': doshaColor } as React.CSSProperties}>
       <ReactMarkdown 
         remarkPlugins={[remarkGfm]}
         components={{
@@ -98,7 +98,7 @@ export default function ClinicalMarkdown({
           ),
           li: ({ children, ...props }) => {
             // Check if it's an unordered list item
-            const isBullet = (children as any)?.props?.ordered === false || !props.index
+            const isBullet = (React.isValidElement(children) && (children.props as { ordered?: boolean }).ordered === false) || !props.index
             if (isBullet) {
               return (
                 <li style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>

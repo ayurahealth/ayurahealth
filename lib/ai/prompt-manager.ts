@@ -207,12 +207,13 @@ export interface PromptBuildInput {
   clinicalMemoryCtx?: string
   patientProfileCtx?: string
   agentTraceCtx?: string
+  cavemanMode?: boolean
   promptProfile: PromptProfile
   autoRecoveryPolicy: AutoRecoveryPolicy
 }
 
 export function buildSystemPrompt(input: PromptBuildInput): string {
-  const { systems, dosha, lang, attachments, deepThink, vedicContext, knowledgeCtx, clinicalMemoryCtx, patientProfileCtx, agentTraceCtx, promptProfile, autoRecoveryPolicy } = input
+  const { systems, dosha, lang, attachments, deepThink, vedicContext, knowledgeCtx, clinicalMemoryCtx, patientProfileCtx, agentTraceCtx, cavemanMode, promptProfile, autoRecoveryPolicy } = input
 
   const langName = LANG_NAMES[lang] || 'English'
 
@@ -303,9 +304,17 @@ ${knowledgeCtx ? `\nFOUNDATIONAL DATA RETRIEVED FROM AI BRAIN (NotebookLM Curate
 - [3-6 actionable bullets]
 ### Sources
 - [Only if sources are available; otherwise write: "- No external sources used."]
-### Follow-ups
-- [2-4 smart next questions the user can ask]
 - Never invent clinical certainty. If unsure, state uncertainty briefly and provide safe next step.`
+
+  const cavemanStyle = cavemanMode ? `
+CAVEMAN SKILL ACTIVE:
+- Talk like caveman.
+- Use very small words.
+- Max 1-2 sentence per answer.
+- Zero fluff. Save energy.
+- Example: "You have Pitta. Eat cold. No fire food. Drink water."
+- IGNORE ALL OTHER STRUCTURES. NO HEADINGS. NO BULLETS. JUST WORDS.
+` : ''
 
   return [
     VAIDYA_SYSTEM,
@@ -323,7 +332,7 @@ ${knowledgeCtx ? `\nFOUNDATIONAL DATA RETRIEVED FROM AI BRAIN (NotebookLM Curate
     autoRecoveryPolicy.applied ? `AUTO RECOVERY POLICY ACTIVE: ${autoRecoveryPolicy.reasons.join(' | ')}` : '',
     patientProfileCtx || '',
     clinicalMemoryCtx || '',
-    responseTemplate,
+    cavemanMode ? cavemanStyle : responseTemplate,
     vedicSection,
     agentTraceCtx || '',
   ].filter(Boolean).join('\n')

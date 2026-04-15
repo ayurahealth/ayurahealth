@@ -1,8 +1,8 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  // Required for Capacitor/iOS static export
-  output: 'export',
+  // Dual-Mode Build: 'export' for Capacitor, default for Vercel/Web
+  output: process.env.STATIC_EXPORT === 'true' ? 'export' : undefined,
   images: {
     unoptimized: true,
   },

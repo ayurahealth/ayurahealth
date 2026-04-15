@@ -6,7 +6,7 @@ import VaidyaOracle from '../VaidyaOracle'
 import { ChatSkeleton } from '../BoneyardLoaders'
 import MessageItem from './MessageItem'
 import ClinicalMarkdown from '../ui/ClinicalMarkdown'
-import { ShieldCheck, Activity, Info, Printer, Download, FileText } from 'lucide-react'
+import { ShieldCheck, Activity, Printer } from 'lucide-react'
 
 interface ChatSource {
   title: string

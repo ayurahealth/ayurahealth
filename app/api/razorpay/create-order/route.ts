@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { checkRateLimit, checkPaymentRateLimit } from '@/lib/rateLimit'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 // Server-side pricing — NEVER trust client-sent amounts

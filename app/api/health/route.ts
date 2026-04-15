@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDeepChecks, getVaidyaCheck } from '@/lib/healthChecks'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         if (tokenBuffer.length === secretBuffer.length) {
           isAuthorized = crypto.timingSafeEqual(tokenBuffer, secretBuffer)
         }
-      } catch (err) {
+      } catch {
         isAuthorized = false
       }
     }

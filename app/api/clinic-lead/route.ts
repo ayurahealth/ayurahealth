@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { checkRateLimit } from '@/lib/rateLimit'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   // ── Rate limit to prevent spam ──────────────────────────────────────────

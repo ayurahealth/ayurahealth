@@ -84,7 +84,7 @@ import type { ChatMessage } from '@/lib/ai/providers/types'
 import { VAIDYA_TOOLS, executeToolCall } from '@/lib/ai/tool-executor'
 import { log } from '@/lib/logger'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 export const runtime = 'nodejs'
 
@@ -109,6 +109,7 @@ const chatSchema = z.object({
   webSearch: z.boolean().optional(),
   sessionId: z.string().uuid().optional(),
   vedicContext: z.string().max(20000).optional(),
+  cavemanMode: z.boolean().optional(),
 })
 
 const MAX_CONTENT_BYTES = 200_000
@@ -177,7 +178,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request data', details: validation.error.format() }, { status: 400 })
     }
 
-    const { messages, systems, dosha, lang, attachments, deepThink, modelPreference, webSearch, sessionId, vedicContext } = validation.data
+    const { messages, systems, dosha, lang, attachments, deepThink, modelPreference, webSearch, sessionId, vedicContext, cavemanMode } = validation.data
 
     // 5. Paywall enforcement
     if (tier === 'free') {
@@ -269,6 +270,7 @@ export async function POST(req: NextRequest) {
       clinicalMemoryCtx,
       patientProfileCtx,
       agentTraceCtx,
+      cavemanMode: Boolean(cavemanMode),
       promptProfile,
       autoRecoveryPolicy,
     })

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import Nav from '../../components/Nav'
 import { useSafeUser as useUser } from '@/lib/clerk-client'
 import { getApiUrl } from '@/lib/constants'
@@ -19,9 +18,7 @@ import {
   Snowflake, 
   Target, 
   Database,
-  ArrowRight,
   ClipboardCheck,
-  Plus,
   ChevronRight,
   ShieldCheck
 } from 'lucide-react'

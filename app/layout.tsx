@@ -28,7 +28,7 @@ export const metadata: Metadata = {
       { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
     ],
     apple: [
-      { url: '/favicon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
   },
   description: 'A professional health companion unifying 8 traditional healing systems. Get personalized guidance rooted in classical texts like Charaka Samhita and Huangdi Neijing.',

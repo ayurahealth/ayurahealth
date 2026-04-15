@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
 import Nav from '../../components/Nav'
 import Surface from '../../components/ui/Surface'
 import IOSButton from '../../components/ui/IOSButton'

@@ -38,7 +38,7 @@ interface NavProps {
   lang?: string
   onLangChange?: (code: string) => void
   showLangPicker?: boolean
-  links?: Array<{ label: string; href: string; icon?: any }>
+  links?: Array<{ label: string; href: string; icon?: React.ComponentType<{ size?: number; className?: string }> }>
 }
 
 export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, links }: NavProps) {

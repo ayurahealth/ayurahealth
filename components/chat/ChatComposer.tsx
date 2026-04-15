@@ -8,7 +8,6 @@ import {
   Mic, 
   Send, 
   Square,
-  Image as ImageIcon,
   FileText,
   Loader2,
   X
