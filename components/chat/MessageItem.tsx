@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { memo } from 'react'
 import { motion } from 'framer-motion'
 import { 
   ShieldCheck, 
@@ -51,7 +51,11 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+// ⚡ Bolt Optimization:
+// Wrapped MessageItem in React.memo() to prevent unnecessary re-renders of older messages
+// when new messages stream in or when non-relevant ChatMessagesPanel state changes.
+// Expected Impact: Reduces re-renders significantly for long chat histories.
+const MessageItem = memo(function MessageItem({
   msg,
   doshaColor,
   voiceSupported,
@@ -227,4 +231,6 @@ export default function MessageItem({
       </div>
     </motion.div>
   )
-}
+})
+
+export default MessageItem
