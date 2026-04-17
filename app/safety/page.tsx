@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import Nav from '../../components/Nav'
-import { motion } from 'framer-motion'
+
 import { ShieldCheck, Info, AlertTriangle, CheckCircle2 } from 'lucide-react'
 
 export default function SafetyPage() {
