@@ -1559,7 +1559,7 @@ function ChatPageContent() {
             <Logo size={24} showText={true} href="/" />
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div className="hidden md:flex" style={{ display: 'none', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
+              <div className="hidden md:flex" style={{ alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
                 <ShieldCheck size={14} style={{ color: 'var(--accent-main)' }} />
                 <span style={{ fontSize: '0.7rem', color: 'var(--accent-secondary)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Clinical Synthesis Active</span>
               </div>
