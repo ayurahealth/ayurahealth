@@ -19,10 +19,11 @@
     "@capacitor/cli": "^8.3.0",
     "@capacitor/core": "^8.3.0",
     "@capacitor/ios": "^8.3.0",
-    "@clerk/nextjs": "^7.0.5",
+    "@clerk/nextjs": "^7.2.1",
+    "@clerk/shared": "^4.8.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@prisma/adapter-pg": "^7.7.0",
-    "@prisma/client": "^7.7.0",
+    "@prisma/client": "^6.19.3",
     "@prisma/config": "^7.7.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
@@ -32,12 +33,13 @@
     "@upstash/redis": "^1.37.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "@xenova/transformers": "^2.17.2",
+    "@xenova/transformers": "^2.0.1",
     "dotenv": "^17.3.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
     "next": "^15.1.0",
     "pg": "^8.20.0",
+    "protobufjs": "^7.5.5",
     "r3f-perf": "^7.2.3",
     "razorpay": "^2.9.6",
     "react": "19.2.3",
@@ -58,7 +60,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "15.1.0",
     "eventsource": "^4.1.0",
-    "prisma": "^7.7.0",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
@@ -66,11 +68,25 @@
   "overrides": {
     "hono": "4.12.12",
     "@hono/node-server": "1.19.13",
-    "@react-spring/animated": { "react": "*" },
-    "@react-spring/core": { "react": "*" },
-    "@react-spring/shared": { "react": "*" },
-    "@react-spring/three": { "react": "*" },
-    "react-composer": { "react": "*" },
-    "@react-three/drei": { "react": "*", "react-dom": "*", "@react-three/fiber": "*" }
+    "@react-spring/animated": {
+      "react": "*"
+    },
+    "@react-spring/core": {
+      "react": "*"
+    },
+    "@react-spring/shared": {
+      "react": "*"
+    },
+    "@react-spring/three": {
+      "react": "*"
+    },
+    "react-composer": {
+      "react": "*"
+    },
+    "@react-three/drei": {
+      "react": "*",
+      "react-dom": "*",
+      "@react-three/fiber": "*"
+    }
   }
 }
