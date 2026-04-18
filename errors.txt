@@ -1,0 +1,14 @@
+app/chat/page.tsx(565,14): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'SetStateAction<Dosha | null>'.
+  Type 'string' is not assignable to type 'SetStateAction<Dosha | null>'.
+app/chat/page.tsx(566,61): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<Lang>'.
+app/chat/page.tsx(1271,235): error TS2538: Type 'null' cannot be used as an index type.
+app/chat/page.tsx(1274,89): error TS2538: Type 'null' cannot be used as an index type.
+app/chat/page.tsx(1276,77): error TS2538: Type 'null' cannot be used as an index type.
+app/chat/page.tsx(1280,289): error TS2538: Type 'null' cannot be used as an index type.
+app/chat/page.tsx(1284,139): error TS2538: Type 'null' cannot be used as an index type.
+app/chat/page.tsx(1284,257): error TS2538: Type 'null' cannot be used as an index type.
+app/chat/page.tsx(1284,383): error TS2538: Type 'null' cannot be used as an index type.
+app/chat/page.tsx(1750,17): error TS2322: Type '{} | undefined' is not assignable to type 'string | undefined'.
+  Type '{}' is not assignable to type 'string'.
+app/chat/page.tsx(1751,17): error TS2322: Type '{} | undefined' is not assignable to type 'string[] | undefined'.
+  Type '{}' is missing the following properties from type 'string[]': length, pop, push, concat, and 35 more.

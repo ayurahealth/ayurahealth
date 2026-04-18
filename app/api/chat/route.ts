@@ -16,6 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
 
@@ -157,7 +158,18 @@ export async function POST(req: NextRequest) {
 
   const ceoToken = req.cookies.get('ayura_ceo_token')?.value
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
-  const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
+  let isCeo = false;
+  if (CEO_BYPASS_KEY && ceoToken) {
+    try {
+      const tokenBuffer = Buffer.from(ceoToken);
+      const secretBuffer = Buffer.from(CEO_BYPASS_KEY);
+      if (tokenBuffer.length === secretBuffer.length) {
+        isCeo = crypto.timingSafeEqual(tokenBuffer, secretBuffer);
+      }
+    } catch {
+      isCeo = false;
+    }
+  }
   if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
 
   // 3. Auth + Paywall
