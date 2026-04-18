@@ -1,3 +1,4 @@
+import React from 'react';
 'use client'
 
 import ReactMarkdown from 'react-markdown'
@@ -98,7 +99,7 @@ export default function ClinicalMarkdown({
           ),
           li: ({ children, ...props }) => {
             // Check if it's an unordered list item
-            const isBullet = (React.isValidElement(children) && (children.props as { ordered?: boolean }).ordered === false) || !props.index
+            const isBullet = (React.isValidElement(children) && (children.props as { ordered?: boolean }).ordered === false) || !(props as any).index
             if (isBullet) {
               return (
                 <li style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>
