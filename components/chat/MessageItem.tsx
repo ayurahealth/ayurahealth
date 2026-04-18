@@ -51,9 +51,7 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-// Memoize MessageItem to prevent unnecessary re-renders of older messages
-// when new messages are added or streamed in the ChatMessagesPanel
-const MessageItem = React.memo(function MessageItem({
+export default function MessageItem({
   msg,
   doshaColor,
   voiceSupported,
@@ -229,6 +227,4 @@ const MessageItem = React.memo(function MessageItem({
       </div>
     </motion.div>
   )
-})
-
-export default MessageItem
+}

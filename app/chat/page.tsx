@@ -57,14 +57,6 @@ interface ChatSource {
   tradition: string
   source: string
 }
-interface SavedState {
-  dosha: Dosha | null
-  messages: Message[]
-  selectedSystems: string[]
-  lang: Lang
-  savedAt: number
-}
-
 interface ModelTrace {
   modelUsed?: string
   providerUsed?: ProviderUsed
@@ -110,7 +102,6 @@ const VEDIC_PREF_KEY = 'ayura_vedic_pref_v1'
 const OBSIDIAN_PREF_KEY = 'ayura_obsidian_pref_v1'
 const AI_PREF_KEY = 'ayura_ai_pref_v1'
 
-const OBSIDIAN_CATEGORIES = ['Health', 'Journal', 'Log', 'Notes', 'Ayurveda'] as const
 const DOSHA_META = {
   Vata:  { emoji: '🌬️', color: 'var(--accent-main)', glow: 'hsla(var(--accent-main-hsl), 0.2)', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'vata_tagline', descKey: 'vata_desc', strengthsKey: 'vata_strengths', watchKey: 'vata_watch' },
   Pitta: { emoji: '🔥', color: 'var(--accent-secondary)', glow: 'hsla(var(--accent-secondary-hsl), 0.2)', bg: 'var(--surface-low)', cardBg: 'var(--bg-main)', cardBorder: 'var(--border-mid)', taglineKey: 'pitta_tagline', descKey: 'pitta_desc', strengthsKey: 'pitta_strengths', watchKey: 'pitta_watch' },
@@ -208,7 +199,6 @@ function ChatPageContent() {
   
   const [currentQ, setCurrentQ] = useState(0)
   const [answers, setAnswers] = useState<string[]>([])
-
   const [dosha, setDosha] = useState<Dosha | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -458,7 +448,7 @@ function ChatPageContent() {
 
   useEffect(() => {
     if (incognito || messages.length === 0) return
-    setSavedState({ dosha, messages, selectedSystems, lang, savedAt: Date.now() })
+    saveState({ dosha, messages, selectedSystems, lang, savedAt: Date.now() })
   }, [messages, dosha, selectedSystems, lang, incognito])
 
   useEffect(() => {
@@ -470,6 +460,8 @@ function ChatPageContent() {
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, streaming])
   useEffect(() => {
+    if (screen === 'result') setTimeout(() => setRevealed(true), 400)
+    else setRevealed(false)
   }, [screen])
   useEffect(() => {
     if (!loading) return
@@ -568,7 +560,7 @@ function ChatPageContent() {
     setScreen('chat'); setShowWelcomeBack(false)
   }
 
-  const handleClearHistory = () => { setSavedState(null); setMessages([]); setDosha(null); setShowClearConfirm(false); setScreen('landing') }
+  const handleClearHistory = () => { clearState(); setMessages([]); setDosha(null); setShowClearConfirm(false); setScreen('landing') }
 
   const shareCard = async () => {
     if (!shareCardRef.current || !dosha) return
@@ -1548,7 +1540,7 @@ function ChatPageContent() {
             <Logo size={24} showText={true} href="/" />
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ display: 'none',  alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
+              <div style={{ display: 'none', md: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
                 <ShieldCheck size={14} style={{ color: 'var(--accent-main)' }} />
                 <span style={{ fontSize: '0.7rem', color: 'var(--accent-secondary)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Clinical Synthesis Active</span>
               </div>
@@ -1748,8 +1740,8 @@ function ChatPageContent() {
                 onSelectSource={setSelectedSource}
                 messagesEndRef={messagesEndRef}
                 userName={user?.firstName || undefined}
-                primaryDosha={typeof dbProfile?.primaryDosha === 'string' ? dbProfile.primaryDosha : (dosha || undefined)}
-                conditions={Array.isArray(dbProfile?.conditions) ? dbProfile?.conditions : undefined}
+                primaryDosha={dbProfile?.primaryDosha || dosha || undefined}
+                conditions={dbProfile?.conditions || undefined}
               />
 
           {/* Input area */}

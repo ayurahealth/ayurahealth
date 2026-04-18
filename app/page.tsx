@@ -2,10 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Nav from '../components/Nav'
-
-import { CreditCard, Hospital, Zap, Activity, BookOpen, ArrowRight, MessageSquare } from 'lucide-react'
+import Surface from '../components/ui/Surface'
+import { CreditCard, Hospital, Zap, Activity, BookOpen, Search, ArrowRight, MessageSquare } from 'lucide-react'
 
 /* ─── AI Organization Translations ────────────────────────────────────────── */
 const T: Record<string, {

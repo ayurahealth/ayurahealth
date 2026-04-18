@@ -1,3 +1,0 @@
-## 2025-02-18 - [React.memo in Chat Application]
-**Learning:** Found an opportunity to improve rendering performance in the Chat panel. `MessageItem` is a large component representing individual messages in a potentially long array (`messages` in `ChatMessagesPanel`). Since the `messages` state is updated when a new message is added or streamed, React re-renders all existing `MessageItem` components unless they are memoized. Given that previous messages are immutable and don't change, `React.memo` is an ideal optimization here.
-**Action:** Wrap `MessageItem` with `React.memo()` to prevent unnecessary re-renders of older messages as new ones are added.
