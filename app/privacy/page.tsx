@@ -1,13 +1,11 @@
 'use client'
-import Link from 'next/link'
-import Image from 'next/image'
 import Nav from '../../components/Nav'
 
 export default function PrivacyPolicy() {
   const sections = [
     {
       title: '1. Neural Privacy Principles',
-      content: 'Ayura Intelligence Lab ("we", "our", "us") is dedicated to extreme privacy. We utilize edge-based neural processing and local storage protocols to ensure your health queries remain under your control. We do not sell research data or patient profiles.',
+      content: 'Ayura Intelligence Lab (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is dedicated to extreme privacy. We utilize edge-based neural processing and local storage protocols to ensure your health queries remain under your control. We do not sell research data or patient profiles.',
     },
     {
       title: '2. Sub-processors & Intelligence Partners',
@@ -35,7 +33,7 @@ export default function PrivacyPolicy() {
       <div style={{ maxWidth: 840, margin: '0 auto', padding: '5rem 2rem' }}>
         <div style={{ marginBottom: '4rem', padding: '2rem', background: 'var(--surface-mid)', border: '1px solid var(--border-high)', borderRadius: '24px' }}>
           <p style={{ fontSize: '1.1rem', lineHeight: 1.7, color: 'var(--text-main)', textAlign: 'center' }}>
-            "Your intelligence is your own. We focus on neural synthesis, not data harvesting."
+            &quot;Your intelligence is your own. We focus on neural synthesis, not data harvesting.&quot;
           </p>
         </div>
 
