@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Nav from '../../components/Nav'
 import { motion } from 'framer-motion'
-import { Zap, Shield, Globe, Activity, Terminal, Database, ArrowRight } from 'lucide-react'
+import { ArrowRight, Zap, Globe, Activity, Terminal, Database } from 'lucide-react'
 
 export default function ClinicPage() {
   const [showModal, setShowModal] = useState(false)

@@ -40,6 +40,17 @@ interface Message {
     forceDeepThink: boolean
   }
 }
+
+interface SavedState {
+  dosha: Dosha | null;
+  messages: Message[];
+  selectedSystems: string[];
+  lang: Lang;
+  savedAt: number;
+}
+
+const OBSIDIAN_CATEGORIES = ['Health', 'Research', 'Journal', 'Ayurveda', 'Integrative'] as const;
+
 interface AgentTrace { id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }
 type ResponseMode = 'fast' | 'deep' | 'research'
 type ProviderUsed = 'HuggingFace' | 'OpenRouter' | 'Groq' | ''
@@ -221,6 +232,7 @@ function ChatPageContent() {
   const [labResults, setLabResults] = useState<Array<{ id: string; value: string; status: 'optimal' | 'low' | 'high' }>>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [attachLoading, setAttachLoading] = useState(false)
+  const [, setRevealed] = useState(false)
 
   const [linkInput, setLinkInput] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
@@ -448,7 +460,9 @@ function ChatPageContent() {
 
   useEffect(() => {
     if (incognito || messages.length === 0) return
-    saveState({ dosha, messages, selectedSystems, lang, savedAt: Date.now() })
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ dosha, messages, selectedSystems, lang, savedAt: Date.now() }))
+    }
   }, [messages, dosha, selectedSystems, lang, incognito])
 
   useEffect(() => {
@@ -560,7 +574,12 @@ function ChatPageContent() {
     setScreen('chat'); setShowWelcomeBack(false)
   }
 
-  const handleClearHistory = () => { clearState(); setMessages([]); setDosha(null); setShowClearConfirm(false); setScreen('landing') }
+  const handleClearHistory = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEY)
+    }
+    setMessages([]); setDosha(null); setShowClearConfirm(false); setScreen('landing')
+  }
 
   const shareCard = async () => {
     if (!shareCardRef.current || !dosha) return
@@ -1540,7 +1559,7 @@ function ChatPageContent() {
             <Logo size={24} showText={true} href="/" />
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ display: 'none', md: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
+                <div className="hidden md:flex" style={{ display: 'none', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', padding: '0.4rem 0.75rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: 12, border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
                 <ShieldCheck size={14} style={{ color: 'var(--accent-main)' }} />
                 <span style={{ fontSize: '0.7rem', color: 'var(--accent-secondary)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Clinical Synthesis Active</span>
               </div>
@@ -1740,8 +1759,8 @@ function ChatPageContent() {
                 onSelectSource={setSelectedSource}
                 messagesEndRef={messagesEndRef}
                 userName={user?.firstName || undefined}
-                primaryDosha={dbProfile?.primaryDosha || dosha || undefined}
-                conditions={dbProfile?.conditions || undefined}
+                primaryDosha={(dbProfile?.primaryDosha as string | undefined) || dosha || undefined}
+                conditions={(dbProfile?.conditions as string[] | undefined) || undefined}
               />
 
           {/* Input area */}
