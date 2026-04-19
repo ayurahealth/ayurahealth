@@ -2,17 +2,15 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { t, type Lang } from '@/lib/translations'
 
 interface QuizScreenProps {
-  lang: Lang
   currentQ: number
   questions: Array<{ emoji: string; q: string; opts: Array<{ l: string; d: string }> }>
   onAnswer: (d: string) => void
   onPrevious: () => void
 }
 
-export default function QuizScreen({ lang, currentQ, questions, onAnswer, onPrevious }: QuizScreenProps) {
+export default function QuizScreen({ currentQ, questions, onAnswer, onPrevious }: QuizScreenProps) {
   return (
     <div style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto', padding: '4rem 1.5rem' }}>
       <div style={{ marginBottom: '3rem' }}>

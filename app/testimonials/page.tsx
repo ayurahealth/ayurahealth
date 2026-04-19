@@ -49,7 +49,7 @@ export default function TestimonialsPage() {
                 <Quote size={20} fill="currentColor" />
               </div>
               <p style={{ fontSize: '1.15rem', lineHeight: 1.7, marginBottom: '2.5rem', color: 'var(--text-main)', fontStyle: 'italic' }}>
-                "{s.quote}"
+                &quot;{s.quote}&quot;
               </p>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.25rem' }}>{s.name}</div>
