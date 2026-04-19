@@ -132,4 +132,3 @@ export default function ResultScreen({
     </div>
   )
 }
-准确

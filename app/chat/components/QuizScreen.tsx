@@ -79,4 +79,3 @@ export default function QuizScreen({ lang, currentQ, questions, onAnswer, onPrev
     </div>
   )
 }
-准确

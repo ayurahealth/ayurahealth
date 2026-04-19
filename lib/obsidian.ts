@@ -138,4 +138,3 @@ export function exportChatToObsidian(messages: Message[], options: {
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
 }
-准确

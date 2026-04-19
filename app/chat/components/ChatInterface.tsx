@@ -143,9 +143,12 @@ export default function ChatInterface({
           loading={loading}
           doshaColor={doshaColor}
           voiceSupported={voiceSupported}
-          isSpeaking={false} // Will be handled by hook
+          isSpeaking={false}
           onSpeakText={onSpeakText}
           onSelectSource={onSelectSource}
+          oracleState={null}
+          thinkingDots={false}
+          messagesEndRef={{ current: null }}
         />
       </div>
 
@@ -185,4 +188,3 @@ export default function ChatInterface({
     </div>
   )
 }
-准确

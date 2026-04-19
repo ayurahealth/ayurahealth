@@ -94,4 +94,3 @@ export default function LandingScreen({ lang, onStartQuiz, onSkipToChat }: Landi
     </div>
   )
 }
-准确
