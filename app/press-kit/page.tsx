@@ -51,7 +51,7 @@ export default function PressKitPage() {
                 Ayura Intelligence Lab is a high-fidelity clinical synthesis organization dedicated to democratizing access to tradition-rooted medical logic through advanced neural networks.
               </p>
               <p>
-                Founded in Tokyo, our mission is to build the "Neural Link" between ancient wisdom and modern clinical standards.
+                Founded in Tokyo, our mission is to build the &quot;Neural Link&quot; between ancient wisdom and modern clinical standards.
               </p>
             </div>
             <div style={{ borderLeft: '1px solid var(--border-low)', paddingLeft: '4rem' }}>

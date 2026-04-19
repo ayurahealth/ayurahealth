@@ -35,7 +35,7 @@ export default function PrivacyPolicy() {
       <div style={{ maxWidth: 840, margin: '0 auto', padding: '5rem 2rem' }}>
         <div style={{ marginBottom: '4rem', padding: '2rem', background: 'var(--surface-mid)', border: '1px solid var(--border-high)', borderRadius: '24px' }}>
           <p style={{ fontSize: '1.1rem', lineHeight: 1.7, color: 'var(--text-main)', textAlign: 'center' }}>
-            "Your intelligence is your own. We focus on neural synthesis, not data harvesting."
+            &quot;Your intelligence is your own. We focus on neural synthesis, not data harvesting.&quot;
           </p>
         </div>
 
