@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useRef, useEffect, Suspense, useCallback } from 'react'
+import { useState, useEffect, Suspense, useCallback } from 'react'
 import { useSafeClerk as useClerk, useSafeUser as useUser } from '@/lib/clerk-client'
 import { Lang, t } from '@/lib/translations'
-import { useChat, ChatSource } from '@/lib/hooks/useChat'
+import { useChat } from '@/lib/hooks/useChat'
 import { useDoshaQuiz, Dosha } from '@/lib/hooks/useDoshaQuiz'
-import { getApiUrl } from '@/lib/constants'
 import { vaidyaVoice } from '@/lib/vaidyaVoice'
 
 // Sub-components
@@ -35,13 +34,13 @@ export default function ChatPage() {
 }
 
 function ChatPageContent() {
-  const { user, isLoaded: clerkLoaded } = useUser()
+  const { user } = useUser()
   const clerk = useClerk()
   
   // State Hooks
   const { 
     messages, input, loading, streaming, sendMessage, 
-    setInput, setIsListening, setMessages, isListening, recognitionRef 
+    setInput, setIsListening, setMessages, isListening
   } = useChat()
   
   const { 
@@ -53,14 +52,14 @@ function ChatPageContent() {
   const [lang, setLang] = useState<Lang>('en')
   const [modelPreference, setModelPreference] = useState('auto')
   const [responseMode, setResponseMode] = useState<'fast' | 'deep' | 'research'>('fast')
-  const [selectedSystems, setSelectedSystems] = useState(['ayurveda'])
+  const selectedSystems = ['ayurveda']
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [attachments, setAttachments] = useState<any[]>([])
-  const [attachLoading, setAttachLoading] = useState(false)
+  const attachLoading = false
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [linkInput, setLinkInput] = useState('')
-  const [selectedSource, setSelectedSource] = useState<ChatSource | null>(null)
-  const [isSharing, setIsSharing] = useState(false)
-  const [shareSuccess, setShareSuccess] = useState(false)
+  const isSharing = false
+  const shareSuccess = false
   const [showPaywall, setShowPaywall] = useState(false)
 
   // Initialization
@@ -79,6 +78,7 @@ function ChatPageContent() {
         }, qs.get('q')!)
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Auth/CEO Bypass Logic
@@ -94,7 +94,7 @@ function ChatPageContent() {
       ? tx.greeting_dosha.replace(/{dosha}/g, activeDosha).replace('{tagline}', '').replace('{desc}', '')
       : tx.greeting
     setMessages([{ role: 'assistant', content: greeting }])
-  }, [dosha, lang])
+  }, [dosha, lang, setMessages])
 
   const handleSendMessage = async () => {
     try {
@@ -112,14 +112,14 @@ function ChatPageContent() {
         incognito: false,
       })
       setAttachments([])
-    } catch (err: any) {
-      if (err.message === 'PAYWALL_LIMIT') setShowPaywall(true)
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === 'PAYWALL_LIMIT') setShowPaywall(true)
     }
   }
 
-  const handleSpeak = (text: string) => {
+  const handleSpeak = useCallback((text: string) => {
     vaidyaVoice.speak(text, () => {})
-  }
+  }, [])
 
   // Render Logic
   return (
@@ -192,7 +192,7 @@ function ChatPageContent() {
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={setSelectedSource}
+          onSelectSource={() => {}}
           onToggleVedicPanel={() => {}}
         />
       )}

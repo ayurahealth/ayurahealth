@@ -20,6 +20,7 @@
     "@capacitor/core": "^8.3.0",
     "@capacitor/ios": "^8.3.0",
     "@clerk/nextjs": "^7.0.5",
+    "@eslint/eslintrc": "^3.3.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
@@ -66,11 +67,25 @@
   "overrides": {
     "hono": "4.12.12",
     "@hono/node-server": "1.19.13",
-    "@react-spring/animated": { "react": "*" },
-    "@react-spring/core": { "react": "*" },
-    "@react-spring/shared": { "react": "*" },
-    "@react-spring/three": { "react": "*" },
-    "react-composer": { "react": "*" },
-    "@react-three/drei": { "react": "*", "react-dom": "*", "@react-three/fiber": "*" }
+    "@react-spring/animated": {
+      "react": "*"
+    },
+    "@react-spring/core": {
+      "react": "*"
+    },
+    "@react-spring/shared": {
+      "react": "*"
+    },
+    "@react-spring/three": {
+      "react": "*"
+    },
+    "react-composer": {
+      "react": "*"
+    },
+    "@react-three/drei": {
+      "react": "*",
+      "react-dom": "*",
+      "@react-three/fiber": "*"
+    }
   }
 }
