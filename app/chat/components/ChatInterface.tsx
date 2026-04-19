@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Message, ChatSource } from '@/lib/hooks/useChat'
 import ChatMessagesPanel from '@/components/chat/ChatMessagesPanel'
 import ChatComposer from '@/components/chat/ChatComposer'
@@ -22,11 +21,11 @@ interface ChatInterfaceProps {
   modelPreference: string
   responseMode: string
   dosha: string | null
-  activeUser: any
-  onInputChange: (e: any) => void
-  onInputKeyDown: (e: any) => void
+  activeUser?: unknown
+  onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onInputKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
   onSendMessage: () => void
-  onFileSelect: (e: any) => void
+  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
   onRemoveAttachment: (id: string) => void
   onToggleLinkInput: () => void
   onLinkInputChange: (v: string) => void
@@ -34,7 +33,7 @@ interface ChatInterfaceProps {
   onCancelLinkInput: () => void
   onStartListening: () => void
   onModelPrefChange: (val: string) => void
-  onResponseModeChange: (val: any) => void
+  onResponseModeChange: (val: 'fast' | 'deep' | 'research') => void
   onSpeakText: (text: string) => void
   onSelectSource: (source: ChatSource) => void
   onToggleVedicPanel: () => void
@@ -54,7 +53,7 @@ export default function ChatInterface({
   modelPreference,
   responseMode,
   dosha,
-  activeUser,
+  // activeUser,
   onInputChange,
   onInputKeyDown,
   onSendMessage,
@@ -112,7 +111,7 @@ export default function ChatInterface({
           </div>
 
           <div style={{ display: 'flex', background: 'var(--bg-main)', borderRadius: '12px', padding: '3px', border: '1px solid var(--border-low)' }}>
-            {(['fast', 'deep', 'research']).map((mode) => (
+            {(['fast', 'deep', 'research'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => onResponseModeChange(mode)}

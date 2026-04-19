@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { getApiUrl } from '@/lib/constants'
 import { log } from '@/lib/logger'
 
@@ -60,7 +60,7 @@ export function useChat() {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isListening, setIsListening] = useState(false)
   
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<unknown>(null)
 
   const clearHistory = useCallback(() => {
     setMessages([])
@@ -113,7 +113,7 @@ export function useChat() {
       let full = ''
       let currentSources: ChatSource[] = []
       let currentAgentTrace: AgentTrace[] = []
-      let currentModelTrace: any = {}
+      let currentModelTrace: Record<string, any> = {}
       let buffer = ''
 
       if (reader) {
@@ -178,10 +178,10 @@ export function useChat() {
       }
 
       return finalAssistantMsg
-    } catch (err: any) {
+    } catch (err: unknown) {
       log.error('CHAT_FETCH_FAILURE', { error: String(err) })
       
-      if (err.message === 'PAYWALL_LIMIT') {
+      if (err instanceof Error && err.message === 'PAYWALL_LIMIT') {
         throw err
       }
 
