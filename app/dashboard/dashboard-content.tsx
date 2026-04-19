@@ -302,7 +302,7 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--text-main)' }}>Refine Health Profile</h3>
-                <button onClick={() => setIsEditing(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
+                <button onClick={() => setIsEditing(false)} aria-label="Close modal" title="Close modal" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
               </div>
 
               <div style={{ marginBottom: '2rem' }}>

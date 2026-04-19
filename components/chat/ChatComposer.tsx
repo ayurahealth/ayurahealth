@@ -139,6 +139,8 @@ export default function ChatComposer({
                 <div style={{ color: 'var(--text-main)', fontSize: '0.75rem', fontWeight: 500, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{att.name}</div>
                 <button 
                   onClick={() => onRemoveAttachment(att.id)} 
+                  aria-label="Remove attachment"
+                  title="Remove attachment"
                   style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2, display: 'flex' }}
                 >
                   <X size={12} />
@@ -220,6 +222,8 @@ export default function ChatComposer({
               <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={onFileSelect} style={{ display: 'none' }} />
               <button 
                 onClick={() => fileInputRef.current?.click()} 
+                aria-label="Attach file"
+                title="Attach file"
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
                   background: 'transparent', color: 'var(--text-muted)', border: 'none',
@@ -231,6 +235,8 @@ export default function ChatComposer({
               
               <button 
                 onClick={onToggleLinkInput} 
+                aria-label="Add link"
+                title="Add link"
                 className={showLinkInput ? 'active' : ''}
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
@@ -244,6 +250,8 @@ export default function ChatComposer({
               {voiceSupported && (
                 <button 
                   onClick={onStartListening} 
+                  aria-label={isListening ? "Stop listening" : "Start voice input"}
+                  title={isListening ? "Stop listening" : "Start voice input"}
                   style={{ 
                     width: 36, height: 36, borderRadius: '10px', 
                     background: 'transparent', color: isListening ? 'var(--accent-secondary)' : 'var(--text-muted)', border: 'none',
@@ -261,6 +269,8 @@ export default function ChatComposer({
               </div>
               <button 
                 onClick={onSendMessage} 
+                aria-label="Send message"
+                title="Send message"
                 disabled={loading || (!input.trim() && attachments.length === 0)} 
                 className="btn-primary"
                 style={{ 
