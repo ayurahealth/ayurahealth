@@ -146,8 +146,8 @@ export default function ChatInterface({
           isSpeaking={false}
           onSpeakText={onSpeakText}
           onSelectSource={onSelectSource}
-          oracleState={null}
-          thinkingDots={false}
+          oracleState="idle"
+          thinkingDots=""
           messagesEndRef={{ current: null }}
         />
       </div>
