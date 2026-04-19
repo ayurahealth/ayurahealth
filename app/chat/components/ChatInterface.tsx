@@ -136,7 +136,7 @@ export default function ChatInterface({
       </div>
 
       {/* Messages Thread */}
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <ChatMessagesPanel
           messages={messages}
           streaming={streaming}
