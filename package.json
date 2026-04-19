@@ -50,8 +50,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@eslint/compat": "^2.0.5",
-    "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/postcss": "^4",
     "@types/eventsource": "^1.1.15",
     "@types/node": "^22",
@@ -68,25 +66,11 @@
   "overrides": {
     "hono": "4.12.12",
     "@hono/node-server": "1.19.13",
-    "@react-spring/animated": {
-      "react": "*"
-    },
-    "@react-spring/core": {
-      "react": "*"
-    },
-    "@react-spring/shared": {
-      "react": "*"
-    },
-    "@react-spring/three": {
-      "react": "*"
-    },
-    "react-composer": {
-      "react": "*"
-    },
-    "@react-three/drei": {
-      "react": "*",
-      "react-dom": "*",
-      "@react-three/fiber": "*"
-    }
+    "@react-spring/animated": { "react": "*" },
+    "@react-spring/core": { "react": "*" },
+    "@react-spring/shared": { "react": "*" },
+    "@react-spring/three": { "react": "*" },
+    "react-composer": { "react": "*" },
+    "@react-three/drei": { "react": "*", "react-dom": "*", "@react-three/fiber": "*" }
   }
 }
