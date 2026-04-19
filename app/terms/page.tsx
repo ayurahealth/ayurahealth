@@ -39,7 +39,7 @@ export default function Terms() {
     },
     {
       title: '9. Organization Contact',
-      content: 'Legal: legal@ayura.ai\nSupport: support@ayura.ai\nAyura Intelligence Lab · Tokyo, Japan',
+      content: 'Legal: legal@ayurahealth.com\nSupport: support@ayurahealth.com\nAyura Intelligence Lab · Tokyo, Japan',
     },
   ]
 

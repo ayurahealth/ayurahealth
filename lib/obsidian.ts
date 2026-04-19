@@ -115,7 +115,7 @@ export function exportChatToObsidian(messages: Message[], options: {
     '',
     '_Educational guidance only. Not medical advice._',
     '',
-    `Exported from https://ayura.ai at ${iso}`,
+    `Exported from https://ayurahealth.com at ${iso}`,
     '',
   ].join('\n')
 

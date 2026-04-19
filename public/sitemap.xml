@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ayura.ai</loc>
+    <loc>https://ayurahealth.com</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-  <url><loc>https://ayura.ai/chat</loc><priority>0.8</priority></url>
-  <url><loc>https://ayura.ai/pricing</loc><priority>0.8</priority></url>
-  <url><loc>https://ayura.ai/clinic</loc><priority>0.8</priority></url>
+  <url><loc>https://ayurahealth.com/chat</loc><priority>0.8</priority></url>
+  <url><loc>https://ayurahealth.com/pricing</loc><priority>0.8</priority></url>
+  <url><loc>https://ayurahealth.com/clinic</loc><priority>0.8</priority></url>
 </urlset>

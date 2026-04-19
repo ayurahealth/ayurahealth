@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
-const BASE_URL = 'https://ayura.ai'
+const BASE_URL = 'https://ayurahealth.com'
 
 export const viewport: Viewport = {
   themeColor: '#1a4d2e',

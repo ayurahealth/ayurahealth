@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin')
   const allowedOrigins = [
     process.env.NEXT_PUBLIC_APP_URL,
-    'https://ayura.ai',
-    'https://www.ayura.ai',
+    'https://ayurahealth.com',
+    'https://www.ayurahealth.com',
   ].filter(Boolean)
 
   const isAllowed = origin && (

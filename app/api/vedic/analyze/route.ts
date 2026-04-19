@@ -8,7 +8,7 @@ export const maxDuration = 30
 export async function POST(request: NextRequest) {
   try {
     const origin = request.headers.get('origin')
-    const allowed = ['https://ayura.ai', 'http://localhost:3000']
+    const allowed = ['https://ayurahealth.com', 'http://localhost:3000']
     if (origin && !allowed.includes(origin) && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
