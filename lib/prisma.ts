@@ -7,7 +7,10 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 const createPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL
   if (!connectionString) {
-    throw new Error('DATABASE_URL is not set')
+    console.warn('⚠️ WARNING: DATABASE_URL is not set. Prisma operations will fail if executed.');
+    return new PrismaClient({
+      log: process.env.NODE_ENV === 'development' ? ['error'] : [],
+    });
   }
 
   const pool = new pg.Pool({ 
