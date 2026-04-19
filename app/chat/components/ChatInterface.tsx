@@ -12,6 +12,7 @@ interface ChatInterfaceProps {
   streaming: string
   loading: boolean
   input: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   attachments: any[]
   attachLoading: boolean
   showLinkInput: boolean

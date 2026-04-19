@@ -45,6 +45,7 @@ export interface ChatOptions {
   responseMode: 'fast' | 'deep' | 'research'
   webSearchEnabled: boolean
   lang: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   attachments: any[]
   vedicEnabled: boolean
   vedicContext: string | null
@@ -113,6 +114,7 @@ export function useChat() {
       let full = ''
       let currentSources: ChatSource[] = []
       let currentAgentTrace: AgentTrace[] = []
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let currentModelTrace: Record<string, any> = {}
       let buffer = ''
 

@@ -53,6 +53,7 @@ function ChatPageContent() {
   const [modelPreference, setModelPreference] = useState('auto')
   const [responseMode, setResponseMode] = useState<'fast' | 'deep' | 'research'>('fast')
   const selectedSystems = ['ayurveda']
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [attachments, setAttachments] = useState<any[]>([])
   const attachLoading = false
   const [showLinkInput, setShowLinkInput] = useState(false)
