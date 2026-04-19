@@ -117,9 +117,9 @@ function ChatPageContent() {
     }
   }
 
-  const handleSpeak = (text: string) => {
+  const handleSpeak = useCallback((text: string) => {
     vaidyaVoice.speak(text, () => {})
-  }
+  }, [])
 
   // Render Logic
   return (

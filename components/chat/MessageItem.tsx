@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { memo } from 'react'
 import { motion } from 'framer-motion'
 import { 
   ShieldCheck, 
@@ -51,7 +51,7 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+function MessageItem({
   msg,
   doshaColor,
   voiceSupported,
@@ -228,3 +228,5 @@ export default function MessageItem({
     </motion.div>
   )
 }
+
+export default memo(MessageItem)
