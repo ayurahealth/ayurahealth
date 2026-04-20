@@ -175,6 +175,31 @@ function ChatPageContent() {
     }
   }
 
+  const handleShare = async () => {
+    if (!dosha) return
+    setIsSharing(true)
+    const shareText = `My Ayura Intelligence Bio-Signature: ${dosha}. Discover your constitutional blueprint at ayurahealth.com`
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Ayura Intelligence Bio-Signature',
+          text: shareText,
+          url: 'https://ayurahealth.com'
+        })
+        setShareSuccess(true)
+      } catch (err) {
+        console.error('Share failed:', err)
+      }
+    } else {
+      await navigator.clipboard.writeText(shareText)
+      setShareSuccess(true)
+    }
+    
+    setIsSharing(false)
+    setTimeout(() => setShareSuccess(false), 3000)
+  }
+
   // Render Logic
   return (
     <main style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
@@ -212,7 +237,7 @@ function ChatPageContent() {
           isSharing={isSharing}
           shareSuccess={shareSuccess}
           onStartChat={() => handleStartChat(dosha)}
-          onShare={() => {}} // html2canvas logic can be added
+          onShare={handleShare}
           onRetake={() => { setScreen('quiz'); setCurrentQ(0); setAnswers([]) }}
         />
       )}
