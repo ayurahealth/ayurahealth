@@ -2,24 +2,25 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { t, type Lang } from '@/lib/translations'
+import { useTranslation } from '@/lib/i18n/LanguageContext'
 
 interface QuizScreenProps {
-  lang: Lang
+  lang: any
   currentQ: number
   questions: Array<{ emoji: string; q: string; opts: Array<{ l: string; d: string }> }>
   onAnswer: (d: string) => void
   onPrevious: () => void
 }
 
-export default function QuizScreen({ lang, currentQ, questions, onAnswer, onPrevious }: QuizScreenProps) {
+export default function QuizScreen({ currentQ, questions, onAnswer, onPrevious }: QuizScreenProps) {
+  const { t } = useTranslation()
   return (
     <div style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto', padding: '4rem 1.5rem' }}>
       <div style={{ marginBottom: '3rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'flex-end' }}>
           <div>
-            <span style={{ color: 'var(--accent-main)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Protocol Phase</span>
-            <div style={{ color: 'var(--text-main)', fontSize: '1.25rem', fontWeight: 600 }}>Step {currentQ + 1} of {questions.length}</div>
+            <span style={{ color: 'var(--accent-main)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t('quiz_protocol')}</span>
+            <div style={{ color: 'var(--text-main)', fontSize: '1.25rem', fontWeight: 600 }}>{t('quiz_step')} {currentQ + 1} {t('quiz_of')} {questions.length}</div>
           </div>
           <span style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: 500 }}>{Math.round((currentQ / questions.length) * 100)}%</span>
         </div>
@@ -73,7 +74,7 @@ export default function QuizScreen({ lang, currentQ, questions, onAnswer, onPrev
           onMouseEnter={e => e.currentTarget.style.opacity = '1'}
           onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
         >
-          ← Previous Step
+          {t('btn_prev')}
         </button>
       )}
     </div>

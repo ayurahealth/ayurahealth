@@ -89,6 +89,7 @@ export const metadata: Metadata = {
 
 import ClerkWrapper from '../components/ClerkWrapper'
 import ConsentBanner from '../components/ConsentBanner'
+import { LanguageProvider } from '@/lib/i18n/LanguageContext'
 import { Outfit, DM_Sans } from 'next/font/google'
 
 const outfit = Outfit({
@@ -110,9 +111,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${outfit.variable} ${dmSans.variable}`}>
       <head>
         {/* Favicon */}
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
+        <link rel="shortcut icon" href="/favicon.png" />
 
         {/* ─── Extra meta for LINE / KakaoTalk / WeChat / Viber ─── */}
         <meta property="og:image" content={`${BASE_URL}/og-image.svg`} />
@@ -169,12 +170,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         ])}} />
       </head>
       <body>
-        <ClerkWrapper>
-          {children}
-          <ConsentBanner />
-          <Analytics />
-          <SpeedInsights />
-        </ClerkWrapper>
+        <LanguageProvider>
+          <ClerkWrapper>
+            {children}
+            <ConsentBanner />
+            <Analytics />
+            <SpeedInsights />
+          </ClerkWrapper>
+        </LanguageProvider>
       </body>
     </html>
   )

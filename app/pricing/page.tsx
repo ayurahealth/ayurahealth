@@ -8,10 +8,11 @@ import IOSButton from '../../components/ui/IOSButton'
 import IOSSegmentedControl from '../../components/ui/IOSSegmentedControl'
 import { Check, ShieldCheck, Sparkles, Zap, ArrowRight, HelpCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useTranslation } from '@/lib/i18n/LanguageContext'
 
-const PRICING_TIERS = [
+const PRICING_TIERS = (t: any) => [
   {
-    name: 'Free',
+    name: t('pricing_free'),
     priceUSD: 0,
     priceINR: 0,
     period: 'Forever',
@@ -25,7 +26,7 @@ const PRICING_TIERS = [
       'Multi-language support',
       'No credit card required',
     ],
-    cta: 'Start Free Consultations',
+    cta: t('pricing_start_free'),
     ctaHref: '/chat',
     highlighted: false,
     badge: null,
@@ -46,14 +47,14 @@ const PRICING_TIERS = [
       'PDF report exports',
       'Priority assistance',
     ],
-    cta: 'Start 7-Day Free Trial',
+    cta: t('pricing_start_trial'),
     ctaHref: '/pricing/checkout?tier=premium',
     highlighted: true,
     badge: 'Recommended',
     icon: ShieldCheck
   },
   {
-    name: 'Clinical Plus',
+    name: t('pricing_enterprise'),
     priceUSD: 9.99,
     priceINR: 799,
     period: 'month',
@@ -67,7 +68,7 @@ const PRICING_TIERS = [
       'Advanced health analytics',
       'One-on-one support',
     ],
-    cta: 'Start 7-Day Free Trial',
+    cta: t('pricing_start_trial'),
     ctaHref: '/pricing/checkout?tier=premium-plus',
     highlighted: false,
     badge: 'Enterprise',
@@ -78,11 +79,13 @@ const PRICING_TIERS = [
 type Currency = 'usd' | 'inr'
 
 export default function PricingPage() {
+  const { t } = useTranslation()
+  const pricingTiers = PRICING_TIERS(t)
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly')
   const [currency, setCurrency] = useState<Currency>('usd')
 
-  const getPrice = (tier: typeof PRICING_TIERS[0]) => {
-    if (tier.priceUSD === 0) return 'Free'
+  const getPrice = (tier: typeof pricingTiers[0]) => {
+    if (tier.priceUSD === 0) return t('pricing_free')
     const base = currency === 'usd' ? tier.priceUSD : tier.priceINR
     if (billing === 'annual') {
       const annual = base * 12 * 0.8
@@ -92,11 +95,11 @@ export default function PricingPage() {
   }
 
   const getPeriod = (priceUSD: number) => {
-    if (priceUSD === 0) return 'Forever'
+    if (priceUSD === 0) return ''
     return billing === 'annual' ? '/year' : '/month'
   }
 
-  const getSavings = (tier: typeof PRICING_TIERS[0]) => {
+  const getSavings = (tier: typeof pricingTiers[0]) => {
     if (tier.priceUSD === 0) return null
     const base = currency === 'usd' ? tier.priceUSD : tier.priceINR
     const saved = base * 12 * 0.2
@@ -104,11 +107,11 @@ export default function PricingPage() {
   }
 
   return (
-    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', overflowX: 'hidden', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
+    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', overflowX: 'hidden', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))', position: 'relative' }}>
       <Nav />
 
       {/* Hero */}
-      <section style={{ padding: '8rem 1.5rem 4rem', textAlign: 'center', maxWidth: 1000, margin: '0 auto' }}>
+      <section style={{ padding: 'max(15vh, 10rem) 1.5rem 4rem', textAlign: 'center', maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <motion.div
            initial={{ opacity: 0, y: 15 }}
            animate={{ opacity: 1, y: 0 }}
@@ -119,10 +122,10 @@ export default function PricingPage() {
             <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2px' }}>Professional Licensing</span>
           </div>
           <h1 className="hero-text" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, lineHeight: 1.1, marginBottom: '2rem', color: 'var(--text-main)' }}>
-            Clinical Grade Pricing
+            {t('heading_pricing')}
           </h1>
           <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: 640, margin: '0 auto 4rem', lineHeight: 1.6 }}>
-            Direct, standardized rates for individuals and clinical practitioners. All assessments are browser-local by default.
+            {t('pricing_sub')}
           </p>
 
           {/* Toggles */}
@@ -131,8 +134,8 @@ export default function PricingPage() {
               value={billing}
               onChange={(id) => setBilling(id as 'monthly' | 'annual')}
               options={[
-                { id: 'monthly', label: 'Monthly' },
-                { id: 'annual', label: 'Annual (-20%)' },
+                { id: 'monthly', label: t('pricing_monthly') },
+                { id: 'annual', label: t('pricing_annual') },
               ]}
             />
             <IOSSegmentedControl
@@ -150,7 +153,7 @@ export default function PricingPage() {
       {/* Pricing Cards */}
       <section style={{ padding: '2rem 1.5rem 6rem', maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.75rem' }}>
-          {PRICING_TIERS.map((tier, idx) => {
+          {pricingTiers.map((tier, idx) => {
             const Icon = tier.icon
             return (
               <Surface
@@ -237,7 +240,7 @@ export default function PricingPage() {
       <section style={{ padding: '8rem 1.5rem', maxWidth: 900, margin: '0 auto', borderTop: '1px solid var(--border-low)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '4rem', justifyContent: 'center' }}>
           <HelpCircle size={32} style={{ color: 'var(--accent-main)' }} />
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Common Questions</h2>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{t('heading_faq')}</h2>
         </div>
         
         <div style={{ display: 'grid', gap: '1rem' }}>
@@ -257,11 +260,15 @@ export default function PricingPage() {
       {/* Footer */}
       <footer style={{ padding: '6rem 1.5rem', borderTop: '1px solid var(--border-low)', textAlign: 'center' }}>
         <div style={{ display: 'flex', gap: '2.5rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
-          {['Compliance', 'Data Privacy', 'Clinical Support'].map((label) => (
-            <Link key={label} href={`/${label.toLowerCase().replace(' ', '-')}`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '1rem', fontWeight: 500 }}>{label}</Link>
+          {[
+            {label: t('footer_compliance'), href: '/compliance'},
+            {label: t('footer_privacy'), href: '/data-privacy'},
+            {label: t('footer_support'), href: '/clinical-support'}
+          ].map((item) => (
+            <Link key={item.label} href={item.href} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '1rem', fontWeight: 500 }}>{item.label}</Link>
           ))}
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', opacity: 0.4 }}>© 2026 Ayura Intelligence Lab · Verified Neural Protocol</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', opacity: 0.4 }}>{t('footer_copy')}</p>
       </footer>
     </main>
   )

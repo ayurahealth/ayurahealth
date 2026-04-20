@@ -7,6 +7,7 @@ import ChatMessagesPanel from '@/components/chat/ChatMessagesPanel'
 import ChatComposer from '@/components/chat/ChatComposer'
 import { ShieldCheck, Zap } from 'lucide-react'
 import Logo from '@/components/Logo'
+import { useTranslation } from '@/lib/i18n/LanguageContext'
 
 interface ChatInterfaceProps {
   messages: Message[]
@@ -72,6 +73,7 @@ export default function ChatInterface({
 }: ChatInterfaceProps) {
   
   const doshaColor = dosha === 'Vata' ? '#6abf8a' : dosha === 'Pitta' ? '#f59e0b' : '#3b82f6'
+  const { t } = useTranslation()
 
   return (
     <div className="chat-shell" style={{ position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100dvh' }}>
@@ -162,7 +164,7 @@ export default function ChatInterface({
         isListening={isListening}
         input={input}
         loading={loading}
-        placeholder={dosha ? `Message Vaidya (${dosha} Intelligence)...` : "Begin clinical synthesis..."}
+        placeholder={dosha ? t('chat_placeholder_dosha').replace('{dosha}', dosha) : t('chat_placeholder')}
         fileInputRef={{ current: null }} // Refs handled in parent
         linkInputRef={{ current: null }}
         textareaRef={{ current: null }}

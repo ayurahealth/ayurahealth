@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense, useCallback } from 'react'
 import { useSafeClerk as useClerk, useSafeUser as useUser } from '@/lib/clerk-client'
-import { Lang, t } from '@/lib/translations'
+import { useTranslation } from '@/lib/i18n/LanguageContext'
 import { useChat, ChatSource } from '@/lib/hooks/useChat'
 import { useDoshaQuiz, Dosha } from '@/lib/hooks/useDoshaQuiz'
 import { getApiUrl } from '@/lib/constants'
@@ -14,12 +14,12 @@ import QuizScreen from './components/QuizScreen'
 import ResultScreen from './components/ResultScreen'
 import ChatInterface from './components/ChatInterface'
 
-const QUESTIONS = (lang: Lang) => [
-  { emoji: '🧍', q: t[lang].q1, opts: [{ l: t[lang].q1a, d: 'Vata' }, { l: t[lang].q1b, d: 'Pitta' }, { l: t[lang].q1c, d: 'Kapha' }] },
-  { emoji: '🌿', q: t[lang].q2, opts: [{ l: t[lang].q2a, d: 'Vata' }, { l: t[lang].q2b, d: 'Pitta' }, { l: t[lang].q2c, d: 'Kapha' }] },
-  { emoji: '🌙', q: t[lang].q3, opts: [{ l: t[lang].q3a, d: 'Vata' }, { l: t[lang].q3b, d: 'Pitta' }, { l: t[lang].q3c, d: 'Kapha' }] },
-  { emoji: '🧠', q: t[lang].q4, opts: [{ l: t[lang].q4a, d: 'Vata' }, { l: t[lang].q4b, d: 'Pitta' }, { l: t[lang].q4c, d: 'Kapha' }] },
-  { emoji: '✨', q: t[lang].q5, opts: [{ l: t[lang].q5a, d: 'Vata' }, { l: t[lang].q5b, d: 'Pitta' }, { l: t[lang].q5c, d: 'Kapha' }] },
+const QUESTIONS = (t: any) => [
+  { emoji: t('q1e'), q: t('q1'), opts: [{ l: t('q1a'), d: 'Vata' }, { l: t('q1b'), d: 'Pitta' }, { l: t('q1c'), d: 'Kapha' }] },
+  { emoji: t('q2e'), q: t('q2'), opts: [{ l: t('q2a'), d: 'Vata' }, { l: t('q2b'), d: 'Pitta' }, { l: t('q2c'), d: 'Kapha' }] },
+  { emoji: t('q3e'), q: t('q3'), opts: [{ l: t('q3a'), d: 'Vata' }, { l: t('q3b'), d: 'Pitta' }, { l: t('q3c'), d: 'Kapha' }] },
+  { emoji: t('q4e'), q: t('q4'), opts: [{ l: t('q4a'), d: 'Vata' }, { l: t('q4b'), d: 'Pitta' }, { l: t('q4c'), d: 'Kapha' }] },
+  { emoji: t('q5e'), q: t('q5'), opts: [{ l: t('q5a'), d: 'Vata' }, { l: t('q5b'), d: 'Pitta' }, { l: t('q5c'), d: 'Kapha' }] },
 ]
 
 export default function ChatPage() {
@@ -37,6 +37,7 @@ export default function ChatPage() {
 function ChatPageContent() {
   const { user, isLoaded: clerkLoaded } = useUser()
   const clerk = useClerk()
+  const { language: lang, t } = useTranslation()
   
   // State Hooks
   const { 
@@ -50,7 +51,6 @@ function ChatPageContent() {
 
   // Local UI State
   const [screen, setScreen] = useState<'landing' | 'quiz' | 'result' | 'chat'>('landing')
-  const [lang, setLang] = useState<Lang>('en')
   const [modelPreference, setModelPreference] = useState('auto')
   const [responseMode, setResponseMode] = useState<'fast' | 'deep' | 'research'>('fast')
   const [selectedSystems, setSelectedSystems] = useState(['ayurveda'])
@@ -66,9 +66,6 @@ function ChatPageContent() {
   // Initialization
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedLang = localStorage.getItem('ayura_lang') as Lang
-      if (savedLang) setLang(savedLang)
-      
       const qs = new URLSearchParams(window.location.search)
       if (qs.get('q')) {
         setScreen('chat')
@@ -89,12 +86,11 @@ function ChatPageContent() {
   const handleStartChat = useCallback((d?: Dosha | null) => {
     setScreen('chat')
     const activeDosha = d ?? dosha
-    const tx = t[lang]
     const greeting = activeDosha 
-      ? tx.greeting_dosha.replace(/{dosha}/g, activeDosha).replace('{tagline}', '').replace('{desc}', '')
-      : tx.greeting
+      ? t('greeting_dosha').replace(/{dosha}/g, activeDosha).replace('{tagline}', '').replace('{desc}', '')
+      : t('greeting')
     setMessages([{ role: 'assistant', content: greeting }])
-  }, [dosha, lang])
+  }, [dosha, t])
 
   const handleSendMessage = async () => {
     try {
@@ -134,9 +130,9 @@ function ChatPageContent() {
 
       {screen === 'quiz' && (
         <QuizScreen 
-          lang={lang}
+          lang={lang as any}
           currentQ={currentQ}
-          questions={QUESTIONS(lang)}
+          questions={QUESTIONS(t)}
           onAnswer={(d) => {
             const newAns = [...answers, d]
             setAnswers(newAns)
@@ -153,7 +149,7 @@ function ChatPageContent() {
 
       {screen === 'result' && dosha && (
         <ResultScreen 
-          lang={lang}
+          lang={lang as any}
           dosha={dosha}
           isSharing={isSharing}
           shareSuccess={shareSuccess}
@@ -201,10 +197,10 @@ function ChatPageContent() {
       {showPaywall && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', maxWidth: 400 }}>
-            <h2>Synthesis Limit Reached</h2>
-            <p>Upgrade to Ayura Intelligence Pro for unlimited clinical analysis.</p>
-            <button onClick={() => clerk.openSignUp()} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>Upgrade Now</button>
-            <button onClick={() => setShowPaywall(false)} style={{ marginTop: '1rem', opacity: 0.5 }}>Close</button>
+            <h2>{t('msg_limit')}</h2>
+            <p>{t('msg_upgrade')}</p>
+            <button onClick={() => clerk.openSignUp()} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>{t('btn_upgrade')}</button>
+            <button onClick={() => setShowPaywall(false)} style={{ marginTop: '1rem', opacity: 0.5 }}>{t('btn_close')}</button>
           </div>
         </div>
       )}

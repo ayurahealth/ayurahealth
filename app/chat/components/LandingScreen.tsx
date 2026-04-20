@@ -2,17 +2,17 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { t, type Lang } from '@/lib/translations'
+import { useTranslation } from '@/lib/i18n/LanguageContext'
 import EngagementStory from '../../../components/EngagementStory'
 
 interface LandingScreenProps {
-  lang: Lang
+  lang: any
   onStartQuiz: () => void
   onSkipToChat: () => void
 }
 
-export default function LandingScreen({ lang, onStartQuiz, onSkipToChat }: LandingScreenProps) {
-  const tx = t[lang]
+export default function LandingScreen({ onStartQuiz, onSkipToChat }: LandingScreenProps) {
+  const { t } = useTranslation()
 
   return (
     <div style={{ position: 'relative', zIndex: 1, maxWidth: 840, margin: '0 auto', textAlign: 'center', padding: '4rem 1.5rem' }}>
@@ -33,7 +33,7 @@ export default function LandingScreen({ lang, onStartQuiz, onSkipToChat }: Landi
           lineHeight: 1.1,
           fontWeight: 500
         }}>
-          {tx.title}
+          {t('hero_title')}
         </h1>
         <p style={{ 
           fontSize: '1.25rem', 
@@ -42,7 +42,7 @@ export default function LandingScreen({ lang, onStartQuiz, onSkipToChat }: Landi
           margin: '0 auto 3.5rem',
           lineHeight: 1.6
         }}>
-          {tx.subtitle}
+          {t('hero_sub')}
         </p>
       </motion.div>
 
@@ -58,7 +58,7 @@ export default function LandingScreen({ lang, onStartQuiz, onSkipToChat }: Landi
           className="btn-primary"
           style={{ width: '100%', height: 64, fontSize: '1.1rem', borderRadius: '18px' }}
         >
-          Start Clinical Intake
+          {t('btn_start_intake')}
         </button>
       </div>
       
@@ -79,7 +79,7 @@ export default function LandingScreen({ lang, onStartQuiz, onSkipToChat }: Landi
         onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-low)'}
         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
       >
-        {tx.skip_btn}
+        {t('btn_skip')}
       </button>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '4rem', flexWrap: 'wrap', opacity: 0.4 }}>
@@ -90,7 +90,7 @@ export default function LandingScreen({ lang, onStartQuiz, onSkipToChat }: Landi
           </div>
         ))}
       </div>
-      <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '3rem', lineHeight: 1.6, maxWidth: 600, margin: '3rem auto 0', opacity: 0.5 }}>{tx.disclaimer}</p>
+      <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '3rem', lineHeight: 1.6, maxWidth: 600, margin: '3rem auto 0', opacity: 0.5 }}>{t('disclaimer')}</p>
     </div>
   )
 }
