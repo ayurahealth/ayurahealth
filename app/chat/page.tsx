@@ -42,8 +42,8 @@ function ChatPageContent() {
   // State Hooks
   const { 
     messages, input, loading, streaming, sendMessage, 
-    setInput, setIsListening, setMessages, isListening, recognitionRef,
-    isSpeaking, setIsSpeaking
+    setInput, setIsListening, setMessages, isListening,
+    isSpeaking, setIsSpeaking, analyser
   } = useChat()
   
   const { 
