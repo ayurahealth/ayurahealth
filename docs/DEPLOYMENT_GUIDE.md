@@ -18,7 +18,7 @@ Ayura Intelligence Lab is a premium institutional AI wellness platform with inte
 - ✅ Implemented security headers
 - ✅ Created institutional branding with golden leaf logo
 - ✅ Comprehensive payment flow validation
-- ✅ Domain synchronized to ayura.ai
+- ✅ Domain synchronized to ayurahealth.com
 
 ---
 
@@ -26,9 +26,9 @@ Ayura Intelligence Lab is a premium institutional AI wellness platform with inte
 
 ### Option 1: Institutional Production URL (Recommended)
 
-**Production URL:** `https://ayura.ai`
+**Production URL:** `https://ayurahealth.com`
 
-This deployment is the final institutional version with all payment features synchronized to the ayura.ai domain.
+This deployment is the final institutional version with all payment features synchronized to the ayurahealth.com domain.
 
 ### Option 2: Deploy Fresh Build
 
@@ -70,7 +70,7 @@ NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_YOUR_RAZORPAY_KEY_ID
 RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_KEY_SECRET
 
 # Application URLs
-NEXT_PUBLIC_APP_URL=https://ayura.ai
+NEXT_PUBLIC_APP_URL=https://ayurahealth.com
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_CLERK_KEY
@@ -100,12 +100,12 @@ CLERK_SECRET_KEY=YOUR_CLERK_SECRET
 2. **Configure Webhook (Recommended):**
    - Go to Settings → Webhooks
    - Click "Add New Webhook"
-   - URL: `https://ayura.ai/api/webhooks/razorpay`
+   - URL: `https://ayurahealth.com/api/webhooks/razorpay`
    - Events: `payment.authorized`, `payment.failed`
 
 3. **Test Mode:**
    - Use test credentials from Razorpay dashboard for staging
-   - Switch to live mode for ayura.ai production
+   - Switch to live mode for ayurahealth.com production
 
 ---
 
@@ -131,7 +131,7 @@ Review `SECURITY_AUDIT.md` for:
 - ✅ No API keys hardcoded
 - ✅ Security headers configured
 - ✅ Backend authentication implemented
-- ✅ Institutional CORS whitelist (ayura.ai)
+- ✅ Institutional CORS whitelist (ayurahealth.com)
 
 ---
 
@@ -157,7 +157,7 @@ Implement for production:
 ## 🎯 Post-Deployment Checklist
 
 ### Immediate (Day 1)
-- [ ] Verify deployment successful at ayura.ai
+- [ ] Verify deployment successful at ayurahealth.com
 - [ ] Test payment flows in production
 - [ ] Monitor error rates
 - [ ] Verify no console errors
@@ -193,16 +193,16 @@ Implement for production:
 ## 📞 Support Resources
 
 ### Emergency Contacts
-- **Security Issues:** security@ayura.ai
-- **Payment Issues:** payments@ayura.ai
-- **Technical Support:** support@ayura.ai
+- **Security Issues:** security@ayurahealth.com
+- **Payment Issues:** payments@ayurahealth.com
+- **Technical Support:** support@ayurahealth.com
 
 ---
 
 ## 🎓 Next Steps
 
 ### Phase 1: Launch (Ayura AI Transition)
-- Deploy to ayura.ai
+- Deploy to ayurahealth.com
 - Gather institutional feedback
 
 ---

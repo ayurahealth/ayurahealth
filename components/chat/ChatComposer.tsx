@@ -1,6 +1,7 @@
 'use client'
 
 import type { ChangeEvent, KeyboardEvent, RefObject } from 'react'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { 
   Paperclip, 
@@ -49,6 +50,7 @@ interface ChatComposerProps {
   onInputChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
   onInputKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void
   onSendMessage: () => void
+  analyser?: AnalyserNode | null
 }
 
 export default function ChatComposer({
@@ -74,6 +76,7 @@ export default function ChatComposer({
   onInputChange,
   onInputKeyDown,
   onSendMessage,
+  analyser,
 }: ChatComposerProps) {
   
   const attachmentColorMap = { 
@@ -90,6 +93,53 @@ export default function ChatComposer({
       return false
     }
   }
+
+  /* ─── Neural Waveform Logic ─── */
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  
+  useEffect(() => {
+    if (!isListening || !analyser || !canvasRef.current) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const bufferLength = analyser.frequencyBinCount
+    const dataArray = new Uint8Array(bufferLength)
+    let animationId: number
+
+    const draw = () => {
+      animationId = requestAnimationFrame(draw)
+      analyser.getByteTimeDomainData(dataArray)
+
+      // Get dimensions from computed style if 0
+      const width = canvas.width
+      const height = canvas.height
+
+      ctx.clearRect(0, 0, width, height)
+      ctx.lineWidth = 2
+      ctx.strokeStyle = '#6abf8a' // var(--accent-main)
+      ctx.beginPath()
+
+      const sliceWidth = width / bufferLength
+      let x = 0
+
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0
+        const y = (v * height) / 2
+
+        if (i === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+        x += sliceWidth
+      }
+
+      ctx.lineTo(width, height / 2)
+      ctx.stroke()
+    }
+
+    draw()
+    return () => cancelAnimationFrame(animationId)
+  }, [isListening, analyser])
 
   return (
     <div 
@@ -192,28 +242,51 @@ export default function ChatComposer({
 
         {/* ─── Main Input Area ─── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={onInputChange}
-            onKeyDown={onInputKeyDown}
-            placeholder={placeholder}
-            rows={1}
-            style={{ 
-              width: '100%', 
-              background: 'transparent', 
-              border: 'none', 
-              color: 'var(--text-main)', 
-              padding: '0.5rem 0.75rem', 
-              resize: 'none', 
-              fontSize: '1.15rem', 
-              outline: 'none', 
-              lineHeight: 1.5, 
-              maxHeight: 200, 
-              overflowY: 'auto', 
-              fontFamily: 'inherit'
-            }}
-          />
+          <div style={{ position: 'relative' }}>
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={onInputChange}
+              onKeyDown={onInputKeyDown}
+              placeholder={isListening ? "Listening with Neural Precision..." : placeholder}
+              rows={1}
+              style={{ 
+                width: '100%', 
+                background: 'transparent', 
+                border: 'none', 
+                color: isListening ? 'var(--accent-main)' : 'var(--text-main)', 
+                padding: '0.5rem 0.75rem', 
+                resize: 'none', 
+                fontSize: '1.15rem', 
+                outline: 'none', 
+                lineHeight: 1.5, 
+                maxHeight: 200, 
+                overflowY: 'auto', 
+                fontFamily: 'inherit',
+                opacity: isListening ? 0.4 : 1,
+                transition: 'opacity 0.3s ease'
+              }}
+            />
+            {isListening && (
+              <div 
+                style={{ 
+                  position: 'absolute', 
+                  bottom: -2, 
+                  left: '0.75rem', 
+                  right: '0.75rem', 
+                  height: 32,
+                  pointerEvents: 'none'
+                }}
+              >
+                <canvas 
+                  ref={canvasRef} 
+                  width={600} 
+                  height={32} 
+                  style={{ width: '100%', height: '100%', opacity: 0.8 }} 
+                />
+              </div>
+            )}
+          </div>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.25rem' }}>
             <div style={{ display: 'flex', gap: '0.4rem' }}>
@@ -256,8 +329,20 @@ export default function ChatComposer({
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.7rem', fontWeight: 600, color: 'var(--accent-main)', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.6 }}>
-                <Zap size={10} fill="currentColor" /> Intelligence Active
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.4rem', 
+                fontSize: '0.7rem', 
+                fontWeight: 600, 
+                color: isListening ? 'var(--accent-secondary)' : 'var(--accent-main)', 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.05em', 
+                opacity: isListening ? 1 : 0.6,
+                transition: 'all 0.3s ease'
+              }}>
+                <Zap size={10} fill="currentColor" className={isListening ? 'animate-pulse' : ''} /> 
+                {isListening ? 'Voice Synthesis Active' : 'Intelligence Active'}
               </div>
               <button 
                 onClick={onSendMessage} 

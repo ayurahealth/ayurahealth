@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
-const BASE_URL = 'https://ayura.ai'
+const BASE_URL = 'https://ayurahealth.com'
 
 export const viewport: Viewport = {
   themeColor: '#1a4d2e',
@@ -23,9 +23,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.ico', sizes: 'any' },
     ],
     apple: [
       { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
@@ -82,6 +81,16 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: BASE_URL,
   },
   category: 'health',
 }
@@ -89,6 +98,7 @@ export const metadata: Metadata = {
 
 import ClerkWrapper from '../components/ClerkWrapper'
 import ConsentBanner from '../components/ConsentBanner'
+import { LanguageProvider } from '@/lib/i18n/LanguageContext'
 import { Outfit, DM_Sans } from 'next/font/google'
 
 const outfit = Outfit({
@@ -109,11 +119,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${outfit.variable} ${dmSans.variable}`}>
       <head>
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.svg" />
-
         {/* ─── Extra meta for LINE / KakaoTalk / WeChat / Viber ─── */}
         <meta property="og:image" content={`${BASE_URL}/og-image.svg`} />
         <meta property="og:image:width" content="1200" />
@@ -144,7 +149,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             "url": BASE_URL,
             "logo": {
               "@type": "ImageObject",
-              "url": `${BASE_URL}/favicon.png`,
+              "url": `${BASE_URL}/favicon.svg`,
               "width": 512,
               "height": 512
             },
@@ -169,12 +174,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         ])}} />
       </head>
       <body>
-        <ClerkWrapper>
-          {children}
-          <ConsentBanner />
-          <Analytics />
-          <SpeedInsights />
-        </ClerkWrapper>
+        <LanguageProvider>
+          <ClerkWrapper>
+            {children}
+            <ConsentBanner />
+            <Analytics />
+            <SpeedInsights />
+          </ClerkWrapper>
+        </LanguageProvider>
       </body>
     </html>
   )

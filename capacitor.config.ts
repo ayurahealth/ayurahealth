@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Ayura Intelligence',
   webDir: 'out',
   server: {
-    url: 'https://ayura.ai',
+    url: 'https://ayurahealth.com',
     cleartext: false,
   },
   ios: {

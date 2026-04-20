@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/navigation'
+import Link from 'next/link'
 import Logo from '../../../components/Logo'
 import { motion } from 'framer-motion'
 import { Check, ArrowRight, Zap, Globe, Shield } from 'lucide-react'
@@ -106,7 +106,7 @@ export function SuccessContent() {
             </div>
 
             <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid var(--border-low)', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              <p>For protocol support, contact our intelligence team at <strong>intel@ayura.ai</strong></p>
+              <p>For protocol support, contact our intelligence team at <strong>intel@ayurahealth.com</strong></p>
             </div>
           </motion.div>
         )}

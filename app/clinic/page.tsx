@@ -53,7 +53,7 @@ export default function ClinicPage() {
 
       <Nav showLangPicker={false} />
 
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '10rem 1.5rem 6rem', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'max(15vh, 10rem) 1.5rem 6rem', position: 'relative', zIndex: 1 }}>
 
         {/* Hero */}
         <div style={{ textAlign: 'center', marginBottom: '6rem' }}>

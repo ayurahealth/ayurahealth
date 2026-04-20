@@ -59,8 +59,8 @@
 	<true/>
 	<key>WKAppBoundDomains</key>
 	<array>
-		<string>ayura.ai</string>
-		<string>www.ayura.ai</string>
+		<string>ayurahealth.com</string>
+		<string>www.ayurahealth.com</string>
 	</array>
 </dict>
 </plist>

@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
     },
     {
       title: '4. Contact Intelligence Compliance',
-      content: 'Privacy requests: privacy@ayura.ai\nAyura Intelligence Lab · Tokyo, Japan',
+      content: 'Privacy requests: privacy@ayurahealth.com\nAyura Intelligence Lab · Tokyo, Japan',
     },
   ]
 

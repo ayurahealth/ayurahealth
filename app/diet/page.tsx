@@ -55,6 +55,7 @@ export default function DietChartPage() {
   const [conditions, setConditions] = useState<string[]>([])
   const [diet, setDiet] = useState('')
   const [loading, setLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -131,10 +132,10 @@ Include classical source citations (e.g., Charaka Samhita).`
 
 
   return (
-    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
+    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))', position: 'relative' }}>
       <Nav />
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '7rem 1.5rem 4rem' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 'max(15vh, 10rem) 1.5rem 4rem', position: 'relative', zIndex: 1 }}>
         
         {/* Progress Stepper */}
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '4rem', justifyContent: 'center' }}>
@@ -308,11 +309,15 @@ Include classical source citations (e.g., Charaka Samhita).`
                      <ClinicalMarkdown content={diet} doshaColor={dosha === 'Pitta' ? 'var(--accent-secondary)' : 'var(--accent-main)'} />
                   </Surface>
                   <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                    <IOSButton variant="secondary" onClick={() => { navigator.clipboard.writeText(diet) }} style={{ flex: 1 }}>
+                    <IOSButton variant="secondary" onClick={() => { 
+                      navigator.clipboard.writeText(diet);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }} style={{ flex: 1 }}>
                       <ClipboardCheck size={18} />
-                      Copy Protocol
+                      {copied ? 'Copied!' : 'Copy Protocol'}
                     </IOSButton>
-                    <IOSButton onClick={() => { setStep(1); setDiet('') }} style={{ flex: 1 }}>
+                    <IOSButton onClick={() => { setStep(1); setDiet(''); setCopied(false) }} style={{ flex: 1 }}>
                       Next Protocol
                     </IOSButton>
                   </div>

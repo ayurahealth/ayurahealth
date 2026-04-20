@@ -57,7 +57,7 @@ export default function PressKitPage() {
             <div style={{ borderLeft: '1px solid var(--border-low)', paddingLeft: '4rem' }}>
               <div style={{ marginBottom: '2rem' }}>
                 <div style={{ fontWeight: 700, color: 'var(--accent-main)', marginBottom: '0.5rem' }}>Contact Inquiries</div>
-                <p>press@ayura.ai</p>
+                <p>press@ayurahealth.com</p>
               </div>
               <div>
                 <div style={{ fontWeight: 700, color: 'var(--accent-main)', marginBottom: '0.5rem' }}>Social Graph</div>

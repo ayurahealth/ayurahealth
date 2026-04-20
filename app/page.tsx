@@ -7,50 +7,35 @@ import Nav from '../components/Nav'
 import Surface from '../components/ui/Surface'
 import { CreditCard, Hospital, Zap, Activity, BookOpen, Search, ArrowRight, MessageSquare } from 'lucide-react'
 
-/* ─── AI Organization Translations ────────────────────────────────────────── */
-const T: Record<string, {
-  tagline: string; sub: string; cta: string; free: string;
-  traditions: string; tradSub: string;
-  how: string; s1t: string; s1d: string; s2t: string; s2d: string; s3t: string; s3d: string;
-  finalCta: string; finalSub: string; footer: string; clinic: string;
-}> = {
-  en: {
-    tagline: 'Intelligence for Humanity\nSynthesizing Ancient Medical Logic.',
-    sub: 'Access the world\'s most sophisticated clinical reasoning engine. Rooted in 8 classical medical traditions, designed for modern longevity.',
-    cta: 'Initialize Assessment', free: '3 Active Neural Sessions · No Credit Card',
-    traditions: '8 Intelligence Pillars', tradSub: 'A unified reasoning system connecting classical medical paradigms.',
-    how: 'Core Capabilities',
-    s1t: 'Neural Synthesis', s1d: 'Standardized assessment algorithms reveal your clinical profile based on verified Ayurvedic and Traditional logic.',
-    s2t: 'Reasoning Traceability', s2d: 'Every intelligence output cross-references primary sources like Charaka Samhita and Huangdi Neijing via live neural tracing.',
-    s3t: 'Analytical Integrity', s3d: 'Multi-step tradition analysis for complex physiological pathways, providing depth beyond simple pattern matching.',
-    finalCta: 'The future of healing is intelligent.', finalSub: 'Ayura Intelligence Lab is live. Initialize your first session today.',
-    footer: 'Clinical Intelligence Research Mode · For educational purposes only · Not medical advice', clinic: 'Analytics Portal',
-  },
-}
-
-const getT = (code: string) => T[code] || T['en']
-
-const CAPABILITIES = [
-  { name: 'Classical Reasoning', desc: 'Synthesizing 5,000 years of clinical logic into actionable health insights.', icon: BookOpen },
-  { name: 'Neural Tracing', desc: 'Verifiable citations from primary medical texts in every individual response.', icon: Zap },
-  { name: 'Tradition Synthesis', desc: 'Unified cross-analysis between Ayurveda, TCM, and 6 other medical paradigms.', icon: Activity },
-]
+import { useTranslation } from '@/lib/i18n/LanguageContext'
 
 export default function LandingPage() {
-  const [lang, setLang] = useState('en')
-  const t = getT(lang)
+  const { language: lang, t } = useTranslation()
   const isRTL = ['ar', 'fa', 'ur', 'he'].includes(lang)
   const [teaserPrompt, setTeaserPrompt] = useState('')
   const [isFocused, setIsFocused] = useState(false)
+  const [terminalText, setTerminalText] = useState('')
   const router = useRouter()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  const fullTerminalText = `> INITIALIZING TRADITION SYNERGY...
+> CROSS-REFERENCING: CHARAKA SAMHITA [CH. 1-4], NEI JING [SEC 2]
+> DETECTING PHYSIOLOGICAL SYNERGY... [VAT+PIT]
+> SYNTHESIZING CLINICAL GUIDANCE...
+> TRACE COMPLETE: ACCURACY 99.4% | CITATIONS 14 / FOUNDATIONAL TEXTS`
+
   useEffect(() => {
-    const saved = localStorage.getItem('ayura_lang')
-    if (saved && saved !== lang) {
-      setLang(saved)
-    }
-  }, [lang])
+    let currentIndex = 0
+    const intervalId = setInterval(() => {
+      setTerminalText(fullTerminalText.slice(0, currentIndex + 1))
+      currentIndex++
+      if (currentIndex === fullTerminalText.length) {
+        clearInterval(intervalId)
+      }
+    }, 45) // Typist speed
+    return () => clearInterval(intervalId)
+  }, [fullTerminalText])
+
 
   const handleTeaserSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -59,13 +44,13 @@ export default function LandingPage() {
   }
 
   const navLinks = [
-    { label: 'Pricing', href: '/pricing', icon: CreditCard },
-    { label: t.clinic, href: '/clinic', icon: Hospital },
+    { label: t('nav_pricing'), href: '/pricing', icon: CreditCard },
+    { label: t('nav_clinic'), href: '/clinic', icon: Hospital },
   ]
 
   return (
     <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', position: 'relative', overflow: 'hidden' }}>
-      <Nav lang={lang} onLangChange={setLang} showLangPicker={true} links={navLinks} />
+      <Nav showLangPicker={true} links={navLinks} />
 
       {/* ─── Ambient Intelligence Background ─── */}
       <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '120vw', height: '100vh', background: 'radial-gradient(circle at center, hsla(144, 20%, 60%, 0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
@@ -90,7 +75,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             style={{ fontSize: 'clamp(2.5rem, 8vw, 5rem)', fontWeight: 700, lineHeight: 1.05, marginBottom: '1.5rem', whiteSpace: 'pre-line', letterSpacing: '-0.03em' }}
           >
-            {t.tagline}
+            {t('landing_tagline')}
           </motion.h1>
           
           <motion.p 
@@ -99,7 +84,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             style={{ fontSize: '1.25rem', color: 'var(--text-muted)', maxWidth: 680, margin: '0 auto 4rem', lineHeight: 1.6 }}
           >
-            {t.sub}
+            {t('landing_sub')}
           </motion.p>
 
           {/* ─── The Main Intelligence Composer (Claude/Perplexity Style) ─── */}
@@ -129,7 +114,7 @@ export default function LandingPage() {
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   onChange={(e) => setTeaserPrompt(e.target.value)}
-                  placeholder="How can Ayura Intelligence assist your clinical observation today?"
+                  placeholder={t('teaser_placeholder')}
                   style={{ 
                     width: '100%', 
                     background: 'transparent', 
@@ -153,10 +138,10 @@ export default function LandingPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem 0.5rem' }}>
                   <div style={{ display: 'flex', gap: '0.75rem' }}>
                     <button type="button" className="btn-secondary" style={{ padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <Activity size={14} /> Traditional Engine
+                      <Activity size={14} /> {t('teaser_trad')}
                     </button>
                     <button type="button" className="btn-secondary" style={{ padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <BookOpen size={14} /> Reasoning Trace
+                      <BookOpen size={14} /> {t('teaser_trace')}
                     </button>
                   </div>
                   <button 
@@ -173,17 +158,21 @@ export default function LandingPage() {
             
             <div style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
                <Link href="/chat" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
-                <MessageSquare size={16} /> Enter Full Interface
+                <MessageSquare size={16} /> {t('teaser_enter')}
               </Link>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
-                <span style={{ color: 'var(--accent-main)', marginRight: '0.5rem' }}>●</span> {t.free}
+                <span style={{ color: 'var(--accent-main)', marginRight: '0.5rem' }}>●</span> {t('landing_free')}
               </div>
             </div>
           </motion.div>
 
           {/* ─── Capabilities Grid ─── */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', textAlign: 'left' }}>
-            {CAPABILITIES.map((cap, i) => (
+            {[
+              { name: t('cap_1_name'), desc: t('cap_1_desc'), icon: BookOpen },
+              { name: t('cap_2_name'), desc: t('cap_2_desc'), icon: Zap },
+              { name: t('cap_3_name'), desc: t('cap_3_desc'), icon: Activity },
+            ].map((cap, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -215,12 +204,13 @@ export default function LandingPage() {
               </div>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'monospace', opacity: 0.6 }}>ayura_neural_engine_synthesis.v1</span>
             </div>
-            <div style={{ padding: '3rem', whiteSpace: 'pre-line', fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--accent-main)', opacity: 0.8, lineHeight: 1.8 }}>
-              {`> INITIALIZING TRADITION SYNERGY...
-> CROSS-REFERENCING: CHARAKA SAMHITA [CH. 1-4], NEI JING [SEC 2]
-> DETECTING PHYSIOLOGICAL SYNERGY... [VAT+PIT]
-> SYNTHESIZING CLINICAL GUIDANCE...
-> TRACE COMPLETE: ACCURACY 99.4% | CITATIONS 14 / FOUNDATIONAL TEXTS`}
+            <div style={{ padding: '3rem', whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--accent-main)', opacity: 0.8, lineHeight: 1.8 }}>
+              {terminalText}
+              <motion.span 
+                animate={{ opacity: [1, 0, 1] }} 
+                transition={{ repeat: Infinity, duration: 0.8 }}
+                style={{ display: 'inline-block', width: 8, height: 15, background: 'var(--accent-main)', marginLeft: 4, verticalAlign: 'middle' }}
+              />
             </div>
           </div>
         </div>
@@ -229,12 +219,17 @@ export default function LandingPage() {
       {/* ─── Footer ─── */}
       <footer style={{ borderTop: '1px solid var(--border-low)', padding: '6rem 2rem', textAlign: 'center' }}>
         <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
-          {['Research', 'Compliance', 'Intelligence Integrity', 'API Support'].map((label) => (
-            <Link key={label} href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>{label}</Link>
+          {[
+            {label: t('footer_research'), href: '/'},
+            {label: t('footer_compliance'), href: '/'},
+            {label: 'Intelligence Integrity', href: '/'},
+            {label: t('footer_support'), href: '/'},
+          ].map((item, i) => (
+            <Link key={i} href={item.href} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>{item.label}</Link>
           ))}
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: 640, margin: '0 auto 2rem', opacity: 0.4, lineHeight: 1.8 }}>Powered by Ayura Intelligence Lab. Verified Clinical Reasoning Standards v1.1.0</p>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.2 }}>© 2026 Ayura Intelligence · Tokyo Laboratory</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.2 }}>{t('footer_copy')}</p>
       </footer>
     </main>
   )

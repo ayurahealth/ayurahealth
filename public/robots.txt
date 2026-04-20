@@ -1,10 +1,11 @@
 User-agent: *
 Allow: /
-Allow: /
-Allow: /chat
 
 Disallow: /api/
+Disallow: /design-system
+Disallow: /onboarding
+Disallow: /dashboard
 Disallow: /wp-admin/
 Disallow: /*.php
-Sitemap: https://ayura.ai/sitemap.xml
-准确
+
+Sitemap: https://ayurahealth.com/sitemap.xml

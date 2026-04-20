@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false, 
   },
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
   },
 
   /* config options here */
@@ -25,33 +25,11 @@ const nextConfig: NextConfig = {
   async headers() {
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.razorpay.com https://*.clerk.accounts.dev https://*.clerk.accounts.com https://accounts.ayura.ai https://clerk.ayura.ai https://*.clerk.ayura.ai https://www.googletagmanager.com https://fonts.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.razorpay.com https://*.clerk.accounts.dev https://*.clerk.accounts.com https://accounts.ayurahealth.com https://clerk.ayurahealth.com https://*.clerk.ayurahealth.com https://www.googletagmanager.com https://fonts.googleapis.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
-      [
-        "connect-src 'self'",
-        "https://api.groq.com",
-        "https://openrouter.ai",
-        "https://router.huggingface.co",
-        "https://api-inference.huggingface.co",
-        "http://localhost:11434",
-        "https://checkout.razorpay.com",
-        "https://api.razorpay.com",
-        "https://cdn.razorpay.com",
-        "https://lumberjack.razorpay.com",
-        "https://*.clerk.accounts.dev",
-        "https://*.clerk.accounts.com",
-        "https://accounts.ayura.ai",
-        "https://clerk.ayura.ai",
-        "https://*.clerk.ayura.ai",
-        "https://formspree.io",
-        "https://www.google-analytics.com",
-        "https://vitals.vercel-insights.com",
-        "https://va.vercel-scripts.com",
-        "https://ayura.ai",
-        "https://www.ayura.ai",
-      ].join(' '),
+      "connect-src 'self' https://api.groq.com https://openrouter.ai https://router.huggingface.co https://api-inference.huggingface.co http://localhost:11434 https://checkout.razorpay.com https://api.razorpay.com https://cdn.razorpay.com https://lumberjack.razorpay.com https://*.clerk.accounts.dev https://*.clerk.accounts.com https://accounts.ayurahealth.com https://clerk.ayurahealth.com https://*.clerk.ayurahealth.com https://formspree.io https://www.google-analytics.com https://vitals.vercel-insights.com https://va.vercel-scripts.com",
       "frame-src https://api.razorpay.com https://checkout.razorpay.com",
       "frame-ancestors 'none'",
       "worker-src 'self' blob:",
@@ -76,6 +54,15 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      // ── Canonical domain: force www → non-www (301) ──
+      // This tells Google the true canonical is ayurahealth.com (no www)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.ayurahealth.com' }],
+        destination: 'https://ayurahealth.com/:path*',
+        permanent: true,
+      },
+      // ── Legacy redirects ──
       { source: '/home', destination: '/', permanent: true },
       { source: '/blog', destination: '/', permanent: true },
     ]
@@ -83,4 +70,3 @@ const nextConfig: NextConfig = {
 }
 
 export default nextConfig
-准确

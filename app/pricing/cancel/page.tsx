@@ -53,7 +53,7 @@ export default function CancelPage() {
               </div>
               <div className="faq-item">
                 <strong>Have questions?</strong>
-                <p>Our support team is here to help. Email us at support@ayura.ai</p>
+                <p>Our support team is here to help. Email us at support@ayurahealth.com</p>
               </div>
               <div className="faq-item">
                 <strong>Want a different plan?</strong>
@@ -72,7 +72,7 @@ export default function CancelPage() {
 
             {/* Support Info */}
             <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(106,191,138,0.1)', fontSize: '0.85rem', color: 'rgba(232,223,200,0.5)' }}>
-              <p>Questions? Contact us at <strong>support@ayura.ai</strong></p>
+              <p>Questions? Contact us at <strong>support@ayurahealth.com</strong></p>
             </div>
           </div>
         </div>

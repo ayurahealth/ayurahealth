@@ -3,7 +3,7 @@
 import { PropsWithChildren, type CSSProperties } from 'react'
 import { motion } from 'framer-motion'
 
-type SurfaceVariant = 'default' | 'strong' | 'glass'
+type SurfaceVariant = 'default' | 'strong' | 'glass' | 'ultra' | 'thin' | 'thick' | 'accent'
 
 interface SurfaceProps extends PropsWithChildren {
   style?: CSSProperties
@@ -15,11 +15,16 @@ interface SurfaceProps extends PropsWithChildren {
 
 export default function Surface({ children, style, className, variant = 'default', delay = 0, onClick }: SurfaceProps) {
   const getBaseClass = () => {
-    if (variant === 'glass') return 'glass-surface'
-    return 'flat-card'
+    switch (variant) {
+      case 'glass':  return 'ios-glass'
+      case 'ultra':  return 'ios-glass-ultra'
+      case 'thin':   return 'ios-glass-thin'
+      case 'thick':  return 'ios-glass-thick'
+      case 'accent': return 'ios-glass-accent'
+      case 'strong': return 'flat-card'
+      default:       return 'ios-glass-thin'
+    }
   }
-
-  const background = variant === 'strong' ? 'var(--surface-mid)' : undefined
 
   return (
     <motion.div
@@ -28,10 +33,7 @@ export default function Surface({ children, style, className, variant = 'default
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
       className={`${getBaseClass()}${className ? ` ${className}` : ''}`}
       onClick={onClick}
-      style={{
-        background,
-        ...style,
-      }}
+      style={style}
     >
       {children}
     </motion.div>

@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       },
       create: {
         id: user.id,
-        email: user.emailAddresses?.[0]?.emailAddress || 'unknown@ayura.ai',
+        email: user.emailAddresses?.[0]?.emailAddress || 'unknown@ayurahealth.com',
         conditions: profile.conditions || [],
         healthGoal: profile.goals?.[0] || undefined,
         subscriptionStatus: 'free'

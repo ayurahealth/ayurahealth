@@ -45,8 +45,8 @@ export default function ContactPage() {
           {/* Methods */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {[
-              { icon: Mail, label: 'Email Interaction', value: 'hello@ayura.ai' },
-              { icon: MessageCircle, label: 'Direct Intelligence', value: 'intel@ayura.ai' },
+              { icon: Mail, label: 'Email Interaction', value: 'hello@ayurahealth.com' },
+              { icon: MessageCircle, label: 'Direct Intelligence', value: 'intel@ayurahealth.com' },
               { icon: Globe, label: 'Global Headquarters', value: 'Tokyo, Japan' },
             ].map((m, i) => (
               <div key={i} style={{ padding: '2rem', border: '1px solid var(--border-low)', borderRadius: '24px', background: 'var(--surface-low)' }}>

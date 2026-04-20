@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { SafeSignInButton, SafeUserButton, useSafeUser } from '../lib/clerk-client'
+import { useTranslation } from '@/lib/i18n/LanguageContext'
 import Logo from './Logo'
 import { 
   LayoutDashboard, 
@@ -35,19 +36,18 @@ const LANGUAGES = [
 ]
 
 interface NavProps {
-  lang?: string
-  onLangChange?: (code: string) => void
   showLangPicker?: boolean
   links?: Array<{ label: string; href: string; icon?: React.ComponentType<{ size?: number; className?: string }> }>
 }
 
-export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, links }: NavProps) {
+export default function Nav({ showLangPicker = true, links }: NavProps) {
   const [scrolled, setScrolled] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const [search, setSearch] = useState('')
   const pickerRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   
+  const { language: lang, setLanguage, t } = useTranslation()
   const { isSignedIn, isLoaded } = useSafeUser()
 
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0]
@@ -57,10 +57,10 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
   )
 
   const defaultLinks = links || [
-    { label: 'Intelligence Suite', href: '/dashboard', icon: LayoutDashboard },
-    { label: 'Synergy Lab', href: '/diet', icon: Leaf },
-    { label: 'Intelligence Console', href: '/clinic', icon: Hospital },
-    { label: 'Pricing', href: '/pricing', icon: CreditCard },
+    { label: t('nav_dashboard'), href: '/dashboard', icon: LayoutDashboard },
+    { label: t('nav_diet'), href: '/diet', icon: Leaf },
+    { label: t('nav_clinic'), href: '/clinic', icon: Hospital },
+    { label: t('nav_pricing'), href: '/pricing', icon: CreditCard },
   ]
 
   useEffect(() => {
@@ -86,8 +86,7 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
   }, [])
 
   const selectLang = (code: string) => {
-    onLangChange?.(code)
-    localStorage.setItem('ayura_lang', code)
+    setLanguage(code as any)
     setShowPicker(false)
   }
 
@@ -95,30 +94,34 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
     <>
       <style>{`
         .nav-root { 
-          position: fixed; top: 0; left: 0; right: 0; z-index: 200; 
+          position: fixed; top: 1rem; left: 1rem; right: 1rem; z-index: 200; 
           height: 64px; display: flex; align-items: center; 
-          justify-content: space-between; padding: 0 2rem; 
-          border-bottom: 1px solid transparent;
+          justify-content: space-between; padding: 0.6rem 1.25rem; 
+          border: 1px solid var(--border-low);
+          border-radius: 20px;
+          background: hsla(154, 15%, 5%, 0.7);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           transition: all 0.3s var(--ease-out);
+          max-width: 1200px;
+          margin: 0 auto;
         }
         .nav-root.scrolled { 
-          background: hsla(var(--bg-main-hsl), 0.8); 
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid var(--border-low); 
-          height: 60px;
+          background: hsla(154, 15%, 5%, 0.9); 
+          border-color: var(--border-mid);
+          box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         .nav-actions { display: flex; align-items: center; gap: 1.25rem; }
         
         .desktop-links { display: flex; gap: 1.5rem; align-items: center; }
         .nav-link { 
           color: var(--text-muted); 
-          font-size: 0.9rem; 
+          font-size: 0.85rem; 
           text-decoration: none; 
           transition: color 0.2s; 
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         .nav-link:hover { color: var(--text-main); }
         
@@ -220,7 +223,7 @@ export default function Nav({ lang = 'en', onLangChange, showLangPicker = true, 
                 <SafeUserButton appearance={{ elements: { avatarBox: { width: 34, height: 34, borderRadius: '10px' } } }} />
               ) : (
                 <SafeSignInButton mode="modal">
-                  <button className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.25rem' }}>Sign In</button>
+                  <button className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.25rem' }}>{t('sign_in')}</button>
                 </SafeSignInButton>
               )
             ) : null}
