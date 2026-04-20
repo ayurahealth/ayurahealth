@@ -114,6 +114,55 @@ function ChatPageContent() {
     }
   }
 
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setAttachLoading(true)
+    const newAttachments = [...attachments]
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const reader = new FileReader()
+
+        const promise = new Promise<void>((resolve) => {
+            reader.onload = (event) => {
+                const content = event.target?.result as string
+                const type = file.type.startsWith('image/') ? 'image' : 'pdf'
+                
+                newAttachments.push({
+                    id: Math.random().toString(36).slice(2, 11),
+                    type,
+                    name: file.name,
+                    content: content,
+                    preview: type === 'image' ? content : undefined,
+                    size: `${(file.size / 1024 / 1024).toFixed(1)}MB`
+                })
+                resolve()
+            }
+            reader.readAsDataURL(file)
+        })
+        await promise
+    }
+
+    setAttachments(newAttachments)
+    setAttachLoading(false)
+    e.target.value = '' // Clear input
+  }
+
+  const handleAddLink = () => {
+    if (!linkInput.trim()) return
+    const id = Math.random().toString(36).slice(2, 11)
+    setAttachments(prev => [...prev, {
+        id,
+        type: 'link',
+        name: linkInput.trim(),
+        content: linkInput.trim()
+    }])
+    setLinkInput('')
+    setShowLinkInput(false)
+  }
+
   const handleSpeak = (text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
@@ -188,11 +237,11 @@ function ChatPageContent() {
           onInputChange={(e) => setInput(e.target.value)}
           onInputKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage() } }}
           onSendMessage={handleSendMessage}
-          onFileSelect={() => {}} // implementation in props
+          onFileSelect={handleFileSelect}
           onRemoveAttachment={(id) => setAttachments(prev => prev.filter(a => a.id !== id))}
           onToggleLinkInput={() => setShowLinkInput(!showLinkInput)}
           onLinkInputChange={setLinkInput}
-          onAddLink={() => {}}
+          onAddLink={handleAddLink}
           onCancelLinkInput={() => setShowLinkInput(false)}
           onStartListening={() => setIsListening(!isListening)}
           onModelPrefChange={setModelPreference}
