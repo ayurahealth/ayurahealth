@@ -1,0 +1,3 @@
+## 2025-04-20 - React.memo on Heavy Markdown Components
+**Learning:** In chat interfaces, list items that render Markdown (like `ClinicalMarkdown`) are computationally expensive. During streaming or when input changes trigger parent re-renders, not memoizing these components causes severe performance degradation as the entire historical chat is re-rendered on every keystroke or streaming tick.
+**Action:** Always wrap heavy list components (especially message items rendering markdown) with `React.memo()`. Crucially, ensure that all callback props passed to these memoized components (e.g., `handleSpeak`) are also wrapped in `useCallback` to prevent breaking the memoization through referential inequality.

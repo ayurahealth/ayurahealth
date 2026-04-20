@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Message, ChatSource } from '@/lib/hooks/useChat'
 import ChatMessagesPanel from '@/components/chat/ChatMessagesPanel'
 import ChatComposer from '@/components/chat/ChatComposer'
@@ -14,7 +13,7 @@ interface ChatInterfaceProps {
   streaming: string
   loading: boolean
   input: string
-  attachments: any[]
+  attachments: Array<{ id: string, type: 'image' | 'pdf' | 'link', name: string, content: string, preview?: string, size?: string }>
   attachLoading: boolean
   showLinkInput: boolean
   linkInput: string
@@ -24,11 +23,11 @@ interface ChatInterfaceProps {
   modelPreference: string
   responseMode: string
   dosha: string | null
-  activeUser: any
-  onInputChange: (e: any) => void
-  onInputKeyDown: (e: any) => void
+  activeUser?: { firstName: string, imageUrl: string } | null
+  onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onInputKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
   onSendMessage: () => void
-  onFileSelect: (e: any) => void
+  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
   onRemoveAttachment: (id: string) => void
   onToggleLinkInput: () => void
   onLinkInputChange: (v: string) => void
@@ -36,7 +35,7 @@ interface ChatInterfaceProps {
   onCancelLinkInput: () => void
   onStartListening: () => void
   onModelPrefChange: (val: string) => void
-  onResponseModeChange: (val: any) => void
+  onResponseModeChange: (val: string) => void
   onSpeakText: (text: string) => void
   onSelectSource: (source: ChatSource) => void
   onToggleVedicPanel: () => void
@@ -58,7 +57,6 @@ export default function ChatInterface({
   modelPreference,
   responseMode,
   dosha,
-  activeUser,
   onInputChange,
   onInputKeyDown,
   onSendMessage,

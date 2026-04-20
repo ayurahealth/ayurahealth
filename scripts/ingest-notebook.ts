@@ -3,8 +3,6 @@ import path from 'path';
 import { Client } from 'pg';
 import { getEmbedding } from '../lib/ai/embeddings';
 
-/**
-import { PrismaClient } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 
 /**
@@ -12,8 +10,6 @@ import { v4 as uuidv4 } from 'uuid'
  * ----------------------------------------------------
  * Orchestrates high-performance data ingestion for the neural synthesis pipeline.
  */
-
-const prisma = new PrismaClient()
 
 const DB_URL = process.env.DATABASE_URL || process.env.DIRECT_URL;
 if (!DB_URL) {
