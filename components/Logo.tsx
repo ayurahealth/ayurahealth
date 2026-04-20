@@ -26,11 +26,11 @@ export default function Logo({ size = 36, showText = true, href = '/' }: LogoPro
       onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
     >
       <Image
-        src="/favicon.svg"
+        src="/favicon.png"
         alt="Ayura Intelligence"
         width={size}
         height={size}
-        style={{ width: size, height: size, display: 'block', flexShrink: 0 }}
+        style={{ width: size, height: size, display: 'block', flexShrink: 0, borderRadius: '25%' }}
       />
       {showText && (
         <span style={{

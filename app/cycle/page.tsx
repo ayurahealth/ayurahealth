@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AyurvedicCycle from '../../components/AyurvedicCycle';
 import DoshaQuiz from '../../components/DoshaQuiz';
 import { useRouter } from 'next/navigation';
+import Nav from '../../components/Nav';
+import Surface from '../../components/ui/Surface';
 
 interface UserProfile {
   id: string;
@@ -49,7 +51,6 @@ export default function CyclePage() {
   };
 
   const handleQuizComplete = async (scores: { vata: number; pitta: number; kapha: number }) => {
-    // Determine primary dosha
     const maxScore = Math.max(scores.vata, scores.pitta, scores.kapha);
     let primary = 'Vata';
     if (scores.pitta === maxScore) primary = 'Pitta';
@@ -77,73 +78,65 @@ export default function CyclePage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#05100a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="pulse-loader" style={{ width: 40, height: 40, border: '2px solid #6abf8a', borderRadius: '50%', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
+      <div style={{ minHeight: '100vh', background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 40, height: 40, border: '2px solid var(--accent-main)', borderRadius: '50%', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
       </div>
     );
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#05100a', color: '#e8dfc8', fontFamily: '"DM Sans", sans-serif' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', position: 'relative', overflowX: 'hidden' }}>
+      <Nav />
       {/* Background Ambience */}
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'radial-gradient(circle at 50% -20%, rgba(26,77,46,0.15) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'radial-gradient(circle at 50% -20%, hsla(var(--accent-main-hsl), 0.15) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
 
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: '2rem', position: 'relative', zIndex: 1 }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-          <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '1.5rem' }}>🌿</span>
-            <span style={{ fontWeight: 700, letterSpacing: '0.05em', fontSize: '0.9rem' }}>AYURA INTELLIGENCE</span>
-          </div>
-          {user ? (
-            <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Hi, {user.firstName}</div>
-          ) : (
-            <SignInButton mode="modal">
-              <button style={{ background: 'none', border: 'none', color: '#6abf8a', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}>Sign In</button>
-            </SignInButton>
-          )}
-        </header>
-
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 'max(15vh, 10rem) 1.5rem 4rem', position: 'relative', zIndex: 1 }}>
         <AnimatePresence mode="wait">
           {!user ? (
-            <motion.div key="guest" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4rem 0' }}>
-              <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: '#c9a84c', marginBottom: '1rem' }}>Your Universal Rhythm</h1>
-              <p style={{ opacity: 0.6, marginBottom: '2.5rem' }}>Ancient Ayurveda teaches us that the universe and our bodies follow a synchronized 24-hour cycle.</p>
-              <AyurvedicCycle />
-              <div style={{ marginTop: '3rem' }}>
-                <SignInButton mode="modal">
-                  <button style={{ padding: '1rem 2rem', background: '#1a4d2e', color: 'white', border: 'none', borderRadius: 980, fontWeight: 700, cursor: 'pointer', boxShadow: '0 10px 30px rgba(26,77,46,0.3)' }}>Sign In to Personalize</button>
-                </SignInButton>
-              </div>
+            <motion.div key="guest" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center' }}>
+              <h1 className="hero-text" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', color: 'var(--accent-secondary)', marginBottom: '1rem', fontWeight: 600 }}>Your Universal Rhythm</h1>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: 600, margin: '0 auto 4rem', lineHeight: 1.6 }}>Ancient Ayurveda teaches us that the universe and our bodies follow a synchronized 24-hour cycle.</p>
+              
+              <Surface variant="glass" style={{ padding: '3rem 1rem', display: 'flex', justifyContent: 'center', marginBottom: '3rem' }}>
+                <AyurvedicCycle />
+              </Surface>
+
+              <SignInButton mode="modal">
+                <button className="btn-primary" style={{ padding: '1rem 2.5rem' }}>Personalize Your Rhythm</button>
+              </SignInButton>
             </motion.div>
           ) : showQuiz ? (
-            <motion.div key="quiz" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(106,191,138,0.2)', borderRadius: 24, padding: '2rem', backdropFilter: 'blur(20px)' }}>
+            <motion.div key="quiz" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
+              <Surface variant="glass" style={{ padding: '3rem' }}>
                 <DoshaQuiz onComplete={handleQuizComplete} />
-                <button onClick={() => setShowQuiz(false)} style={{ marginTop: '1rem', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', cursor: 'pointer' }}>Cancel</button>
-              </div>
+                <button onClick={() => setShowQuiz(false)} style={{ marginTop: '2rem', background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer', fontWeight: 600 }}>Cancel Evaluation</button>
+              </Surface>
             </motion.div>
           ) : (
             <motion.div key="dashboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.2rem', color: '#c9a84c', margin: '0 0 0.5rem' }}>My Living Rhythm</h1>
-                <p style={{ opacity: 0.5, fontSize: '0.9rem' }}>Aligning your {profile?.primaryDosha || 'constitution'} with the sun.</p>
+              <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                <h1 className="hero-text" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', color: 'var(--accent-secondary)', marginBottom: '0.5rem', fontWeight: 600 }}>My Living Rhythm</h1>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>Aligning your {profile?.primaryDosha || 'constitution'} with the celestial arc.</p>
               </div>
 
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 32, padding: '2.5rem 1rem', display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+              <Surface variant="glass" style={{ padding: '4rem 1rem', display: 'flex', justifyContent: 'center', marginBottom: '3rem' }}>
                 <AyurvedicCycle userDosha={profile?.primaryDosha} />
-              </div>
+              </Surface>
 
               {!profile?.primaryDosha && (
-                <div style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(106,191,138,0.1), transparent)', border: '1px solid rgba(106,191,138,0.2)', borderRadius: 24, textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '1.1rem', color: '#6abf8a', marginBottom: '0.5rem' }}>Unlock Personalized Wisdom</h3>
-                  <p style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '1.5rem' }}>VAIDYA can calculate your unique Dosha constitution to provide specific rituals for your type.</p>
-                  <button onClick={() => setShowQuiz(true)} style={{ padding: '0.8rem 1.5rem', background: '#6abf8a', color: '#05100a', border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer' }}>Generate My Cycle →</button>
-                </div>
+                <Surface style={{ padding: '3rem', textAlign: 'center', background: 'hsla(var(--accent-main-hsl), 0.05)', border: '1px solid var(--border-mid)' }}>
+                  <h3 style={{ fontSize: '1.5rem', color: 'var(--accent-main)', marginBottom: '1rem' }}>Unlock Personalized Wisdom</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: 500, margin: '0 auto 2.5rem', lineHeight: 1.6 }}>VAIDYA can calculate your unique Dosha constitution to provide specific rituals for your type.</p>
+                  <button onClick={() => setShowQuiz(true)} className="btn-primary">Initialize Evaluation →</button>
+                </Surface>
               )}
 
-              <div style={{ marginTop: '3rem', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.8rem', opacity: 0.4, marginBottom: '1rem' }}>TIP: Save this page to your Home Screen for daily access</div>
-                <button onClick={() => router.push('/chat')} style={{ background: 'none', border: '1px solid rgba(106,191,138,0.3)', color: '#6abf8a', padding: '0.75rem 1.5rem', borderRadius: 12, fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Consult VAIDYA</button>
+              <div style={{ marginTop: '4rem', textAlign: 'center' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '2rem', opacity: 0.5 }}>AUTHORIZED CLINICAL INTENSITY: OPTIMAL</p>
+                <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+                  <button className="btn-secondary" onClick={() => router.push('/chat')}>Consult VAIDYA</button>
+                  <button className="btn-secondary" onClick={() => router.push('/dashboard')}>View Dashboard</button>
+                </div>
               </div>
             </motion.div>
           )}

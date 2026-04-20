@@ -131,10 +131,10 @@ Include classical source citations (e.g., Charaka Samhita).`
 
 
   return (
-    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
+    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))', position: 'relative' }}>
       <Nav />
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '7rem 1.5rem 4rem' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 'max(15vh, 10rem) 1.5rem 4rem', position: 'relative', zIndex: 1 }}>
         
         {/* Progress Stepper */}
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '4rem', justifyContent: 'center' }}>

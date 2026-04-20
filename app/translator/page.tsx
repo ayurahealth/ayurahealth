@@ -44,10 +44,10 @@ export default function TranslatorPage() {
   }
 
   return (
-    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)' }}>
+    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', position: 'relative', overflowX: 'hidden' }}>
       <Nav />
 
-      <div style={{ paddingTop: '8rem', paddingBottom: '4rem', maxWidth: 1200, margin: '0 auto', paddingLeft: '2rem', paddingRight: '2rem' }}>
+      <div style={{ padding: 'max(15vh, 10rem) 1.5rem 4rem', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem, 5vw, 3.8rem)', fontWeight: 500, color: 'var(--text-main)', marginBottom: '1rem' }}>
             Clinical Marker Analysis

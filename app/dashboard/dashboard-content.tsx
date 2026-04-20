@@ -40,7 +40,7 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
   const firstName = user?.firstName || 'Explorer'
 
   return (
-    <main style={{ background: 'var(--bg-main)', height: '100dvh', color: 'var(--text-main)', overflowY: 'auto', paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+    <main style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', overflowX: 'hidden', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))', position: 'relative' }}>
       <style jsx>{`
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 2rem; }
         @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; padding: 1.5rem; } }
@@ -63,10 +63,9 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
         .timeline-card:hover { border-color: var(--border-mid); transform: scale(1.01); }
         .status-pill { padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
       `}</style>
-
       <Nav showLangPicker={false} />
 
-      <div style={{ paddingTop: '7rem', paddingBottom: '4rem' }}>
+      <div style={{ padding: 'max(15vh, 10rem) 1.5rem 4rem', position: 'relative', zIndex: 1 }}>
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
           style={{ maxWidth: 1200, margin: '0 auto', padding: '0 2rem', marginBottom: '3rem' }}
