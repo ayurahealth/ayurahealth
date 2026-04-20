@@ -14,7 +14,7 @@ import QuizScreen from './components/QuizScreen'
 import ResultScreen from './components/ResultScreen'
 import ChatInterface from './components/ChatInterface'
 
-const QUESTIONS = (t: any) => [
+const QUESTIONS = (t: (key: string) => string) => [
   { emoji: t('q1e'), q: t('q1'), opts: [{ l: t('q1a'), d: 'Vata' }, { l: t('q1b'), d: 'Pitta' }, { l: t('q1c'), d: 'Kapha' }] },
   { emoji: t('q2e'), q: t('q2'), opts: [{ l: t('q2a'), d: 'Vata' }, { l: t('q2b'), d: 'Pitta' }, { l: t('q2c'), d: 'Kapha' }] },
   { emoji: t('q3e'), q: t('q3'), opts: [{ l: t('q3a'), d: 'Vata' }, { l: t('q3b'), d: 'Pitta' }, { l: t('q3c'), d: 'Kapha' }] },
@@ -35,7 +35,7 @@ export default function ChatPage() {
 }
 
 function ChatPageContent() {
-  const { user, isLoaded: clerkLoaded } = useUser()
+  const { user } = useUser()
   const clerk = useClerk()
   const { language: lang, t } = useTranslation()
   
@@ -54,8 +54,8 @@ function ChatPageContent() {
   const [screen, setScreen] = useState<'landing' | 'quiz' | 'result' | 'chat'>('landing')
   const [modelPreference, setModelPreference] = useState('auto')
   const [responseMode, setResponseMode] = useState<'fast' | 'deep' | 'research'>('fast')
-  const [selectedSystems, setSelectedSystems] = useState(['ayurveda'])
-  const [attachments, setAttachments] = useState<any[]>([])
+  const [selectedSystems] = useState(['ayurveda'])
+  const [attachments, setAttachments] = useState<Array<{ id: string, type: 'image' | 'pdf' | 'link', name: string, content: string, preview?: string, size?: string }>>([])
   const [attachLoading, setAttachLoading] = useState(false)
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [linkInput, setLinkInput] = useState('')
@@ -65,8 +65,10 @@ function ChatPageContent() {
   const [showPaywall, setShowPaywall] = useState(false)
 
   // Initialization
+  const isInitialized = useRef(false)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !isInitialized.current) {
+      isInitialized.current = true
       const qs = new URLSearchParams(window.location.search)
       if (qs.get('q')) {
         setScreen('chat')
@@ -77,7 +79,7 @@ function ChatPageContent() {
         }, qs.get('q')!)
       }
     }
-  }, [])
+  }, [attachments, dosha, lang, modelPreference, responseMode, selectedSystems, sendMessage])
 
   // Auth/CEO Bypass Logic
   const isCeo = typeof window !== 'undefined' && document.cookie.includes('ayura_ceo_token')
@@ -91,7 +93,7 @@ function ChatPageContent() {
       ? t('greeting_dosha').replace(/{dosha}/g, activeDosha).replace('{tagline}', '').replace('{desc}', '')
       : t('greeting')
     setMessages([{ role: 'assistant', content: greeting }])
-  }, [dosha, t])
+  }, [dosha, setMessages, t])
 
   const handleSendMessage = async () => {
     try {
@@ -109,8 +111,8 @@ function ChatPageContent() {
         incognito: false,
       })
       setAttachments([])
-    } catch (err: any) {
-      if (err.message === 'PAYWALL_LIMIT') setShowPaywall(true)
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === 'PAYWALL_LIMIT') setShowPaywall(true)
     }
   }
 
@@ -213,7 +215,7 @@ function ChatPageContent() {
 
       {screen === 'quiz' && (
         <QuizScreen 
-          lang={lang as any}
+          lang={lang}
           currentQ={currentQ}
           questions={QUESTIONS(t)}
           onAnswer={(d) => {
@@ -232,8 +234,8 @@ function ChatPageContent() {
 
       {screen === 'result' && dosha && (
         <ResultScreen 
-          lang={lang as any}
-          dosha={dosha}
+          lang={lang as 'en' | 'es' | 'hi'}
+          dosha={dosha as 'Vata' | 'Pitta' | 'Kapha'}
           isSharing={isSharing}
           shareSuccess={shareSuccess}
           onStartChat={() => handleStartChat(dosha)}
