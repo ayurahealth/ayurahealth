@@ -42,7 +42,8 @@ function ChatPageContent() {
   // State Hooks
   const { 
     messages, input, loading, streaming, sendMessage, 
-    setInput, setIsListening, setMessages, isListening, recognitionRef 
+    setInput, setIsListening, setMessages, isListening, recognitionRef,
+    isSpeaking, setIsSpeaking
   } = useChat()
   
   const { 
@@ -114,7 +115,15 @@ function ChatPageContent() {
   }
 
   const handleSpeak = (text: string) => {
-    vaidyaVoice.speak(text, () => {})
+    if (isSpeaking) {
+      vaidyaVoice.stop()
+      setIsSpeaking(false)
+    } else {
+      setIsSpeaking(true)
+      vaidyaVoice.speak(text, () => {
+        setIsSpeaking(false)
+      })
+    }
   }
 
   // Render Logic
@@ -171,6 +180,7 @@ function ChatPageContent() {
           linkInput={linkInput}
           voiceSupported={true}
           isListening={isListening}
+          isSpeaking={isSpeaking}
           modelPreference={modelPreference}
           responseMode={responseMode}
           dosha={dosha}

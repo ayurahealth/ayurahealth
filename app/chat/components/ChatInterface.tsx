@@ -20,6 +20,7 @@ interface ChatInterfaceProps {
   linkInput: string
   voiceSupported: boolean
   isListening: boolean
+  isSpeaking: boolean
   modelPreference: string
   responseMode: string
   dosha: string | null
@@ -52,6 +53,7 @@ export default function ChatInterface({
   linkInput,
   voiceSupported,
   isListening,
+  isSpeaking,
   modelPreference,
   responseMode,
   dosha,
@@ -145,7 +147,7 @@ export default function ChatInterface({
           loading={loading}
           doshaColor={doshaColor}
           voiceSupported={voiceSupported}
-          isSpeaking={false}
+          isSpeaking={isSpeaking}
           onSpeakText={onSpeakText}
           onSelectSource={onSelectSource}
           oracleState="idle"
