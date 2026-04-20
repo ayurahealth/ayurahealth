@@ -61,6 +61,62 @@ export function useChat() {
   const [isListening, setIsListening] = useState(false)
   
   const recognitionRef = useRef<any>(null)
+  const inputRef = useRef(input)
+
+  useEffect(() => {
+    inputRef.current = input
+  }, [input])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      if (isListening) {
+        console.warn('Speech Recognition not supported in this browser.')
+        setIsListening(false)
+      }
+      return
+    }
+
+    if (isListening) {
+      const recognition = new SpeechRecognition()
+      recognition.continuous = true
+      recognition.interimResults = true
+      const initialInput = inputRef.current
+
+      recognition.onresult = (event: any) => {
+        let transcript = ''
+        for (let i = 0; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript
+        }
+        const sep = initialInput && !initialInput.endsWith(' ') ? ' ' : ''
+        setInput(initialInput + sep + transcript)
+      }
+
+      recognition.onerror = () => setIsListening(false)
+      recognition.onend = () => setIsListening(false)
+
+      try {
+        recognition.start()
+        recognitionRef.current = recognition
+      } catch (err) {
+        setIsListening(false)
+      }
+    } else {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+        recognitionRef.current = null
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+        recognitionRef.current = null
+      }
+    }
+  }, [isListening])
 
   const clearHistory = useCallback(() => {
     setMessages([])
