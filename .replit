@@ -1,4 +1,4 @@
-# AyuraHealth Replit Configuration
+# Ayura Intelligence Lab Replit Configuration
 # 🌿 VAIDYA + AI Brain Ready
 
 run = "npm run dev"
@@ -23,4 +23,4 @@ pattern = "**/*.{js,jsx,ts,tsx}"
 syntax = "typescript"
 
 [ports]
-"127.0.0.1:3000" = { external = 80, name = "AyuraHealth" }
+"127.0.0.1:3000" = { external = 80, name = "Ayura Intelligence Lab" }

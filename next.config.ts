@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
       "connect-src 'self' https://api.groq.com https://openrouter.ai https://router.huggingface.co https://api-inference.huggingface.co http://localhost:11434 https://checkout.razorpay.com https://api.razorpay.com https://cdn.razorpay.com https://lumberjack.razorpay.com https://*.clerk.accounts.dev https://*.clerk.accounts.com https://accounts.ayurahealth.com https://clerk.ayurahealth.com https://*.clerk.ayurahealth.com https://formspree.io https://www.google-analytics.com https://vitals.vercel-insights.com https://va.vercel-scripts.com",
-      "frame-src https://api.razorpay.com",
+      "frame-src https://api.razorpay.com https://checkout.razorpay.com",
       "frame-ancestors 'none'",
       "worker-src 'self' blob:",
     ].join('; ')
@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: [
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31104000; includeSubDomains; preload' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -51,6 +51,7 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+
   async redirects() {
     return [
       // ── Canonical domain: force www → non-www (301) ──

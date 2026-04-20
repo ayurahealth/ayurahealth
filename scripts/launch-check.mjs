@@ -3,7 +3,7 @@
  * Pre-launch smoke checks against a running deployment.
  *
  * Usage:
- *   LAUNCH_BASE_URL=https://ayurahealth.com npm run launch:check
+ *   LAUNCH_BASE_URL=https://ayura.ai npm run launch:check
  *   LAUNCH_BASE_URL=http://127.0.0.1:3000 npm run launch:check
  *
  * Optional deep health (requires HEALTH_CHECK_SECRET in env matching server):
@@ -12,7 +12,7 @@
 
 const baseRaw =
   process.env.LAUNCH_BASE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://127.0.0.1:3000')
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://ayura.ai')
 
 const base = baseRaw.replace(/\/$/, '')
 
@@ -34,7 +34,7 @@ async function fetchStatus(url) {
 
 async function main() {
   let failed = false
-  console.log(`Launch check against ${base}\n`)
+  console.log(`Institutional Launch check against ${base}\n`)
 
   for (const { path, name } of paths) {
     const url = `${base}${path}`
@@ -52,7 +52,7 @@ async function main() {
         const sum = body.checks?.summary
         if (v && !v.ready) {
           console.log(
-            `  WARN  ${name}  200  VAIDYA not ready (set GROQ_API_KEY and/or OPENROUTER_API_KEY on Vercel)`
+            `  WARN  ${name}  200  VAIDYA Intelligence not ready (verify Environment Variables on Vercel)`
           )
           failed = true
         } else {
@@ -82,7 +82,7 @@ async function main() {
         console.log(`\n  OK    deep-health  summary=${body.checks?.summary}`)
         const c = body.checks
         if (c?.database === 'error') {
-          console.log('  WARN  database check failed — verify DATABASE_URL and Supabase')
+          console.log('  WARN  database check failed — verify Supabase connectivity')
           failed = true
         }
       }
@@ -91,15 +91,16 @@ async function main() {
       failed = true
     }
   } else {
-    console.log('\n  SKIP  deep-health  (set HEALTH_CHECK_SECRET to verify DB + Clerk + Stripe env flags)')
+    console.log('\n  SKIP  deep-health  (set HEALTH_CHECK_SECRET to verify DB + Clerk env flags)')
   }
 
   if (failed) {
-    console.log('\nLaunch check finished with warnings or failures.')
+    console.log('\nInstitutional launch check finished with warnings or failures.')
     process.exit(1)
   }
-  console.log('\nLaunch check passed.')
+  console.log('\nInstitutional launch check passed.')
   process.exit(0)
 }
 
 main()
+准确

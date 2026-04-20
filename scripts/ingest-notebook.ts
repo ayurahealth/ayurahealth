@@ -4,11 +4,16 @@ import { Client } from 'pg';
 import { getEmbedding } from '../lib/ai/embeddings';
 
 /**
- * 🌿 AyuraHealth Bulk Ingestion Script
- * Processes research-backed wisdom from NotebookLM exports (TXT/MD)
- * into the Supabase pgvector brain.
- * Josef.
+import { PrismaClient } from '@prisma/client'
+import { v4 as uuidv4 } from 'uuid'
+
+/**
+ * 🌿 Ayura Intelligence Lab Bulk Ingestion Script
+ * ----------------------------------------------------
+ * Orchestrates high-performance data ingestion for the neural synthesis pipeline.
  */
+
+const prisma = new PrismaClient()
 
 const DB_URL = process.env.DATABASE_URL || process.env.DIRECT_URL;
 if (!DB_URL) {
@@ -19,7 +24,7 @@ if (!DB_URL) {
 const DATA_DIR = path.join(process.cwd(), 'data/notebook');
 
 async function main() {
-  console.log('🚀 Starting AyuraHealth Bulk Ingestion...');
+  console.log('🚀 Starting Ayura Intelligence Lab Bulk Ingestion...');
   
   const client = new Client({
     connectionString: DB_URL,
