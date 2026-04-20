@@ -53,6 +53,15 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // ── Canonical domain: force www → non-www (301) ──
+      // This tells Google the true canonical is ayurahealth.com (no www)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.ayurahealth.com' }],
+        destination: 'https://ayurahealth.com/:path*',
+        permanent: true,
+      },
+      // ── Legacy redirects ──
       { source: '/home', destination: '/', permanent: true },
       { source: '/blog', destination: '/', permanent: true },
     ]
