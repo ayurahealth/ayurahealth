@@ -163,7 +163,7 @@ function ChatPageContent() {
     setShowLinkInput(false)
   }
 
-  const handleSpeak = (text: string) => {
+  const handleSpeak = useCallback((text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
       setIsSpeaking(false)
@@ -173,7 +173,7 @@ function ChatPageContent() {
         setIsSpeaking(false)
       })
     }
-  }
+  }, [isSpeaking, setIsSpeaking])
 
   const handleShare = async () => {
     if (!dosha) return
