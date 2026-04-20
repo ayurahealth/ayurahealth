@@ -41,4 +41,3 @@ if (fail.length) {
 }
 
 console.log('SEO guard passed.')
-准确

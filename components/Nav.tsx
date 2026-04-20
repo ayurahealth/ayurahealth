@@ -86,7 +86,7 @@ export default function Nav({ showLangPicker = true, links }: NavProps) {
   }, [])
 
   const selectLang = (code: string) => {
-    setLanguage(code as any)
+    setLanguage(code as 'en' | 'es' | 'hi')
     setShowPicker(false)
   }
 

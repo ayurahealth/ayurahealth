@@ -9,7 +9,7 @@ function replaceInFile(filePath) {
       fs.writeFileSync(filePath, content);
       console.log(`Updated: ${filePath}`);
     }
-  } catch (e) {
+  } catch {
     // skip
   }
 }

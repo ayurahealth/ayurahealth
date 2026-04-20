@@ -10,7 +10,7 @@ import { Check, ShieldCheck, Sparkles, Zap, ArrowRight, HelpCircle } from 'lucid
 import { motion } from 'framer-motion'
 import { useTranslation } from '@/lib/i18n/LanguageContext'
 
-const PRICING_TIERS = (t: any) => [
+const PRICING_TIERS = (t: (key: string) => string) => [
   {
     name: t('pricing_free'),
     priceUSD: 0,

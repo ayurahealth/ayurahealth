@@ -46,7 +46,7 @@ export interface ChatOptions {
   responseMode: 'fast' | 'deep' | 'research'
   webSearchEnabled: boolean
   lang: string
-  attachments: any[]
+  attachments: Array<{ id: string, type: 'image' | 'pdf' | 'link', name: string, content: string, preview?: string, size?: string }>
   vedicEnabled: boolean
   vedicContext: string | null
   cavemanMode: boolean
@@ -160,7 +160,7 @@ export function useChat() {
       let full = ''
       let currentSources: ChatSource[] = []
       let currentAgentTrace: AgentTrace[] = []
-      let currentModelTrace: any = {}
+      let currentModelTrace: { modelUsed?: string, providerUsed?: string, quality?: Message['quality'], policy?: Message['policy'] } = {}
       let buffer = ''
 
       if (reader) {
@@ -225,10 +225,10 @@ export function useChat() {
       }
 
       return finalAssistantMsg
-    } catch (err: any) {
+    } catch (err: unknown) {
       log.error('CHAT_FETCH_FAILURE', { error: String(err) })
       
-      if (err.message === 'PAYWALL_LIMIT') {
+      if (err instanceof Error && err.message === 'PAYWALL_LIMIT') {
         throw err
       }
 

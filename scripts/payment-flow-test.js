@@ -373,7 +373,9 @@ function generateReport() {
   const reportPath = path.join(process.cwd(), '.payment-flow-report.json');
   fs.writeFileSync(reportPath, JSON.stringify(results, null, 2));
   log(`\nReport saved to: ${reportPath}`, 'cyan');
-  /**
+}
+
+/**
  * Ayura Intelligence Lab Automated Payment Flow Validation Script
  * ----------------------------------------------------
  */
