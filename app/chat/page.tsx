@@ -274,6 +274,7 @@ function ChatPageContent() {
           onSpeakText={handleSpeak}
           onSelectSource={setSelectedSource}
           onToggleVedicPanel={() => {}}
+          analyser={analyser}
         />
       )}
 

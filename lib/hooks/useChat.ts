@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { getApiUrl } from '@/lib/constants'
 import { log } from '@/lib/logger'
+import { useAudioRecorder } from '@/lib/hooks/useAudioRecorder'
 
 export interface Message {
   role: 'user' | 'assistant'
@@ -58,65 +59,55 @@ export function useChat() {
   const [loading, setLoading] = useState(false)
   const [streaming, setStreaming] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isListening, setIsListening] = useState(false)
+  const { isRecording, startRecording, stopRecording, audioBlob, analyser } = useAudioRecorder()
+  const isListening = isRecording
   
-  const recognitionRef = useRef<any>(null)
+  const setIsListening = useCallback((listening: boolean) => {
+    if (listening) {
+      startRecording().catch(err => {
+        log.error('STT_START_FAILURE', { error: String(err) })
+      })
+    } else {
+      stopRecording()
+    }
+  }, [startRecording, stopRecording])
+  
   const inputRef = useRef(input)
 
   useEffect(() => {
     inputRef.current = input
   }, [input])
 
+  // Whisper Transcription Bridge
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SpeechRecognition) {
-      if (isListening) {
-        console.warn('Speech Recognition not supported in this browser.')
-        setIsListening(false)
-      }
-      return
-    }
-
-    if (isListening) {
-      const recognition = new SpeechRecognition()
-      recognition.continuous = true
-      recognition.interimResults = true
-      const initialInput = inputRef.current
-
-      recognition.onresult = (event: any) => {
-        let transcript = ''
-        for (let i = 0; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript
+    if (audioBlob) {
+      const transcribe = async () => {
+        setLoading(true)
+        try {
+          const formData = new FormData()
+          formData.append('file', audioBlob, 'recording.webm')
+          
+          const res = await fetch('/api/audio/transcribe', {
+            method: 'POST',
+            body: formData
+          })
+          
+          if (!res.ok) throw new Error('Transcription failed')
+          
+          const { text } = await res.json()
+          if (text) {
+            const sep = inputRef.current && !inputRef.current.endsWith(' ') ? ' ' : ''
+            setInput(prev => prev + sep + text)
+          }
+        } catch (err) {
+          log.error('WHISPER_TRANSCRIBE_FAILURE', { error: String(err) })
+        } finally {
+          setLoading(false)
         }
-        const sep = initialInput && !initialInput.endsWith(' ') ? ' ' : ''
-        setInput(initialInput + sep + transcript)
       }
-
-      recognition.onerror = () => setIsListening(false)
-      recognition.onend = () => setIsListening(false)
-
-      try {
-        recognition.start()
-        recognitionRef.current = recognition
-      } catch (err) {
-        setIsListening(false)
-      }
-    } else {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop()
-        recognitionRef.current = null
-      }
+      transcribe()
     }
-
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop()
-        recognitionRef.current = null
-      }
-    }
-  }, [isListening])
+  }, [audioBlob])
 
   const clearHistory = useCallback(() => {
     setMessages([])
@@ -263,6 +254,6 @@ export function useChat() {
     setIsSpeaking,
     isListening,
     setIsListening,
-    recognitionRef
+    analyser
   }
 }

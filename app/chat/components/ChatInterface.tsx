@@ -40,6 +40,7 @@ interface ChatInterfaceProps {
   onSpeakText: (text: string) => void
   onSelectSource: (source: ChatSource) => void
   onToggleVedicPanel: () => void
+  analyser?: AnalyserNode | null
 }
 
 export default function ChatInterface({
@@ -72,6 +73,7 @@ export default function ChatInterface({
   onResponseModeChange,
   onSpeakText,
   onSelectSource,
+  analyser,
 }: ChatInterfaceProps) {
   
   const doshaColor = dosha === 'Vata' ? '#6abf8a' : dosha === 'Pitta' ? '#f59e0b' : '#3b82f6'
@@ -180,6 +182,7 @@ export default function ChatInterface({
         onInputChange={onInputChange}
         onInputKeyDown={onInputKeyDown}
         onSendMessage={onSendMessage}
+        analyser={analyser}
       />
 
       {/* Institutional Footer */}
