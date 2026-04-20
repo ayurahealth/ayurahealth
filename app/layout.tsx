@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.png', type: 'image/png', sizes: '512x512' },
       { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.ico', sizes: 'any' },
     ],
     apple: [
       { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
@@ -110,11 +110,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${outfit.variable} ${dmSans.variable}`}>
       <head>
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/favicon.png" />
-        <link rel="shortcut icon" href="/favicon.png" />
-
         {/* ─── Extra meta for LINE / KakaoTalk / WeChat / Viber ─── */}
         <meta property="og:image" content={`${BASE_URL}/og-image.svg`} />
         <meta property="og:image:width" content="1200" />
