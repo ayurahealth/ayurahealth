@@ -13,7 +13,7 @@ interface ChatInterfaceProps {
   streaming: string
   loading: boolean
   input: string
-  attachments: any[]
+  attachments: Array<{ id: string, type: 'image' | 'pdf' | 'link', name: string, content: string, preview?: string, size?: string }>
   attachLoading: boolean
   showLinkInput: boolean
   linkInput: string

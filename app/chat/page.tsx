@@ -5,7 +5,6 @@ import { useSafeClerk as useClerk, useSafeUser as useUser } from '@/lib/clerk-cl
 import { useTranslation } from '@/lib/i18n/LanguageContext'
 import { useChat, ChatSource } from '@/lib/hooks/useChat'
 import { useDoshaQuiz, Dosha } from '@/lib/hooks/useDoshaQuiz'
-import { getApiUrl } from '@/lib/constants'
 import { vaidyaVoice } from '@/lib/vaidyaVoice'
 
 // Sub-components
@@ -59,7 +58,7 @@ function ChatPageContent() {
   const [attachLoading, setAttachLoading] = useState(false)
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [linkInput, setLinkInput] = useState('')
-  const [selectedSource, setSelectedSource] = useState<ChatSource | null>(null)
+  const [, setSelectedSource] = useState<ChatSource | null>(null)
   const [isSharing, setIsSharing] = useState(false)
   const [shareSuccess, setShareSuccess] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
