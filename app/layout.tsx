@@ -23,7 +23,6 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.png', type: 'image/png', sizes: '512x512' },
       { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/favicon.ico', sizes: 'any' },
     ],
@@ -140,7 +139,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             "url": BASE_URL,
             "logo": {
               "@type": "ImageObject",
-              "url": `${BASE_URL}/favicon.png`,
+              "url": `${BASE_URL}/favicon.svg`,
               "width": 512,
               "height": 512
             },
