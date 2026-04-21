@@ -165,7 +165,7 @@ function ChatPageContent() {
     e.target.value = ''
   }
 
-  const handleAddLink = () => {
+  const handleAddLink = useCallback(() => {
     if (!linkInput.trim()) return
 
     setAttachments((prev) => [
@@ -179,9 +179,9 @@ function ChatPageContent() {
     ])
     setLinkInput('')
     setShowLinkInput(false)
-  }
+  }, [linkInput])
 
-  const handleSpeak = (text: string) => {
+  const handleSpeak = useCallback((text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
       setIsSpeaking(false)
@@ -192,7 +192,10 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }
+  }, [isSpeaking, setIsSpeaking, vaidyaVoice])
+
+  const handleSelectSource = useCallback(() => {}, [])
+  const handleCancelLinkInput = useCallback(() => setShowLinkInput(false), [])
 
   const handleShare = async () => {
     if (!dosha) return
@@ -293,12 +296,12 @@ function ChatPageContent() {
           onToggleLinkInput={() => setShowLinkInput((prev) => !prev)}
           onLinkInputChange={setLinkInput}
           onAddLink={handleAddLink}
-          onCancelLinkInput={() => setShowLinkInput(false)}
+          onCancelLinkInput={handleCancelLinkInput}
           onStartListening={() => setIsListening(!isListening)}
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={() => {}}
+          onSelectSource={handleSelectSource}
           analyser={analyser}
         />
       )}

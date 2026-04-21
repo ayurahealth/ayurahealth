@@ -1,0 +1,3 @@
+## 2024-05-18 - Avoid Modifying Package.json Unnecessarily
+**Learning:** Adding missing peer dependencies locally to satisfy the TypeScript compiler check (like adding `@clerk/react` to devDependencies) violates the constraints of this environment (which strictly prohibits modifying `package.json` without explicit instruction). It's better to tolerate the compiler output about missing modules or temporarily use workarounds rather than altering package specifications or leaving behind heavy build artifacts (`pnpm-lock.yaml`).
+**Action:** In the future, DO NOT modify `package.json` or `pnpm-lock.yaml` to fix local `tsc` checks. Focus solely on resolving the immediate code implementation tasks unless explicitly directed otherwise.
