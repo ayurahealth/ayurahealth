@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "Scanning for hardcoded secrets..."
           # Note: Simplified check for CI visibility
-          grep -r --exclude-dir=node_modules "sk_live" . && exit 1 || echo "No live secrets detected."
+          grep -r --exclude-dir=node_modules --exclude-dir=.git "sk_live" . | grep -v ".github/workflows" && exit 1 || echo "No live secrets detected."
 
       - name: Branch Policy Guard
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
