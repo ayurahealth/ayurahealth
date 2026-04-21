@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  if (!isAuthorized) {
+  if (!isAuthorized || !CEO_BYPASS_KEY) {
     return NextResponse.json({ error: 'Unauthorized. Please check your CEO_BYPASS_KEY.' }, { status: 401 })
   }
 
