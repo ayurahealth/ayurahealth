@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { SafeSignInButton, SafeUserButton, useSafeUser } from '../lib/clerk-client'
 import { useTranslation } from '@/lib/i18n/LanguageContext'
+import type { SupportedLang } from '@/lib/i18n/translations'
 import Logo from './Logo'
 import { 
   LayoutDashboard, 
@@ -86,7 +87,7 @@ export default function Nav({ showLangPicker = true, links }: NavProps) {
   }, [])
 
   const selectLang = (code: string) => {
-    setLanguage(code as any)
+    setLanguage(code as SupportedLang)
     setShowPicker(false)
   }
 

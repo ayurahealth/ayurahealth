@@ -1,21 +1,20 @@
-/**
- * API Constants
- * 
- * In native environments (Capacitor/iOS), relative paths like '/api/chat' fail.
- * This helper ensures we use the absolute production URL when running as an app.
- */
+import { Capacitor } from '@capacitor/core'
 
-const PRODUCTION_URL = 'https://ayurahealth.com';
+const DEFAULT_APP_URL = 'https://ayurahealth.com'
+const PRODUCTION_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || DEFAULT_APP_URL
 
-// Check if running in a native Capacitor environment
-const isNative = typeof window !== 'undefined' && (window as unknown as { Capacitor?: { isNative: boolean } }).Capacitor?.isNative;
+function shouldUseAbsoluteApiUrl(): boolean {
+  if (typeof window === 'undefined') return false
 
-export const API_BASE_URL = isNative ? PRODUCTION_URL : '';
+  if (Capacitor.isNativePlatform()) return true
 
-/**
- * Helper to build API URLs
- */
+  return ['capacitor:', 'file:'].includes(window.location.protocol)
+}
+
+export const API_BASE_URL = shouldUseAbsoluteApiUrl() ? PRODUCTION_URL : ''
+
 export function getApiUrl(path: string): string {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${API_BASE_URL}${cleanPath}`;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return `${API_BASE_URL}${cleanPath}`
 }

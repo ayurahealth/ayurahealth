@@ -24,7 +24,13 @@ export const useAudioRecorder = (): AudioRecorderHook => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       // Setup AudioContext for visualization
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioWindow = window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }
+      const AudioContextCtor = audioWindow.AudioContext || audioWindow.webkitAudioContext
+      if (!AudioContextCtor) {
+        throw new Error('AudioContext is not supported in this browser')
+      }
+
+      const audioContext = new AudioContextCtor();
       const source = audioContext.createMediaStreamSource(stream);
       const analyserNode = audioContext.createAnalyser();
       analyserNode.fftSize = 256;

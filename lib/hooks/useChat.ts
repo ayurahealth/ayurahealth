@@ -2,55 +2,15 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { getApiUrl } from '@/lib/constants'
+import type { ChatAttachment, ChatMessage as Message, ChatOptions, ChatSource, AgentTrace } from '@/lib/chat/types'
 import { log } from '@/lib/logger'
 import { useAudioRecorder } from '@/lib/hooks/useAudioRecorder'
 
-export interface Message {
-  role: 'user' | 'assistant'
-  content: string
-  sources?: ChatSource[]
-  agentTrace?: AgentTrace[]
+interface ChatModelTrace {
   modelUsed?: string
   providerUsed?: string
-  quality?: {
-    formatScore: number
-    completeness: number
-    latencyMs: number
-    repaired: boolean
-  }
-  policy?: {
-    applied: boolean
-    reasons: string[]
-    webSearchSuppressed: boolean
-    forceDeepThink: boolean
-  }
-}
-
-export interface ChatSource {
-  title: string
-  content: string
-  tradition: string
-  source: string
-}
-
-export interface AgentTrace { 
-  id: 'planner' | 'researcher' | 'synthesizer'
-  label: string
-  summary: string 
-}
-
-export interface ChatOptions {
-  selectedSystems: string[]
-  dosha: string | null
-  modelPreference: string
-  responseMode: 'fast' | 'deep' | 'research'
-  webSearchEnabled: boolean
-  lang: string
-  attachments: any[]
-  vedicEnabled: boolean
-  vedicContext: string | null
-  cavemanMode: boolean
-  incognito: boolean
+  quality?: Message['quality']
+  policy?: Message['policy']
 }
 
 export function useChat() {
@@ -87,7 +47,7 @@ export function useChat() {
           const formData = new FormData()
           formData.append('file', audioBlob, 'recording.webm')
           
-          const res = await fetch('/api/audio/transcribe', {
+          const res = await fetch(getApiUrl('/api/audio/transcribe'), {
             method: 'POST',
             body: formData
           })
@@ -160,7 +120,7 @@ export function useChat() {
       let full = ''
       let currentSources: ChatSource[] = []
       let currentAgentTrace: AgentTrace[] = []
-      let currentModelTrace: any = {}
+      let currentModelTrace: ChatModelTrace = {}
       let buffer = ''
 
       if (reader) {
@@ -187,8 +147,8 @@ export function useChat() {
                 full += d.content
                 setStreaming(full) 
               } 
-            } catch (e) {
-              console.warn('SSE_PARSE_ERROR:', e)
+            } catch (err) {
+              console.warn('SSE_PARSE_ERROR:', err)
             }
           }
         }
@@ -225,10 +185,10 @@ export function useChat() {
       }
 
       return finalAssistantMsg
-    } catch (err: any) {
+    } catch (err: unknown) {
       log.error('CHAT_FETCH_FAILURE', { error: String(err) })
       
-      if (err.message === 'PAYWALL_LIMIT') {
+      if (err instanceof Error && err.message === 'PAYWALL_LIMIT') {
         throw err
       }
 
@@ -257,3 +217,5 @@ export function useChat() {
     analyser
   }
 }
+
+export type { Message, ChatSource, AgentTrace, ChatOptions, ChatAttachment }

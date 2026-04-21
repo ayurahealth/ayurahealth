@@ -8,6 +8,7 @@ import DoshaQuiz from '../../components/DoshaQuiz';
 import { useRouter } from 'next/navigation';
 import Nav from '../../components/Nav';
 import Surface from '../../components/ui/Surface';
+import { getApiUrl } from '@/lib/constants';
 
 interface UserProfile {
   id: string;
@@ -38,7 +39,7 @@ export default function CyclePage() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('/api/user-profile');
+      const res = await fetch(getApiUrl('/api/user-profile'));
       const data = await res.json();
       if (data.success) {
         setProfile(data.profile);
@@ -57,7 +58,7 @@ export default function CyclePage() {
     if (scores.kapha === maxScore) primary = 'Kapha';
 
     try {
-      const res = await fetch('/api/user-profile', {
+      const res = await fetch(getApiUrl('/api/user-profile'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

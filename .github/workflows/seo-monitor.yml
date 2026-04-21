@@ -16,9 +16,9 @@ jobs:
       - name: Check homepage, robots, and sitemap are reachable
         run: |
           set -euo pipefail
-          curl -fsS -I https://ayura.ai > /tmp/home.headers
-          curl -fsS https://ayura.ai/robots.txt > /tmp/robots.txt
-          curl -fsS https://ayura.ai/sitemap.xml > /tmp/sitemap.xml
+          curl -fsS -I https://ayurahealth.com > /tmp/home.headers
+          curl -fsS https://ayurahealth.com/robots.txt > /tmp/robots.txt
+          curl -fsS https://ayurahealth.com/sitemap.xml > /tmp/sitemap.xml
 
       - name: Validate robots.txt and sitemap basics
         run: |
@@ -31,11 +31,11 @@ jobs:
           checks = [
               ('User-agent: *' in robots, 'robots.txt missing User-agent rule'),
               ('Allow: /' in robots, 'robots.txt missing Allow: /'),
-              ('Sitemap: https://ayura.ai/sitemap.xml' in robots, 'robots.txt missing sitemap URL'),
+              ('Sitemap: https://ayurahealth.com/sitemap.xml' in robots, 'robots.txt missing sitemap URL'),
               ('<urlset' in sitemap, 'sitemap.xml missing <urlset> root'),
-              ('https://ayura.ai/chat' in sitemap, 'sitemap.xml missing /chat'),
-              ('https://ayura.ai/pricing' in sitemap, 'sitemap.xml missing /pricing'),
-              ('https://ayura.ai/privacy' in sitemap, 'sitemap.xml missing /privacy'),
+              ('https://ayurahealth.com/chat' in sitemap, 'sitemap.xml missing /chat'),
+              ('https://ayurahealth.com/pricing' in sitemap, 'sitemap.xml missing /pricing'),
+              ('https://ayurahealth.com/privacy' in sitemap, 'sitemap.xml missing /privacy'),
           ]
 
           errors = [msg for ok, msg in checks if not ok]
@@ -54,7 +54,7 @@ jobs:
           import re
           from urllib.request import Request, urlopen
 
-          req = Request('https://ayura.ai', headers={'User-Agent': 'Mozilla/5.0'})
+          req = Request('https://ayurahealth.com', headers={'User-Agent': 'Mozilla/5.0'})
           with urlopen(req, timeout=20) as res:
             html = res.read().decode('utf-8', errors='ignore')
           robots = re.search(r'<meta name="robots" content="([^"]+)"', html, re.I)
@@ -71,7 +71,7 @@ jobs:
       - name: Enforce raw redirect for lang query
         run: |
           set -euo pipefail
-          status="$(curl -s -o /dev/null -w '%{http_code}' 'https://ayura.ai/?lang=ceb')"
+          status="$(curl -s -o /dev/null -w '%{http_code}' 'https://ayurahealth.com/?lang=ceb')"
           if [ "$status" != "301" ] && [ "$status" != "302" ] && [ "$status" != "307" ] && [ "$status" != "308" ]; then
             echo "ERROR: expected redirect status for /?lang=ceb, got $status"
             exit 1

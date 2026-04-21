@@ -1,8 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import Link from 'next/link'
 import Nav from '../../components/Nav'
-import { motion } from 'framer-motion'
 import { Mail, MessageCircle, Globe, Terminal, Loader2, Send } from 'lucide-react'
 
 export default function ContactPage() {
@@ -19,7 +17,7 @@ export default function ContactPage() {
       // Simulate/Trigger contact API
       await new Promise(r => setTimeout(r, 1500))
       setSuccess(true)
-    } catch (err) {
+    } catch {
       setError('System interaction failed. Please retry.')
     } finally {
       setLoading(false)
@@ -78,6 +76,7 @@ export default function ContactPage() {
                 <button type="submit" disabled={loading} className="cta-btn" style={{ width: '100%', padding: '1.25rem', borderRadius: '14px', background: 'var(--accent-main)', color: 'var(--bg-main)', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
                   {loading ? <Loader2 className="animate-spin" size={20} /> : <><Send size={18} /> Transmit Message</>}
                 </button>
+                {error && <p style={{ color: '#fca5a5', marginTop: '1rem', fontSize: '0.9rem' }}>{error}</p>}
               </form>
             )}
           </div>

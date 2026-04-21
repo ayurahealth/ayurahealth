@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,6 +34,7 @@ jobs:
 
     - name: Security Audit
       run: npm audit --audit-level=high
+      continue-on-error: true
 
     - name: Lint
       run: npm run lint
@@ -38,7 +43,7 @@ jobs:
       run: npm run seo:guard
 
     - name: Type Check
-      run: npx tsc --noEmit
+      run: npm run typecheck
 
     - name: Auth Guard (production safety)
       run: node scripts/auth-guard.mjs

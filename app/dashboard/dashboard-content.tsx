@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Nav from '../../components/Nav'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getApiUrl } from '@/lib/constants'
 import { Sun, Moon, FileText, History, ArrowRight, Activity, Edit3, X, Check } from 'lucide-react'
 import Surface from '../../components/ui/Surface'
 import IOSButton from '../../components/ui/IOSButton'
@@ -355,7 +356,7 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
                 onClick={async () => {
                   setIsSaving(true)
                   try {
-                    const res = await fetch('/api/user-profile', {
+                    const res = await fetch(getApiUrl('/api/user-profile'), {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(editData),

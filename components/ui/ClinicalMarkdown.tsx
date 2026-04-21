@@ -97,19 +97,12 @@ export default function ClinicalMarkdown({
               {children}
             </ol>
           ),
-          li: ({ children, ...props }) => {
-            // Check if it's an unordered list item
-            const isBullet = (React.isValidElement(children) && (children.props as { ordered?: boolean }).ordered === false) || !(props as any).ordered;
-            if (isBullet) {
-              return (
-                <li style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>
-                  <span style={{ color: 'var(--markdown-accent)', opacity: 0.6, marginTop: '0.2rem' }}>•</span>
-                  <span>{children}</span>
-                </li>
-              )
-            }
-            return <li style={{ marginBottom: '0.75rem' }}>{children}</li>
-          },
+          li: ({ children }) => (
+            <li style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>
+              <span style={{ color: 'var(--markdown-accent)', opacity: 0.6, marginTop: '0.2rem' }}>•</span>
+              <span>{children}</span>
+            </li>
+          ),
           hr: () => <hr style={{ border: 'none', borderTop: '1px solid var(--border-low)', margin: '2rem 0' }} />,
           table: ({ children }) => (
             <div style={{ overflowX: 'auto', marginBottom: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-low)' }}>

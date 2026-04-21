@@ -92,7 +92,7 @@ export default function DietChartPage() {
 Use a professional, clinical format with structured tables for herb dosages and specific timing.
 Include classical source citations (e.g., Charaka Samhita).`
 
-      const res = await fetch('/api/chat', {
+      const res = await fetch(getApiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

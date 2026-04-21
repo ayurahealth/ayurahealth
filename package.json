@@ -8,6 +8,7 @@
     "build:static": "mv app/api app/_api && npx prisma generate && STATIC_EXPORT=true next build && mv app/_api app/api",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit --incremental false",
     "seo:guard": "node scripts/seo-guard.mjs",
     "launch:check": "node scripts/launch-check.mjs",
     "cap:sync": "npx cap sync ios",

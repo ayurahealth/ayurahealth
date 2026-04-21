@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { useTranslation } from '@/lib/i18n/LanguageContext'
 
 interface QuizScreenProps {
-  lang: any
   currentQ: number
   questions: Array<{ emoji: string; q: string; opts: Array<{ l: string; d: string }> }>
   onAnswer: (d: string) => void

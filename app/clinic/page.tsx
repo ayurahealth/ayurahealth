@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Nav from '../../components/Nav'
 import { motion } from 'framer-motion'
-import { Zap, Shield, Globe, Activity, Terminal, Database, ArrowRight } from 'lucide-react'
+import { Zap, Globe, Activity, Terminal, Database, ArrowRight } from 'lucide-react'
+import { getApiUrl } from '@/lib/constants'
 
 export default function ClinicPage() {
   const [showModal, setShowModal] = useState(false)
@@ -17,7 +18,7 @@ export default function ClinicPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/clinic-lead', {
+      const res = await fetch(getApiUrl('/api/clinic-lead'), {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })

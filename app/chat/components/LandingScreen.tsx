@@ -6,7 +6,6 @@ import { useTranslation } from '@/lib/i18n/LanguageContext'
 import EngagementStory from '../../../components/EngagementStory'
 
 interface LandingScreenProps {
-  lang: any
   onStartQuiz: () => void
   onSkipToChat: () => void
 }

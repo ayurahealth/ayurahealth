@@ -3,7 +3,7 @@
  * Pre-launch smoke checks against a running deployment.
  *
  * Usage:
- *   LAUNCH_BASE_URL=https://ayura.ai npm run launch:check
+ *   LAUNCH_BASE_URL=https://ayurahealth.com npm run launch:check
  *   LAUNCH_BASE_URL=http://127.0.0.1:3000 npm run launch:check
  *
  * Optional deep health (requires HEALTH_CHECK_SECRET in env matching server):
@@ -12,7 +12,7 @@
 
 const baseRaw =
   process.env.LAUNCH_BASE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://ayura.ai')
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://ayurahealth.com')
 
 const base = baseRaw.replace(/\/$/, '')
 
@@ -103,4 +103,3 @@ async function main() {
 }
 
 main()
-准确

@@ -23,7 +23,7 @@ const sitemapRoute = read('public/sitemap.xml')
 mustContain(layout, 'robots:', 'Missing metadata robots config in app/layout.tsx')
 mustContain(layout, 'index: true', 'Root metadata robots must keep index: true')
 mustContain(layout, 'follow: true', 'Root metadata robots must keep follow: true')
-mustNotContain(layout, 'canonical: BASE_URL', 'Do not set a global canonical in app/layout.tsx')
+mustContain(layout, 'canonical: BASE_URL', 'Missing canonical metadata in app/layout.tsx')
 mustNotContain(layout, 'index: false', 'Found index:false in root metadata; this can deindex the site')
 
 mustContain(robotsRoute, 'User-agent: *', 'robots.txt missing User-agent rule')
@@ -31,7 +31,7 @@ mustContain(robotsRoute, 'Allow: /', 'robots.txt missing Allow: /')
 mustContain(robotsRoute, 'Sitemap:', 'robots.txt missing Sitemap declaration')
 
 for (const page of ['/chat', '/pricing', '/clinic', '/diet', '/privacy', '/terms']) {
-  mustContain(sitemapRoute, `<loc>https://ayura.ai${page}</loc>`, `sitemap.xml missing ${page}`)
+  mustContain(sitemapRoute, `<loc>https://ayurahealth.com${page}</loc>`, `sitemap.xml missing ${page}`)
 }
 
 if (fail.length) {
@@ -41,4 +41,3 @@ if (fail.length) {
 }
 
 console.log('SEO guard passed.')
-准确

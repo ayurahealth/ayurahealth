@@ -5,6 +5,7 @@ import Nav from '../../components/Nav'
 import Surface from '../../components/ui/Surface'
 import IOSButton from '../../components/ui/IOSButton'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getApiUrl } from '@/lib/constants'
 
 interface BiomarkerAnalysis {
   western_summary: string;
@@ -25,7 +26,7 @@ export default function TranslatorPage() {
     setResult(null)
 
     try {
-      const res = await fetch('/api/translate', {
+      const res = await fetch(getApiUrl('/api/translate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ labs: labText })
