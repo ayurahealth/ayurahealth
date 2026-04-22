@@ -181,7 +181,12 @@ function ChatPageContent() {
     setShowLinkInput(false)
   }
 
-  const handleSpeak = (text: string) => {
+  /*
+   * 💡 What: Memoize handleSpeak function using useCallback
+   * 🎯 Why: To prevent the function reference from changing on every re-render (e.g., when the user types or messages stream in).
+   * 📊 Impact: Prevents full-list re-renders of the ChatMessagesPanel and MessageItem components, significantly improving UI responsiveness during streaming.
+   */
+  const handleSpeak = useCallback((text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
       setIsSpeaking(false)
@@ -192,7 +197,14 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }
+  }, [isSpeaking, setIsSpeaking])
+
+  /*
+   * 💡 What: Extract and memoize handleSelectSource
+   * 🎯 Why: To prevent passing an inline function `() => {}` to ChatInterface which breaks memoization.
+   * 📊 Impact: Works in tandem with React.memo on MessageItem to eliminate unnecessary re-renders.
+   */
+  const handleSelectSource = useCallback(() => {}, [])
 
   const handleShare = async () => {
     if (!dosha) return
@@ -298,7 +310,7 @@ function ChatPageContent() {
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={() => {}}
+          onSelectSource={handleSelectSource}
           analyser={analyser}
         />
       )}

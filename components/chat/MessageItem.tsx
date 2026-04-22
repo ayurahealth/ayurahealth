@@ -51,7 +51,12 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+/*
+ * 💡 What: Wrap MessageItem in React.memo
+ * 🎯 Why: List items containing expensive components (like ClinicalMarkdown) re-render fully during streaming or keystrokes if props change (or referentially change).
+ * 📊 Impact: Significantly reduces CPU load and increases rendering FPS by preventing redundant UI updates on static past messages.
+ */
+const MessageItem = React.memo(function MessageItem({
   msg,
   doshaColor,
   voiceSupported,
@@ -227,4 +232,6 @@ export default function MessageItem({
       </div>
     </motion.div>
   )
-}
+})
+
+export default MessageItem
