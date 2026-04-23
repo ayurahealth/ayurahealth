@@ -41,7 +41,6 @@ Return ONLY valid JSON matching this schema:
           ],
           maxTokens: 1000,
           temperature: 0.1,
-          response_format: { type: 'json_object' }
         },
         { modelPreference: 'auto', hasImages: false, deepThink: true }
       )
