@@ -636,16 +636,19 @@ input::placeholder, textarea::placeholder {
   scrollbar-width: none;
 }
 
-html, body {
-  height: 100%;
-  overflow: hidden; /* Prevent body scroll if using 100dvh layout */
+html {
+  height: -webkit-fill-available;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
   overscroll-behavior-y: none;
 }
 
-body > main {
-  height: 100%;
-  overflow: auto; /* Allow landing pages to scroll */
-}
+
 
 /* Ensure chat specifically doesn't scroll body */
 .chat-shell {

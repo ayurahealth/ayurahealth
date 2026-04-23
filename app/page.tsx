@@ -48,7 +48,7 @@ export default function LandingPage() {
   ]
 
   return (
-    <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', position: 'relative', overflow: 'hidden' }}>
+    <main dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'var(--text-main)', position: 'relative' }}>
       <Nav showLangPicker={true} links={navLinks} />
 
       {/* ─── Ambient Intelligence Background ─── */}
