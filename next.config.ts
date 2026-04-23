@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=(), payment=(self "https://checkout.razorpay.com")' },
           { key: 'Content-Security-Policy', value: csp },
-          { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+          { key: 'X-Permitted-Cross-Domain-Policies', value: 'master-only' },
         ],
       },
     ]

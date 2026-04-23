@@ -15,6 +15,8 @@ interface BiomarkerAnalysis {
   recommendations: string[];
 }
 
+import ClinicalReport from '../../components/ui/ClinicalReport'
+
 export default function TranslatorPage() {
   const [labText, setLabText] = useState('')
   const [analyzing, setAnalyzing] = useState(false)
@@ -91,48 +93,18 @@ export default function TranslatorPage() {
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
               transition={{ duration: 0.6 }}
-              style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}
             >
-              {/* Pathological Summary */}
-              <Surface style={{ padding: '2rem', border: '1px solid var(--border-mid)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                  <span style={{ fontSize: '1.5rem' }}>🔬</span>
-                  <h2 style={{ fontSize: '1.4rem', color: '#60a5fa', margin: 0 }}>Pathological Summary</h2>
-                </div>
-                <div style={{ color: 'var(--text-main)', lineHeight: 1.7 }}>
-                  <p style={{ marginBottom: '1.5rem' }}>{result.western_summary}</p>
-                  
-                  <h4 style={{ color: 'var(--text-main)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Flagged Markers:</h4>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {result.flagged_markers?.map((m: string, i: number) => (
-                      <span key={i} style={{ padding: '0.3rem 0.8rem', background: 'rgba(96,165,250,0.1)', border: '1px solid rgba(96,165,250,0.2)', borderRadius: '6px', fontSize: '0.85rem', color: '#60a5fa' }}>{m}</span>
-                    ))}
-                  </div>
-                </div>
-              </Surface>
-
-              {/* Traditional Integration */}
-              <Surface style={{ padding: '2rem', border: '1px solid var(--accent-main)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                  <span style={{ fontSize: '1.5rem' }}>🌿</span>
-                  <h2 style={{ fontSize: '1.4rem', color: 'var(--accent-main)', margin: 0 }}>Traditional Integration</h2>
-                </div>
-                <div style={{ color: 'var(--text-main)', lineHeight: 1.7 }}>
-                  <p style={{ marginBottom: '1.5rem', fontWeight: 500 }}>{result.ayurvedic_root_cause}</p>
-                  
-                  <h4 style={{ color: 'var(--text-main)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Systemic Impact:</h4>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-                    {result.affected_systems?.map((s: string, i: number) => (
-                      <span key={i} style={{ padding: '0.3rem 0.8rem', background: 'var(--surface-high)', border: '1px solid var(--border-mid)', borderRadius: '6px', fontSize: '0.85rem', color: 'var(--accent-main)' }}>{s}</span>
-                    ))}
-                  </div>
-
-                  <h4 style={{ color: 'var(--text-main)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Clinical Recommendations:</h4>
-                  <ul style={{ paddingLeft: '1.2rem', color: 'var(--text-muted)' }}>
-                    {result.recommendations?.map((r: string, i: number) => <li key={i} style={{ marginBottom: '0.5rem' }}>{r}</li>)}
-                  </ul>
-                </div>
-              </Surface>
+              <ClinicalReport 
+                summary={result.western_summary}
+                traditionalInsight={result.ayurvedic_root_cause}
+                recommendations={result.recommendations}
+                systemsAffected={result.affected_systems}
+                biomarkers={result.flagged_markers?.map(m => ({
+                  name: m.split(':')[0] || m,
+                  value: m.split(':')[1] || 'Elevated',
+                  status: 'alert'
+                }))}
+              />
             </motion.div>
           )}
         </AnimatePresence>

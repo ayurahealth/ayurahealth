@@ -76,7 +76,7 @@ export default function ChatMessagesPanel({
     month: 'long', day: 'numeric', year: 'numeric' 
   })
   return (
-    <div className="native-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2rem', position: 'relative' }}>
+    <div className="native-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 'clamp(1rem, 3vw, 2rem)', position: 'relative' }}>
       {/* Print-only Clinical Header */}
       <div className="clinical-report-header" style={{ display: 'none' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

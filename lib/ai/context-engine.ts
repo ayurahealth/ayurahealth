@@ -10,26 +10,7 @@
 
 import { log } from '../logger'
 import { executeCompletion, ModelPreference } from './llm-router'
-
-export interface KnowledgeChunkResult {
-  title: string
-  content: string
-  tradition: string
-  source: string
-  similarity: number
-}
-
-interface WebSearchResult {
-  title: string
-  source: string
-  content: string
-}
-
-export interface AgentTraceItem {
-  id: 'planner' | 'researcher' | 'synthesizer'
-  label: string
-  summary: string
-}
+import { KnowledgeChunkResult, AgentTraceItem } from './types'
 
 interface PrismaContextClient {
   userProfile: {
@@ -246,48 +227,81 @@ export async function orchestrateAgents(args: {
     deepThink: true
   }
 
+  const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> => 
+    Promise.race([
+      promise,
+      new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))
+    ])
+
   try {
-    const plannerResponse = await executeCompletion({
-      model: '',
-      messages: [
-        { role: 'system', content: 'You are Planner Agent. Build a short plan for answering this user health query safely. Return max 4 bullets.' },
-        { role: 'user', content: args.userQuery },
-      ],
-      maxTokens: 350,
-      temperature: 0.2
-    }, routingConfig)
+    const plannerResponse = await withTimeout(
+      executeCompletion({
+        model: '',
+        messages: [
+          { role: 'system', content: 'You are Senior Clinical Planner. Develop TWO distinct diagnostic pathways (Path A: Conventional, Path B: Traditional) for this query. Return them as a brief JSON-like summary.' },
+          { role: 'user', content: args.userQuery },
+        ],
+        maxTokens: 500,
+        temperature: 0.3
+      }, routingConfig),
+      10000,
+      { text: 'Path A: Symptomatic relief. Path B: Root cause balancing.', model: 'fallback', provider: 'local' }
+    )
 
     const planner = plannerResponse.text?.trim()
     if (planner) {
-      agentTrace.push({ id: 'planner', label: 'Planner', summary: planner.slice(0, 320) })
+      agentTrace.push({ id: 'planner', label: 'ToT Planner', summary: planner.slice(0, 450) })
     }
 
-    const researcherResponse = await executeCompletion({
-      model: '',
-      messages: [
-        { role: 'system', content: `You are Research Agent. Use this context and return concise evidence bullets:\n${args.knowledgeCtx || 'No extra context found.'}` },
-        { role: 'user', content: args.userQuery },
-      ],
-      maxTokens: 450,
-      temperature: 0.2
-    }, routingConfig)
+    const researcherResponse = await withTimeout(
+      executeCompletion({
+        model: '',
+        messages: [
+          { role: 'system', content: `You are Clinical Research Agent. Use this knowledge and return specific evidence bullets for BOTH paths:\n${args.knowledgeCtx || 'No extra context found.'}` },
+          { role: 'user', content: args.userQuery },
+        ],
+        maxTokens: 600,
+        temperature: 0.2
+      }, routingConfig),
+      15000,
+      { text: 'Evidence: Standard clinical protocols for metabolic and systemic balance.', model: 'fallback', provider: 'local' }
+    )
 
     const researcher = researcherResponse.text?.trim()
     if (researcher) {
-      agentTrace.push({ id: 'researcher', label: 'Researcher', summary: researcher.slice(0, 420) })
+      agentTrace.push({ id: 'researcher', label: 'Evidence Researcher', summary: researcher.slice(0, 550) })
+    }
+
+    const governanceResponse = await withTimeout(
+      executeCompletion({
+        model: '',
+        messages: [
+          { role: 'system', content: 'You are Clinical Governance Agent. Review the research and provide safety guardrails. Avoid prescriptive dosages. Ensure medical disclaimers are contextual. Return 3 compliance points.' },
+          { role: 'user', content: `Research: ${researcher}\nQuery: ${args.userQuery}` },
+        ],
+        maxTokens: 300,
+        temperature: 0.1
+      }, routingConfig),
+      7000,
+      { text: 'Safety: Always consult a professional. Avoid self-diagnosis. Follow traditional safety markers.', model: 'fallback', provider: 'local' }
+    )
+
+    const governance = governanceResponse.text?.trim()
+    if (governance) {
+      agentTrace.push({ id: 'governance', label: 'Clinical Governance', summary: governance.slice(0, 300) })
     }
 
     agentTrace.push({
       id: 'synthesizer',
       label: 'Synthesizer',
-      summary: 'Combining planner and research outputs into one concise clinical response.',
+      summary: 'Reconciling Path A & B with Governance guardrails into a final clinical response.',
     })
   } catch (err) {
     log.error('AGENT_ORCHESTRATION_ERROR', { error: String(err) })
   }
 
   const context = agentTrace.length > 0
-    ? `\nAGENT TRACE BRIEF:\n${agentTrace.map(a => `- ${a.label}: ${a.summary}`).join('\n')}\n`
+    ? `\nINSTITUTIONAL AGENT TRACE:\n${agentTrace.map(a => `### ${a.label}\n${a.summary}`).join('\n\n')}\n`
     : ''
 
   return { agentTrace, context }

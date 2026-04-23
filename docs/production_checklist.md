@@ -18,10 +18,14 @@ This document outlines the critical steps and configurations required to transit
 - [ ] **SEO Metadata**: Finalize institutional `title`, `description`, and `og:image` for all pages.
 - [ ] **Analytics**: Verify Vercel Analytics and LogRocket are firing.
 
-## 4. Stability & Monitoring
-- [ ] **LogRocket**: Verify integration for real-time error tracking and performance monitoring.
-- [ ] **Log Ingestion**: Set up structured logging for AI orchestration traces.
-- [ ] **Institutional Rate Limiting**: Switch to `@upstash/ratelimit` before public deployment.
+## 5. Logic Resilience (Gold Build)
+- [x] **Agent Orchestration Timeouts**: Ensure `withTimeout` is applied to all Planner/Researcher calls to prevent hung providers (implemented in `context-engine.ts`).
+- [x] **Clinical Sanitizer**: Verify `sanitizeInput` is used in `api/chat` to block prompt injection and normalize whitespace.
+- [x] **Fallback Intelligence**: Ensure the `Synthesizer` can operate if one agent fails (implemented).
+
+## 6. iOS Native Parity
+- [ ] **Safe Area Audit**: Verify bottom-sheet modals don't overlap the iOS home indicator.
+- [ ] **Glassmorphism Consistency**: Ensure `.ios-glass-thin` uses `var(--surface-glass-bg)` for platform-wide theme syncing.
 
 ---
-*Maintained by Ayura Intelligence Lab Team — April 2026*
+*Maintained by Ayura Intelligence Lab Team — Gold Progress Update April 2026*

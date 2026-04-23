@@ -15,22 +15,7 @@ import { z } from 'zod'
 
 import { checkRateLimitDistributed } from '@/lib/security/ratelimit'
 
-// Prompt Injection Protection (ACE Framework 5.2)
-function sanitizeInput(input: string): string {
-  if (!input) return ''
-  let sanitized = input.normalize('NFKC')
-  sanitized = sanitized
-    .replace(/\u200B/g, '') // Zero width space
-    .replace(/\uFEFF/g, '') // BOM
-    .replace(/ignore\s+(all\s+)?previous\s+instructions?/gi, '')
-    .replace(/system\s*[:\-\=]/gi, '')
-    .replace(/\[INST\]/gi, '')
-    .replace(/<<SYS>>/gi, '')
-    .replace(/<\/?(s|system|human|assistant)>/gi, '')
-    .trim()
-    .slice(0, 4000)
-  return sanitized
-}
+import { sanitizeInput, sanitizePatientData } from '@/lib/security/sanitizer'
 
 // Response Sanitization
 function sanitizeAIResponse(text: string): string {

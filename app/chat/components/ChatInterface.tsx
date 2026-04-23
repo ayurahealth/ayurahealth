@@ -81,7 +81,7 @@ export default function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' })
+    messagesEndRef.current?.scrollIntoView({ block: 'end', behavior: 'auto' })
   }, [messages, streaming])
 
   return (
@@ -95,7 +95,9 @@ export default function ChatInterface({
         display: 'flex',
         flexDirection: 'column',
         height: '100dvh',
+        maxHeight: '100%',
         paddingTop: 'max(0.75rem, env(safe-area-inset-top))',
+        overflow: 'hidden'
       }}
     >
       <motion.div
@@ -104,32 +106,32 @@ export default function ChatInterface({
         transition={{ duration: 0.45 }}
         className="glass-surface"
         style={{
-          margin: '1rem',
+          margin: '0.75rem',
           padding: '0.85rem 1rem',
           borderRadius: '24px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.9rem',
+          gap: '0.75rem',
           border: '1px solid var(--border-low)',
-          background: 'linear-gradient(180deg, rgba(10,19,15,0.88), rgba(9,15,13,0.72))',
+          background: 'linear-gradient(180deg, rgba(20,32,28,0.92), rgba(15,25,22,0.85))',
           backdropFilter: 'blur(20px)',
+          flexShrink: 0,
+          zIndex: 10
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
-            <Logo size={28} showText={true} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-              <span style={{ color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: 600 }}>Premium health companion</span>
-            </div>
+        {/* Top Bar: Logo & Engine Status */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }} className="no-scrollbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', flexShrink: 0 }}>
+            <Logo size={26} showText={true} />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.45rem 1rem', background: 'hsla(var(--accent-main-hsl), 0.05)', borderRadius: '14px', border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
-              <ShieldCheck size={16} style={{ color: 'var(--accent-main)' }} />
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-main)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Engine Active</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', background: 'hsla(var(--accent-main-hsl), 0.08)', borderRadius: '12px', border: '1px solid hsla(var(--accent-main-hsl), 0.15)' }}>
+              <ShieldCheck size={14} style={{ color: 'var(--accent-main)' }} />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-main)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Active</span>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.35rem', background: 'var(--bg-main)', padding: '3px', borderRadius: '12px', border: '1px solid var(--border-low)' }}>
+            <div style={{ display: 'flex', background: 'var(--bg-main)', padding: '2px', borderRadius: '10px', border: '1px solid var(--border-low)' }}>
               <select
                 value={modelPreference}
                 onChange={(e) => onModelPrefChange(e.target.value)}
@@ -137,41 +139,43 @@ export default function ChatInterface({
                   background: 'transparent',
                   color: 'var(--text-main)',
                   border: 'none',
-                  padding: '0.4rem 0.6rem',
+                  padding: '0.35rem 0.5rem',
                   borderRadius: '8px',
-                  fontSize: '0.8rem',
+                  fontSize: '0.75rem',
                   outline: 'none',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
               >
                 <option value="auto">Auto Intelligence</option>
-                <option value="claude">Claude 3.5 Sonnet</option>
-                <option value="gpt">GPT-4 Omni</option>
-                <option value="gemini">Gemini 1.5 Pro</option>
-                <option value="deepseek">DeepSeek R1</option>
-                <option value="groq">Groq Llama 3</option>
+                <option value="claude">Claude 3.5</option>
+                <option value="gpt">GPT-4o</option>
+                <option value="gemini">Gemini Pro</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="groq">Groq</option>
               </select>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.9rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', background: 'var(--bg-main)', borderRadius: '12px', padding: '3px', border: '1px solid var(--border-low)' }}>
+        {/* Secondary Bar: Mode & Profile */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }} className="no-scrollbar">
+          <div style={{ display: 'flex', background: 'var(--bg-main)', borderRadius: '10px', padding: '2px', border: '1px solid var(--border-low)', flexShrink: 0 }}>
             {(['fast', 'deep', 'research'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => onResponseModeChange(mode)}
                 style={{
-                  fontSize: '0.75rem',
-                  padding: '0.45rem 0.75rem',
-                  borderRadius: '10px',
+                  fontSize: '0.7rem',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '8px',
                   background: responseMode === mode ? 'var(--accent-main)' : 'transparent',
                   color: responseMode === mode ? 'var(--bg-main)' : 'var(--text-muted)',
                   border: 'none',
                   cursor: 'pointer',
                   fontWeight: 700,
                   transition: 'all 0.25s var(--ease-out)',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 {mode.charAt(0).toUpperCase() + mode.slice(1)}
@@ -179,15 +183,15 @@ export default function ChatInterface({
             ))}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0 }}>
             {dosha && (
-              <div style={{ padding: '0.45rem 0.85rem', borderRadius: '999px', background: `${doshaColor}14`, border: `1px solid ${doshaColor}33`, color: doshaColor, fontSize: '0.78rem', fontWeight: 700 }}>
-                {dosha} profile
+              <div style={{ padding: '0.35rem 0.75rem', borderRadius: '999px', background: `${doshaColor}14`, border: `1px solid ${doshaColor}33`, color: doshaColor, fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                {dosha}
               </div>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-              <Sparkles size={14} />
-              Ask symptoms, upload reports, or request a simple care plan.
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--text-muted)', fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
+              <Sparkles size={12} />
+              Clinical Lab
             </div>
           </div>
         </div>

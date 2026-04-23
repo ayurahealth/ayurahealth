@@ -3,7 +3,7 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; height: 100%; }
 
 :root {
   /* ── Core Clinical Palette ── */
-  --bg-main-hsl: 154, 15%, 0.5%;
+  --bg-main-hsl: 154, 15%, 3%;
   --bg-main: hsl(var(--bg-main-hsl));
   
   --text-main-hsl: 144, 15%, 96%;
@@ -13,6 +13,11 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; height: 100%; }
   --selection-text: #ffffff;
   --text-muted: hsla(var(--text-main-hsl), 0.48);
   --text-subtle: hsla(var(--text-main-hsl), 0.28);
+  
+  --surface-glass-bg: hsla(154, 15%, 4%, 0.72);
+  --surface-glass-border: hsla(144, 15%, 96%, 0.08);
+  --surface-default-bg: hsla(154, 15%, 2%, 0.4);
+  --surface-default-border: hsla(144, 15%, 96%, 0.04);
   
   --accent-main-hsl: 144, 18%, 60%;
   --accent-main: hsl(var(--accent-main-hsl));
@@ -615,23 +620,36 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Mobile & chat */
+/* Mobile & chat scroll optimizations */
 .native-scroll {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;
+  scrollbar-width: thin;
 }
 
-.ios-surface {
-  background: var(--surface-regular);
-  backdrop-filter: var(--blur-md);
-  -webkit-backdrop-filter: var(--blur-md);
-  border: 1px solid var(--border-low);
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.chat-main {
+html, body {
+  height: 100%;
+  overflow: hidden; /* Prevent body scroll if using 100dvh layout */
+  overscroll-behavior-y: none;
+}
+
+body > main {
+  height: 100%;
+  overflow: auto; /* Allow landing pages to scroll */
+}
+
+/* Ensure chat specifically doesn't scroll body */
+.chat-shell {
   height: 100dvh;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
 
