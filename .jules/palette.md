@@ -1,0 +1,3 @@
+## 2024-05-25 - Dynamic ARIA Labels in Chat Interface
+**Learning:** When managing complex states like toggling link inputs or listening mode (`isListening`, `showLinkInput`), using ternary operators directly inside `aria-label` and `title` attributes (e.g., `aria-label={isListening ? "Stop listening" : "Start voice input"}`) provides a seamless screen reader experience that updates synchronously with visual states.
+**Action:** Always dynamically bind ARIA attributes and tooltips to state variables for toggle buttons, ensuring screen reader feedback perfectly matches the component's visual state.
