@@ -33,7 +33,7 @@ export function sanitizeInput(input: string): string {
   return sanitized
 }
 
-export function sanitizePatientData(data: any): any {
+export function sanitizePatientData<T = unknown>(data: T): T {
   // Deep clone and sanitize strings
   return JSON.parse(JSON.stringify(data, (key, value) => {
     if (typeof value === 'string') {

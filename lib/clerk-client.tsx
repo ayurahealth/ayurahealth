@@ -7,7 +7,7 @@ import {
   UserButton as ReactUserButton,
   useClerk as useReactClerk,
   useUser as useReactUser,
-} from '@clerk/react'
+} from '@clerk/nextjs'
 
 const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 

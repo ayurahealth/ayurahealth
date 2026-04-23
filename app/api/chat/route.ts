@@ -15,7 +15,7 @@ import { z } from 'zod'
 
 import { checkRateLimitDistributed } from '@/lib/security/ratelimit'
 
-import { sanitizeInput, sanitizePatientData } from '@/lib/security/sanitizer'
+import { sanitizeInput } from '@/lib/security/sanitizer'
 
 // Response Sanitization
 function sanitizeAIResponse(text: string): string {
@@ -46,7 +46,7 @@ import {
   fetchWebContext,
   orchestrateAgents,
 } from '@/lib/ai/context-engine'
-import { KnowledgeChunkResult, AgentTraceItem } from '@/lib/ai/types'
+import { KnowledgeChunkResult } from '@/lib/ai/types'
 import { executeCompletion, executeStreamingCompletion } from '@/lib/ai/llm-router'
 import type { ModelPreference } from '@/lib/ai/llm-router'
 import type { ChatMessage } from '@/lib/ai/providers/types'
@@ -83,16 +83,6 @@ const chatSchema = z.object({
 
 const MAX_CONTENT_BYTES = 200_000
 const FREE_MESSAGE_LIMIT = 10
-
-interface PrismaChatSession { id: string }
-interface PrismaChatClient {
-  chatSession: {
-    create(args: { data: { userId: string; topic: string; summary: string } }): Promise<PrismaChatSession>
-  }
-  message: {
-    create(args: { data: { sessionId: string; role: string; content: string } }): Promise<unknown>
-  }
-}
 
 interface ToolTraceItem {
   id: string
@@ -289,7 +279,7 @@ function createCompositeStream(args: {
   metadata: {
     sources: KnowledgeChunkResult[]
     sessionId?: string
-    agentTrace: any[]
+    agentTrace: unknown[]
     modelUsed: string
     providerUsed: string
     policy: AutoRecoveryPolicy
@@ -309,7 +299,10 @@ function createCompositeStream(args: {
       if (args.clerkUserId && !activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
-          const prismaClient = prismaMod.prisma as any
+          const prismaClient = prismaMod.prisma as unknown as {
+            chatSession: { create: (opts: { data: { userId: string; topic: string; summary: string } }) => Promise<{ id: string }> },
+            message: { create: (opts: { data: { sessionId: string; role: string; content: string } }) => Promise<unknown> }
+          }
           const session = await prismaClient.chatSession.create({
             data: { userId: args.clerkUserId, topic: args.userQuery.slice(0, 50), summary: '' }
           })
@@ -323,7 +316,9 @@ function createCompositeStream(args: {
       } else if (args.clerkUserId && activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
-          const prismaClient = prismaMod.prisma as any
+          const prismaClient = prismaMod.prisma as unknown as {
+            message: { create: (opts: { data: { sessionId: string; role: string; content: string } }) => Promise<unknown> }
+          }
           await prismaClient.message.create({
             data: { sessionId: activeSessionId, role: 'user', content: args.userQuery }
           })
@@ -365,7 +360,9 @@ function createCompositeStream(args: {
           
           try {
             const prismaMod = await import('@/lib/prisma')
-            const prismaClient = prismaMod.prisma as any
+            const prismaClient = prismaMod.prisma as unknown as {
+              message: { create: (opts: { data: { sessionId: string; role: string; content: string } }) => Promise<unknown> }
+            }
             await prismaClient.message.create({
               data: { sessionId: activeSessionId, role: 'assistant', content: sanitizedText }
             })
