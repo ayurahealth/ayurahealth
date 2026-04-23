@@ -120,7 +120,6 @@ export default function ChatInterface({
             <Logo size={28} showText={true} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
               <span style={{ color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: 600 }}>Premium health companion</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Built to feel calm, clear, and native on iPhone.</span>
             </div>
           </div>
 
