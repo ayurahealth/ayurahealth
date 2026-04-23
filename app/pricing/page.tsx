@@ -36,8 +36,8 @@ const PRICING_TIERS = (t: TranslationFn) => [
   },
   {
     name: 'Clinical',
-    priceUSD: 4.99,
-    priceINR: 399,
+    priceUSD: 5.99,
+    priceINR: 499,
     period: 'month',
     description: 'For consistent health tracking',
     features: [
@@ -57,8 +57,8 @@ const PRICING_TIERS = (t: TranslationFn) => [
   },
   {
     name: t('pricing_enterprise'),
-    priceUSD: 9.99,
-    priceINR: 799,
+    priceUSD: 11.99,
+    priceINR: 999,
     period: 'month',
     description: 'For professional-grade wellness',
     features: [
