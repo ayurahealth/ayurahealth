@@ -62,9 +62,10 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            style={{ marginBottom: '1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 1rem', background: 'var(--surface-low)', border: '1px solid var(--border-low)', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-main)', letterSpacing: '0.05em', textTransform: 'uppercase' }}
+            className="ios-badge"
+            style={{ marginBottom: '2rem', display: 'inline-flex' }}
           >
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', boxShadow: '0 0 10px currentColor' }} />
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', boxShadow: '0 0 10px currentColor', animation: 'neuralPulse 2s ease-in-out infinite' }} />
             Ayura Intelligence Lab — v1.1.0 Live
           </motion.div>
 
@@ -81,7 +82,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            style={{ fontSize: '1.25rem', color: 'var(--text-muted)', maxWidth: 680, margin: '0 auto 4rem', lineHeight: 1.6 }}
+            style={{ fontSize: 'clamp(1.05rem, 2vw, 1.3rem)', color: 'var(--text-muted)', maxWidth: 640, margin: '0 auto 4rem', lineHeight: 1.7, letterSpacing: '-0.008em' }}
           >
             {t('landing_sub')}
           </motion.p>
@@ -164,9 +165,8 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
-
           {/* ─── Capabilities Grid ─── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', textAlign: 'left' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', textAlign: 'left' }}>
             {[
               { name: t('cap_1_name'), desc: t('cap_1_desc'), icon: BookOpen },
               { name: t('cap_2_name'), desc: t('cap_2_desc'), icon: Zap },
@@ -177,14 +177,14 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 + i * 0.1 }}
-                className="flat-card"
-                style={{ background: 'hsla(var(--bg-main-hsl), 0.5)', border: '1px solid var(--border-low)' }}
+                className="ios-glass-thin ios-glass-mirror"
+                style={{ padding: '2rem 1.75rem' }}
               >
-                <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'var(--surface-low)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)', marginBottom: '1.25rem' }}>
+                <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'hsla(144,18%,60%,0.10)', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)', marginBottom: '1.25rem', boxShadow: '0 0 16px hsla(144,18%,60%,0.12)' }}>
                   <cap.icon size={20} />
                 </div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.75rem' }}>{cap.name}</h3>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>{cap.desc}</p>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.6rem', letterSpacing: '-0.02em' }}>{cap.name}</h3>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.65 }}>{cap.desc}</p>
               </motion.div>
             ))}
           </div>
