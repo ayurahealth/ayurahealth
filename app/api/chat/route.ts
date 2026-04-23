@@ -46,7 +46,7 @@ import {
   fetchWebContext,
   orchestrateAgents,
 } from '@/lib/ai/context-engine'
-import { KnowledgeChunkResult } from '@/lib/ai/types'
+import { KnowledgeChunkResult, AgentTraceItem } from '@/lib/ai/types'
 import { executeCompletion, executeStreamingCompletion } from '@/lib/ai/llm-router'
 import type { ModelPreference } from '@/lib/ai/llm-router'
 import type { ChatMessage } from '@/lib/ai/providers/types'
@@ -280,7 +280,7 @@ function createCompositeStream(args: {
   metadata: {
     sources: KnowledgeChunkResult[]
     sessionId?: string
-    agentTrace: Record<string, unknown>[]
+    agentTrace: AgentTraceItem[]
     modelUsed: string
     providerUsed: string
     policy: AutoRecoveryPolicy
@@ -300,7 +300,8 @@ function createCompositeStream(args: {
       if (args.clerkUserId && !activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
-          const prismaClient = prismaMod.prisma as Record<string, any>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const prismaClient = prismaMod.prisma as any
           const session = await prismaClient.chatSession.create({
             data: { userId: args.clerkUserId, topic: args.userQuery.slice(0, 50), summary: '' }
           })
@@ -314,7 +315,8 @@ function createCompositeStream(args: {
       } else if (args.clerkUserId && activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
-          const prismaClient = prismaMod.prisma as Record<string, any>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const prismaClient = prismaMod.prisma as any
           await prismaClient.message.create({
             data: { sessionId: activeSessionId, role: 'user', content: args.userQuery }
           })
@@ -356,7 +358,8 @@ function createCompositeStream(args: {
           
           try {
             const prismaMod = await import('@/lib/prisma')
-            const prismaClient = prismaMod.prisma as Record<string, any>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const prismaClient = prismaMod.prisma as any
             await prismaClient.message.create({
               data: { sessionId: activeSessionId, role: 'assistant', content: sanitizedText }
             })
