@@ -61,20 +61,21 @@ export default function ClinicPage() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ marginBottom: '2rem', display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 1rem', background: 'var(--surface-low)', border: '1px solid var(--border-low)', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-main)', letterSpacing: '0.05em', textTransform: 'uppercase' }}
+            className="ios-badge"
+            style={{ marginBottom: '2rem', display: 'inline-flex' }}
           >
-            Institutional & Clinical Intelligence Console
+            Institutional &amp; Clinical Intelligence Console
           </motion.div>
-          <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 700, lineHeight: 1.05, marginBottom: '2rem', letterSpacing: '-0.03em' }}>
+          <h1 style={{ marginBottom: '1.5rem' }}>
             Empower Your Institution with<br/>
-            <span style={{ color: 'var(--accent-main)' }}>Neural Health Synthesis.</span>
+            <span className="text-gradient">Neural Health Synthesis.</span>
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: 640, margin: '0 auto 3.5rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 'clamp(1.05rem, 2vw, 1.25rem)', lineHeight: 1.7, maxWidth: 580, margin: '0 auto 3.5rem', letterSpacing: '-0.008em' }}>
             Ayura Intelligence Console provides organizations with private, high-fidelity AI processing rooted in verified classical medical traditions.
           </p>
           <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => setShowModal(true)} className="cta-btn">Initialize Institutional Partnership</button>
-            <button onClick={() => setShowModal(true)} className="outline-btn">System Overview</button>
+            <button onClick={() => setShowModal(true)} className="btn-primary" style={{ fontSize: '1rem' }}>Initialize Institutional Partnership</button>
+            <button onClick={() => setShowModal(true)} className="btn-secondary" style={{ fontSize: '1rem' }}>System Overview</button>
           </div>
         </div>
 
@@ -94,10 +95,10 @@ export default function ClinicPage() {
               transition={{ delay: i * 0.1 }}
               className="feature-card"
             >
-              <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)', marginBottom: '1.5rem', border: '1px solid var(--border-low)' }}>
-                <item.icon size={22} />
+              <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'hsla(144,18%,60%,0.10)', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)', marginBottom: '1.5rem', boxShadow: '0 0 16px hsla(144,18%,60%,0.10)' }}>
+                <item.icon size={20} />
               </div>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 600, marginBottom: '0.75rem' }}>{item.title}</h3>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.65rem', letterSpacing: '-0.02em' }}>{item.title}</h3>
               <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{item.desc}</p>
             </motion.div>
           ))}

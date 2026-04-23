@@ -119,14 +119,14 @@ export default function PricingPage() {
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', justifyContent: 'center', color: 'var(--accent-main)', marginBottom: '1.25rem' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2px' }}>Professional Licensing</span>
+          <div className="ios-badge" style={{ margin: '0 auto 2rem', display: 'inline-flex' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', boxShadow: '0 0 10px currentColor' }} />
+            Professional Licensing
           </div>
-          <h1 className="hero-text" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, lineHeight: 1.1, marginBottom: '2rem', color: 'var(--text-main)' }}>
+          <h1 className="hero-text" style={{ marginBottom: '1.5rem' }}>
             {t('heading_pricing')}
           </h1>
-          <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: 640, margin: '0 auto 4rem', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 'clamp(1.05rem, 2vw, 1.25rem)', color: 'var(--text-muted)', maxWidth: 580, margin: '0 auto 4rem', lineHeight: 1.7, letterSpacing: '-0.008em' }}>
             {t('pricing_sub')}
           </p>
 
@@ -191,20 +191,20 @@ export default function PricingPage() {
                 )}
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: '10px', background: 'var(--surface-high)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)' }}>
-                    <Icon size={24} />
+                  <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'hsla(144,18%,60%,0.10)', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)', boxShadow: '0 0 16px hsla(144,18%,60%,0.10)' }}>
+                    <Icon size={22} />
                   </div>
-                  <h3 style={{ fontSize: '1.75rem', fontWeight: 600, color: 'var(--text-main)' }}>{tier.name}</h3>
+                  <h3 style={{ fontSize: '1.6rem', fontWeight: 700, letterSpacing: '-0.024em', color: 'var(--text-main)' }}>{tier.name}</h3>
                 </div>
                 
                 <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '2.5rem', lineHeight: 1.5 }}>{tier.description}</p>
 
                 <div style={{ marginBottom: '3rem' }}>
-                  <div style={{ fontSize: '3.5rem', fontWeight: 500, color: 'var(--text-main)', lineHeight: 0.9 }}>{getPrice(tier)}</div>
+                  <div className="stat-number" style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)' }}>{getPrice(tier)}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>{getPeriod(tier.priceUSD)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', letterSpacing: '-0.006em' }}>{getPeriod(tier.priceUSD)}</span>
                     {billing === 'annual' && tier.priceUSD > 0 && (
-                      <span style={{ color: 'var(--accent-main)', fontSize: '0.85rem', fontWeight: 600, background: 'hsla(var(--accent-main-hsl), 0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>{getSavings(tier)}</span>
+                      <span style={{ color: 'var(--accent-main)', fontSize: '0.82rem', fontWeight: 700, background: 'hsla(var(--accent-main-hsl), 0.12)', border: '1px solid var(--border-mid)', padding: '0.12rem 0.5rem', borderRadius: '6px' }}>{getSavings(tier)}</span>
                     )}
                   </div>
                 </div>
