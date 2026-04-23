@@ -15,7 +15,7 @@ import { z } from 'zod'
 
 import { checkRateLimitDistributed } from '@/lib/security/ratelimit'
 
-import { sanitizeInput, sanitizePatientData } from '@/lib/security/sanitizer'
+import { sanitizeInput } from '@/lib/security/sanitizer'
 
 // Response Sanitization
 function sanitizeAIResponse(text: string): string {
@@ -84,15 +84,6 @@ const chatSchema = z.object({
 const MAX_CONTENT_BYTES = 200_000
 const FREE_MESSAGE_LIMIT = 10
 
-interface PrismaChatSession { id: string }
-interface PrismaChatClient {
-  chatSession: {
-    create(args: { data: { userId: string; topic: string; summary: string } }): Promise<PrismaChatSession>
-  }
-  message: {
-    create(args: { data: { sessionId: string; role: string; content: string } }): Promise<unknown>
-  }
-}
 
 interface ToolTraceItem {
   id: string
@@ -289,7 +280,7 @@ function createCompositeStream(args: {
   metadata: {
     sources: KnowledgeChunkResult[]
     sessionId?: string
-    agentTrace: any[]
+    agentTrace: AgentTraceItem[]
     modelUsed: string
     providerUsed: string
     policy: AutoRecoveryPolicy
@@ -309,6 +300,7 @@ function createCompositeStream(args: {
       if (args.clerkUserId && !activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const prismaClient = prismaMod.prisma as any
           const session = await prismaClient.chatSession.create({
             data: { userId: args.clerkUserId, topic: args.userQuery.slice(0, 50), summary: '' }
@@ -323,6 +315,7 @@ function createCompositeStream(args: {
       } else if (args.clerkUserId && activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const prismaClient = prismaMod.prisma as any
           await prismaClient.message.create({
             data: { sessionId: activeSessionId, role: 'user', content: args.userQuery }
@@ -365,6 +358,7 @@ function createCompositeStream(args: {
           
           try {
             const prismaMod = await import('@/lib/prisma')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const prismaClient = prismaMod.prisma as any
             await prismaClient.message.create({
               data: { sessionId: activeSessionId, role: 'assistant', content: sanitizedText }
