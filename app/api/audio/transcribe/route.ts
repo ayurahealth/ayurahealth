@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimitDistributed } from '@/lib/security/ratelimit'
 
 export async function POST(req: NextRequest) {
+  // 1. Rate limiting
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
+  const isAllowed = await checkRateLimitDistributed(ip + ':transcribe')
+  if (!isAllowed) {
+    return NextResponse.json({ error: 'Too many transcription requests. Please wait.' }, { status: 429 })
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;

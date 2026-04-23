@@ -7,12 +7,6 @@
  * 3. Input sanitization (prompt injection defense)
  * 4. Delegates to modular services for prompt building, LLM routing, and context assembly
  * 5. Returns true SSE streaming responses
- * 
- * All business logic has been extracted to:
- * - lib/ai/llm-router.ts — Provider selection + fallback chains
- * - lib/ai/prompt-manager.ts — System prompt construction
- * - lib/ai/context-engine.ts — RAG, Clinical Memory, Web Search, Agents
- * - lib/security/input-sanitizer.ts — Safety + injection defense
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -21,33 +15,24 @@ import { z } from 'zod'
 
 import { checkRateLimitDistributed } from '@/lib/security/ratelimit'
 
-// Prompt Injection Protection (ACE Framework 5.2 - Finding #2)
+// Prompt Injection Protection (ACE Framework 5.2)
 function sanitizeInput(input: string): string {
   if (!input) return ''
-  
-  // 1. Unicode Normalization (NFKC) to catch lookalikes
   let sanitized = input.normalize('NFKC')
-
-  // 2. Canonicalize common bypass characters
   sanitized = sanitized
     .replace(/\u200B/g, '') // Zero width space
     .replace(/\uFEFF/g, '') // BOM
-
-  // 3. Regex Filtering (Expanded for Nested/Encoded/HMR variants)
-  sanitized = sanitized
     .replace(/ignore\s+(all\s+)?previous\s+instructions?/gi, '')
     .replace(/system\s*[:\-\=]/gi, '')
     .replace(/\[INST\]/gi, '')
     .replace(/<<SYS>>/gi, '')
     .replace(/<\/?(s|system|human|assistant)>/gi, '')
-    .replace(/base64|encoding|payload/gi, '') // Detect mentions of encodings
     .trim()
     .slice(0, 4000)
-
   return sanitized
 }
 
-// Response Sanitization (Inlined for robustness)
+// Response Sanitization
 function sanitizeAIResponse(text: string): string {
   return text
     .replace(/PROMPT PROFILE:\s*(BALANCED|STRICT|RECOVERY)/gi, '')
@@ -76,9 +61,8 @@ import {
   fetchWebContext,
   orchestrateAgents,
   type KnowledgeChunkResult,
-  type AgentTraceItem,
 } from '@/lib/ai/context-engine'
-import { executeCompletion, executeStreamingCompletion, routeRequest } from '@/lib/ai/llm-router'
+import { executeCompletion, executeStreamingCompletion } from '@/lib/ai/llm-router'
 import type { ModelPreference } from '@/lib/ai/llm-router'
 import type { ChatMessage } from '@/lib/ai/providers/types'
 import { VAIDYA_TOOLS, executeToolCall } from '@/lib/ai/tool-executor'
@@ -132,7 +116,6 @@ interface ToolTraceItem {
   output: string
 }
 
-// ── Stream Headers ──────────────────────────────────────────────────────────
 const STREAM_HEADERS = {
   'Content-Type': 'text/event-stream',
   'Cache-Control': 'no-cache',
@@ -141,14 +124,6 @@ const STREAM_HEADERS = {
 
 // ── Main Handler ────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-
-  // 1. Size guard
-  const contentLength = req.headers.get('content-length')
-  if (contentLength && parseInt(contentLength) > MAX_CONTENT_BYTES) {
-    return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
-  }
-
-  // 2. Rate limiting + CEO Bypass (Finding #1: Serverless Distributed)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
   const isAllowed = await checkRateLimitDistributed(ip)
   if (!isAllowed) {
@@ -160,19 +135,16 @@ export async function POST(req: NextRequest) {
   const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
   if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
 
-  // 3. Auth + Paywall
   const clerkUser = await currentUser()
   const tier = (clerkUser?.publicMetadata?.tier as string) || 'free'
 
   try {
-    // 4. Parse + Validate
     const body = await req.text()
     if (body.length > MAX_CONTENT_BYTES) {
       return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
     }
 
     const json = JSON.parse(body) as Record<string, unknown>
-
     const validation = chatSchema.safeParse(json)
     if (!validation.success) {
       return NextResponse.json({ error: 'Invalid request data', details: validation.error.format() }, { status: 400 })
@@ -180,7 +152,6 @@ export async function POST(req: NextRequest) {
 
     const { messages, systems, dosha, lang, attachments, deepThink, modelPreference, webSearch, sessionId, vedicContext, cavemanMode } = validation.data
 
-    // 5. Paywall enforcement
     if (tier === 'free') {
       const assistantCount = messages.filter(m => m.role === 'assistant').length
       if (assistantCount >= FREE_MESSAGE_LIMIT) {
@@ -191,7 +162,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 6. Validate + Sanitize inputs
     const safeLang = validateLang(lang)
     const safeSystems = validateSystems(systems)
     const safeDosha = validateDosha(dosha)
@@ -201,7 +171,6 @@ export async function POST(req: NextRequest) {
     const lastMsg = messages[messages.length - 1]
     const userQuery = lastMsg.role === 'user' ? sanitizeInput(lastMsg.content) : ''
 
-    // 8. Build prompt profile + auto-recovery
     const promptProfile = buildPromptProfile(messages)
     const autoRecoveryPolicy = buildAutoRecoveryPolicy({
       promptProfile,
@@ -216,46 +185,25 @@ export async function POST(req: NextRequest) {
       clerkUser?.id ? fetchClinicalMemory(clerkUser.id) : Promise.resolve(''),
       clerkUser?.id ? fetchPatientProfile(clerkUser.id) : Promise.resolve(''),
       fetchKnowledgeContext(userQuery),
-      effectiveWebSearch ? fetchWebContext(userQuery) : Promise.resolve({ context: '', chunks: [] as Array<{ title: string; content: string; tradition: string; source: string; similarity: number }> }),
+      effectiveWebSearch ? fetchWebContext(userQuery) : Promise.resolve({ context: '', chunks: [] as KnowledgeChunkResult[] }),
       (sessionId && messages.length === 1) ? fetchChatHistory(sessionId) : Promise.resolve([]),
     ])
 
-    // Backfill history if available
-    const effectiveMessages = historyBackfill.length > 0 ? [...historyBackfill, messages[messages.length-1]] : messages
-
-    const allKnowledgeCtx = [knowledgeResult.context, webResult.context].filter(Boolean).join('')
+    const effectiveMessages = historyBackfill.length > 0 ? [...historyBackfill, messages[messages.length - 1]] : messages
+    const allKnowledgeCtx = [knowledgeResult.context, webResult.context].filter(Boolean).join('\n')
     const allChunks = [...knowledgeResult.chunks, ...webResult.chunks]
 
     // 10. Agent orchestration
-    const agentTrace: Array<{ id: 'planner' | 'researcher' | 'synthesizer'; label: string; summary: string }> = []
-    const agentTraceCtxResult = await (async (): Promise<string> => {
+    const { agentTrace, context: agentTraceCtx } = await (async () => {
       if (effectiveDeepThink || effectiveWebSearch) {
-        const routing = routeRequest({ modelPreference: preferredModel, hasImages: false, deepThink: effectiveDeepThink })
-        const key = routing.provider.name === 'Groq' ? process.env.GROQ_API_KEY || ''
-          : routing.provider.name === 'OpenRouter' ? process.env.OPENROUTER_API_KEY || ''
-          : ''
-        if (key) {
-          const apiUrl = routing.provider.name === 'Groq' ? 'https://api.groq.com/openai/v1/chat/completions'
-            : 'https://openrouter.ai/api/v1/chat/completions'
-          const headers: Record<string, string> = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' }
-          if (routing.provider.name === 'OpenRouter') {
-            headers['HTTP-Referer'] = 'https://ayurahealth.com'
-            headers['X-Title'] = 'Vaidya Intelligence — Ayura Intelligence Lab'
-          }
-          const result = await orchestrateAgents({
-            userQuery,
-            knowledgeCtx: allKnowledgeCtx,
-            apiUrl,
-            headers,
-            model: routing.model,
-          })
-          agentTrace.push(...result.agentTrace)
-          return result.context
-        }
+        return orchestrateAgents({
+          userQuery,
+          knowledgeCtx: allKnowledgeCtx,
+          modelPreference: preferredModel
+        })
       }
-      return ''
+      return { agentTrace: [], context: '' }
     })()
-    const agentTraceCtx = agentTraceCtxResult
 
     // 11. Build system prompt
     const systemPrompt = buildSystemPrompt({
@@ -275,7 +223,6 @@ export async function POST(req: NextRequest) {
       autoRecoveryPolicy,
     })
 
-    // 12. Format messages for API
     const completionMessages = formatMessagesForApi(effectiveMessages, safeAttachments, systemPrompt)
     const hasImages = safeAttachments.some(a => a.type === 'image')
     const maxTokens = effectiveDeepThink ? 4000 : 2500
@@ -285,20 +232,12 @@ export async function POST(req: NextRequest) {
       (autoRecoveryPolicy.applied ? -0.05 : 0)
     ))
 
-    // 13. Agentic Tool Execution Loop (up to 3 iterations)
     const currentMessages: ChatMessage[] = [...completionMessages]
     const toolTrace: ToolTraceItem[] = []
-    
-    // Only use tools if Deep Think or specific tags are present, or in Researcher mode
     const useTools = effectiveWebSearch || effectiveDeepThink || userQuery.toLowerCase().includes('search') || userQuery.toLowerCase().includes('profile')
 
     if (useTools) {
-      for (let i = 0; i < 5; i++) { // Increased to 5 for complex reasoning, but with strict safety break
-        log.info('TOOL_CHECK_ITERATION', { iteration: i, provider: preferredModel })
-        if (i === 4) {
-          log.warn('MAX_TOOL_ITERATIONS_REACHED', { sessionId })
-          break
-        }
+      for (let i = 0; i < 4; i++) {
         try {
           const check = await executeCompletion(
             { model: '', messages: currentMessages, maxTokens: 1000, temperature: 0.1, tools: VAIDYA_TOOLS },
@@ -306,7 +245,6 @@ export async function POST(req: NextRequest) {
           )
 
           if (check.toolCalls && check.toolCalls.length > 0) {
-            log.info('LLM_REQUESTED_TOOLS', { count: check.toolCalls.length })
             const results = await Promise.all(
               check.toolCalls.map(async (tool) => {
                 const result = await executeToolCall(tool)
@@ -320,18 +258,15 @@ export async function POST(req: NextRequest) {
               currentMessages.push({ role: 'system', content: `TOOL_RESULT [${toolName}]: ${result.output}` })
               toolTrace.push({ id: tool.id, name: toolName, args: tool.function.arguments, output: result.output })
             }
-            continue // Check again if LLM needs more tools
+            continue
           }
         } catch {
-          log.error('TOOL_LOOP_FAILED', { error: 'Internal tool execution error' })
           break
         }
-        break // No tool calls, proceed to stream
+        break
       }
     }
 
-    // 14. Execute final LLM streaming completion
-    // 14. Execute final LLM streaming completion
     const streamResult = await executeStreamingCompletion(
       { model: '', messages: currentMessages, maxTokens, temperature },
       { modelPreference: preferredModel, hasImages, deepThink: effectiveDeepThink },
@@ -344,7 +279,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'AI service temporarily unavailable.' }, { status: 500 })
     }
 
-    // 15. Return composite streaming response
     return new NextResponse(createCompositeStream({
       llmStream: streamResult.stream,
       metadata: {
@@ -370,7 +304,7 @@ function createCompositeStream(args: {
   metadata: {
     sources: KnowledgeChunkResult[]
     sessionId?: string
-    agentTrace: AgentTraceItem[]
+    agentTrace: any[]
     modelUsed: string
     providerUsed: string
     policy: AutoRecoveryPolicy
@@ -390,7 +324,7 @@ function createCompositeStream(args: {
       if (args.clerkUserId && !activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
-          const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
+          const prismaClient = prismaMod.prisma as any
           const session = await prismaClient.chatSession.create({
             data: { userId: args.clerkUserId, topic: args.userQuery.slice(0, 50), summary: '' }
           })
@@ -404,7 +338,7 @@ function createCompositeStream(args: {
       } else if (args.clerkUserId && activeSessionId) {
         try {
           const prismaMod = await import('@/lib/prisma')
-          const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
+          const prismaClient = prismaMod.prisma as any
           await prismaClient.message.create({
             data: { sessionId: activeSessionId, role: 'user', content: args.userQuery }
           })
@@ -421,10 +355,7 @@ function createCompositeStream(args: {
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
-
-          if (!firstTokenAt) {
-            firstTokenAt = Date.now()
-          }
+          if (!firstTokenAt) firstTokenAt = Date.now()
 
           const chunk = decoder.decode(value)
           const lines = chunk.split('\n')
@@ -447,17 +378,9 @@ function createCompositeStream(args: {
           const sanitizedText = sanitizeAIResponse(fullText)
           const quality = scoreResponseQuality(sanitizedText, false, Date.now() - startAt)
           
-          log.info('CHAT_STREAM_TELEMETRY', {
-            ttft: firstTokenAt ? firstTokenAt - startAt : 0,
-            totalLatency: Date.now() - startAt,
-            model: args.metadata.modelUsed,
-            provider: args.metadata.providerUsed,
-            sessionId: activeSessionId
-          })
-
           try {
             const prismaMod = await import('@/lib/prisma')
-            const prismaClient = prismaMod.prisma as unknown as PrismaChatClient
+            const prismaClient = prismaMod.prisma as any
             await prismaClient.message.create({
               data: { sessionId: activeSessionId, role: 'assistant', content: sanitizedText }
             })
@@ -472,4 +395,3 @@ function createCompositeStream(args: {
     },
   })
 }
-

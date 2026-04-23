@@ -1,27 +1,26 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimitDistributed } from '@/lib/security/ratelimit'
 
-export const dynamic = 'force-static'
+import { executeCompletion } from '@/lib/ai/llm-router'
+import { log } from '@/lib/logger'
 
-import Anthropic from '@anthropic-ai/sdk'
+export async function POST(req: NextRequest) {
+  // 1. Rate limiting
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
+  const isAllowed = await checkRateLimitDistributed(ip + ':translate')
+  if (!isAllowed) {
+    return NextResponse.json({ error: 'Too many analysis requests. Please wait.' }, { status: 429 })
+  }
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || 'fake-key', // Set yours in .env
-})
-
-export async function POST(req: Request) {
   try {
     const { labs } = await req.json()
     if (!labs) {
       return NextResponse.json({ error: 'No lab data provided.' }, { status: 400 })
     }
 
-    // Attempt to call Anthropic API for real dual-translation
-    if (process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'fake-key') {
-      const response = await anthropic.messages.create({
-        model: "claude-3-haiku-20240307",
-        max_tokens: 1000,
-        temperature: 0.1,
-        system: `You are an elite dual-board certified physician in both modern Western pathology and ancient Indian Ayurveda. 
+    // Attempt to call LLM for real dual-translation
+    try {
+      const systemPrompt = `You are an elite dual-board certified physician in both modern Western pathology and ancient Indian Ayurveda. 
 The user is providing their blood test results or symptoms.
 Analyze the biomarkers and provide a structured JSON response translating the Western medical view into the Ayurvedic view.
 Return ONLY valid JSON matching this schema:
@@ -31,19 +30,30 @@ Return ONLY valid JSON matching this schema:
   "ayurvedic_root_cause": string,
   "affected_systems": string[],
   "recommendations": string[]
-}`,
-        messages: [{ role: "user", content: "Analyze these labs: " + labs }]
-      })
+}`;
 
-      const contentBlock = response.content[0]
-      if (contentBlock.type === 'text') {
-        const content = contentBlock.text
-        // Extract JSON if Claude added markdown fences
-        const jsonMatch = content.match(/\{[\s\S]*\}/)
+      const result = await executeCompletion(
+        {
+          model: '', // Router picks best
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: "Analyze these labs: " + JSON.stringify(labs) }
+          ],
+          maxTokens: 1000,
+          temperature: 0.1,
+          response_format: { type: 'json_object' }
+        },
+        { modelPreference: 'auto', hasImages: false, deepThink: true }
+      )
+
+      if (result.content) {
+        const jsonMatch = result.content.match(/\{[\s\S]*\}/)
         if (jsonMatch) {
           return NextResponse.json({ analysis: JSON.parse(jsonMatch[0]) })
         }
       }
+    } catch (err) {
+      log.error('TRANSLATE_LLM_FAILED', { error: String(err) })
     }
 
     // Fallback Mock Response so you can instantly see the gorgeous UI design without needing API Keys

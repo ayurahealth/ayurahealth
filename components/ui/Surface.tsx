@@ -31,7 +31,7 @@ export default function Surface({ children, style, className, variant = 'default
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
-      className={`${getBaseClass()}${className ? ` ${className}` : ''}`}
+      className={`${getBaseClass()} ios-glass-mirror ios-glass-shimmer${className ? ` ${className}` : ''}`}
       onClick={onClick}
       style={style}
     >

@@ -177,7 +177,7 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 + i * 0.1 }}
-                className="ios-glass-thin ios-glass-mirror"
+                className="ios-glass-thin ios-glass-mirror ios-glass-shimmer"
                 style={{ padding: '2rem 1.75rem' }}
               >
                 <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'hsla(144,18%,60%,0.10)', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)', marginBottom: '1.25rem', boxShadow: '0 0 16px hsla(144,18%,60%,0.12)' }}>

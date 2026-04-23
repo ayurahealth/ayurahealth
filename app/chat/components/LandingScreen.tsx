@@ -45,7 +45,7 @@ export default function LandingScreen({ onStartQuiz, onSkipToChat }: LandingScre
         </p>
       </motion.div>
 
-      <div className="glass-surface" style={{ padding: '3rem', marginBottom: '1.5rem', borderRadius: '32px', background: 'var(--surface-low)', border: '1px solid var(--border-low)' }}>
+      <div className="ios-glass-regular ios-glass-mirror ios-glass-shimmer" style={{ padding: '3rem', marginBottom: '1.5rem', borderRadius: '32px' }}>
         <EngagementStory />
         <div style={{ fontSize: '2.5rem', textAlign: 'center', marginBottom: '1rem' }}>🔬</div>
         <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-main)', fontSize: '1.75rem', textAlign: 'center', fontWeight: 600, marginBottom: '0.75rem' }}>Precision Diagnostic</h3>

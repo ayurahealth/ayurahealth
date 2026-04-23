@@ -46,7 +46,7 @@ export default function ClinicPage() {
         .outline-btn:hover { background: var(--surface-low); border-color: var(--text-main); }
         
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-        .modal { background: var(--bg-main); border: 1px solid var(--border-high); border-radius: 24px; padding: 3rem; width: 100%; max-width: 540px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8); }
+        .modal { background: var(--surface-thick); backdrop-filter: var(--blur-lg); border: 1px solid var(--border-high); border-radius: 24px; padding: 3rem; width: 100%; max-width: 540px; position: relative; box-shadow: var(--shadow-xl); }
         .form-input { width: 100%; background: var(--surface-low); border: 1px solid var(--border-mid); border-radius: 12px; padding: 1rem; color: var(--text-main); outline: none; transition: all 0.2s; margin-bottom: 1.25rem; font-size: 1rem; }
         .form-input:focus { border-color: var(--accent-main); background: var(--bg-main); }
         .form-label { display: block; fontSize: 0.85rem; color: var(--text-muted); marginBottom: 0.5rem; font-weight: 500; }
@@ -93,7 +93,7 @@ export default function ClinicPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="feature-card"
+              className="ios-glass-thin ios-glass-mirror ios-glass-shimmer"
             >
               <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'hsla(144,18%,60%,0.10)', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-main)', marginBottom: '1.5rem', boxShadow: '0 0 16px hsla(144,18%,60%,0.10)' }}>
                 <item.icon size={20} />

@@ -9,6 +9,7 @@
  */
 
 import { log } from '../logger'
+import { executeCompletion, ModelPreference } from './llm-router'
 
 export interface KnowledgeChunkResult {
   title: string
@@ -230,72 +231,46 @@ export async function fetchWebContext(query: string): Promise<{
 
 // ── Agent Orchestration ─────────────────────────────────────────────────────
 
-interface AgentStepArgs {
-  apiUrl: string
-  headers: Record<string, string>
-  model: string
-  roleInstruction: string
-  userInput: string
-}
-
-interface AgentStepResponse {
-  choices?: Array<{ message?: { content?: string } }>
-}
-
-async function runAgentStep(args: AgentStepArgs): Promise<string> {
-  try {
-    const response = await fetch(args.apiUrl, {
-      method: 'POST',
-      headers: args.headers,
-      body: JSON.stringify({
-        model: args.model,
-        stream: false,
-        temperature: 0.2,
-        max_tokens: 350,
-        messages: [
-          { role: 'system', content: args.roleInstruction },
-          { role: 'user', content: args.userInput },
-        ],
-      }),
-      signal: AbortSignal.timeout(15000),
-    })
-    if (!response.ok) return ''
-    const json = (await response.json().catch(() => null)) as AgentStepResponse | null
-    return json?.choices?.[0]?.message?.content?.trim() || ''
-  } catch (err) {
-    log.error('AGENT_STEP_ERROR', { error: String(err) })
-    return ''
-  }
-}
+// Orchestration logic refactored to use llm-router fallbacks.
 
 export async function orchestrateAgents(args: {
   userQuery: string
   knowledgeCtx: string
-  apiUrl: string
-  headers: Record<string, string>
-  model: string
+  modelPreference: ModelPreference
 }): Promise<{ agentTrace: AgentTraceItem[]; context: string }> {
   const agentTrace: AgentTraceItem[] = []
 
+  const routingConfig = {
+    modelPreference: args.modelPreference,
+    hasImages: false,
+    deepThink: true
+  }
+
   try {
-    const planner = await runAgentStep({
-      apiUrl: args.apiUrl,
-      headers: args.headers,
-      model: args.model,
-      roleInstruction: 'You are Planner Agent. Build a short plan for answering this user health query safely. Return max 4 bullets.',
-      userInput: args.userQuery,
-    })
+    const plannerResponse = await executeCompletion({
+      messages: [
+        { role: 'system', content: 'You are Planner Agent. Build a short plan for answering this user health query safely. Return max 4 bullets.' },
+        { role: 'user', content: args.userQuery },
+      ],
+      maxTokens: 350,
+      temperature: 0.2
+    }, routingConfig)
+
+    const planner = plannerResponse.text?.trim()
     if (planner) {
       agentTrace.push({ id: 'planner', label: 'Planner', summary: planner.slice(0, 320) })
     }
 
-    const researcher = await runAgentStep({
-      apiUrl: args.apiUrl,
-      headers: args.headers,
-      model: args.model,
-      roleInstruction: `You are Research Agent. Use this context and return concise evidence bullets:\n${args.knowledgeCtx || 'No extra context found.'}`,
-      userInput: args.userQuery,
-    })
+    const researcherResponse = await executeCompletion({
+      messages: [
+        { role: 'system', content: `You are Research Agent. Use this context and return concise evidence bullets:\n${args.knowledgeCtx || 'No extra context found.'}` },
+        { role: 'user', content: args.userQuery },
+      ],
+      maxTokens: 450,
+      temperature: 0.2
+    }, routingConfig)
+
+    const researcher = researcherResponse.text?.trim()
     if (researcher) {
       agentTrace.push({ id: 'researcher', label: 'Researcher', summary: researcher.slice(0, 420) })
     }
