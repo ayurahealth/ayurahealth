@@ -248,6 +248,7 @@ export async function orchestrateAgents(args: {
 
   try {
     const plannerResponse = await executeCompletion({
+      model: '',
       messages: [
         { role: 'system', content: 'You are Planner Agent. Build a short plan for answering this user health query safely. Return max 4 bullets.' },
         { role: 'user', content: args.userQuery },
@@ -262,6 +263,7 @@ export async function orchestrateAgents(args: {
     }
 
     const researcherResponse = await executeCompletion({
+      model: '',
       messages: [
         { role: 'system', content: `You are Research Agent. Use this context and return concise evidence bullets:\n${args.knowledgeCtx || 'No extra context found.'}` },
         { role: 'user', content: args.userQuery },
