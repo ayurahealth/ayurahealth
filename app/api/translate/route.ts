@@ -45,8 +45,8 @@ Return ONLY valid JSON matching this schema:
         { modelPreference: 'auto', hasImages: false, deepThink: true }
       )
 
-      if (result.content) {
-        const jsonMatch = result.content.match(/\{[\s\S]*\}/)
+      if (result.text) {
+        const jsonMatch = result.text.match(/\{[\s\S]*\}/)
         if (jsonMatch) {
           return NextResponse.json({ analysis: JSON.parse(jsonMatch[0]) })
         }
