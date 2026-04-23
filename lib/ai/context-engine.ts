@@ -10,7 +10,7 @@
 
 import { log } from '../logger'
 import { executeCompletion, ModelPreference } from './llm-router'
-import { KnowledgeChunkResult, AgentTraceItem } from './types'
+import { KnowledgeChunkResult, AgentTraceItem, WebSearchResult } from './types'
 
 interface PrismaContextClient {
   userProfile: {
@@ -245,7 +245,7 @@ export async function orchestrateAgents(args: {
         temperature: 0.3
       }, routingConfig),
       10000,
-      { text: 'Path A: Symptomatic relief. Path B: Root cause balancing.', model: 'fallback', provider: 'local' }
+      { text: 'Path A: Symptomatic relief. Path B: Root cause balancing.', model: 'fallback', provider: 'local', latencyMs: 0 }
     )
 
     const planner = plannerResponse.text?.trim()
@@ -264,7 +264,7 @@ export async function orchestrateAgents(args: {
         temperature: 0.2
       }, routingConfig),
       15000,
-      { text: 'Evidence: Standard clinical protocols for metabolic and systemic balance.', model: 'fallback', provider: 'local' }
+      { text: 'Evidence: Standard clinical protocols for metabolic and systemic balance.', model: 'fallback', provider: 'local', latencyMs: 0 }
     )
 
     const researcher = researcherResponse.text?.trim()
@@ -283,7 +283,7 @@ export async function orchestrateAgents(args: {
         temperature: 0.1
       }, routingConfig),
       7000,
-      { text: 'Safety: Always consult a professional. Avoid self-diagnosis. Follow traditional safety markers.', model: 'fallback', provider: 'local' }
+      { text: 'Safety: Always consult a professional. Avoid self-diagnosis. Follow traditional safety markers.', model: 'fallback', provider: 'local', latencyMs: 0 }
     )
 
     const governance = governanceResponse.text?.trim()

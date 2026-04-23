@@ -40,3 +40,9 @@ export interface KnowledgeChunkResult {
   source: string;
   similarity: number;
 }
+
+export interface WebSearchResult {
+  title: string;
+  source: string;
+  content: string;
+}

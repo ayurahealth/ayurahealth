@@ -45,8 +45,8 @@ import {
   fetchKnowledgeContext,
   fetchWebContext,
   orchestrateAgents,
-  type KnowledgeChunkResult,
 } from '@/lib/ai/context-engine'
+import { KnowledgeChunkResult, AgentTraceItem } from '@/lib/ai/types'
 import { executeCompletion, executeStreamingCompletion } from '@/lib/ai/llm-router'
 import type { ModelPreference } from '@/lib/ai/llm-router'
 import type { ChatMessage } from '@/lib/ai/providers/types'
