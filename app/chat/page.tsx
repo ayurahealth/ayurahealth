@@ -181,7 +181,8 @@ function ChatPageContent() {
     setShowLinkInput(false)
   }
 
-  const handleSpeak = (text: string) => {
+  // ⚡ Bolt Performance Optimization: Memoized handleSpeak to prevent ChatMessagesPanel re-renders during keystrokes/streaming
+  const handleSpeak = useCallback((text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
       setIsSpeaking(false)
@@ -192,7 +193,10 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }
+  }, [isSpeaking, setIsSpeaking])
+
+  // ⚡ Bolt Performance Optimization: Memoized handleSelectSource to prevent ChatMessagesPanel re-renders
+  const handleSelectSource = useCallback(() => {}, [])
 
   const handleShare = async () => {
     if (!dosha) return
@@ -298,7 +302,7 @@ function ChatPageContent() {
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={() => {}}
+          onSelectSource={handleSelectSource}
           analyser={analyser}
         />
       )}

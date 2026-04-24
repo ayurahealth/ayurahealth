@@ -51,7 +51,9 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+// ⚡ Bolt Performance Optimization: Wrapped MessageItem in React.memo to prevent expensive
+// re-renders of Markdown content during keystrokes and streaming updates
+export default React.memo(function MessageItem({
   msg,
   doshaColor,
   voiceSupported,
@@ -227,4 +229,4 @@ export default function MessageItem({
       </div>
     </motion.div>
   )
-}
+})
