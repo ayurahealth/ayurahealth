@@ -15,7 +15,7 @@ export default function ConsentBanner() {
   }, [])
 
   const accept = () => {
-    localStorage.setItem('ayura_intel_consent_v1', 'accepted')
+    localStorage.setItem('ayura_consent_v1', 'accepted')
     setShow(false)
   }
 
