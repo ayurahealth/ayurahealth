@@ -1,7 +1,7 @@
 'use client'
 
+import React, { type RefObject } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { RefObject } from 'react'
 import VaidyaOracle from '../VaidyaOracle'
 import { ChatSkeleton } from '../BoneyardLoaders'
 import MessageItem from './MessageItem'
@@ -53,7 +53,7 @@ interface ChatMessagesPanelProps {
   conditions?: string[]
 }
 
-export default function ChatMessagesPanel({
+function ChatMessagesPanel({
   messages,
   loading,
   streaming,
@@ -270,3 +270,5 @@ export default function ChatMessagesPanel({
     </div>
   )
 }
+
+export default React.memo(ChatMessagesPanel)
