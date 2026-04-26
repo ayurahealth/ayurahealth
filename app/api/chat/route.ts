@@ -109,7 +109,19 @@ export async function POST(req: NextRequest) {
 
   const ceoToken = req.cookies.get('ayura_ceo_token')?.value
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
-  const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
+  let isCeo = false
+  if (CEO_BYPASS_KEY && ceoToken) {
+    try {
+      const crypto = await import('crypto')
+      const tokenBuffer = Buffer.from(ceoToken || '')
+      const secretBuffer = Buffer.from(CEO_BYPASS_KEY || '')
+      if (tokenBuffer.length === secretBuffer.length) {
+        isCeo = crypto.timingSafeEqual(tokenBuffer, secretBuffer)
+      }
+    } catch {
+      isCeo = false
+    }
+  }
   if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
 
   const clerkUser = await currentUser()
@@ -129,7 +141,7 @@ export async function POST(req: NextRequest) {
 
     const { messages, systems, dosha, lang, attachments, deepThink, modelPreference, webSearch, sessionId, vedicContext, cavemanMode } = validation.data
 
-    if (tier === 'free') {
+    if (tier === 'free' && !isCeo) {
       const assistantCount = messages.filter(m => m.role === 'assistant').length
       if (assistantCount >= FREE_MESSAGE_LIMIT) {
         return NextResponse.json(
