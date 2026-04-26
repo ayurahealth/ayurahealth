@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   const response = NextResponse.redirect(new URL('/chat', req.url))
   
   // Set a permanent, secure, HttpOnly cookie for the bypass
-  response.cookies.set('ayura_ceo_token', CEO_BYPASS_KEY, {
+  response.cookies.set('ayura_ceo_token', CEO_BYPASS_KEY as string, {
     path: '/',
     maxAge: 365 * 24 * 60 * 60, // 1 year
     httpOnly: true,
