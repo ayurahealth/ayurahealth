@@ -6,9 +6,10 @@ import type { ChangeEvent, KeyboardEvent } from 'react'
 import type { ChatAttachment, ChatMessage as Message, ChatSource, ResponseMode } from '@/lib/chat/types'
 import ChatMessagesPanel from '@/components/chat/ChatMessagesPanel'
 import ChatComposer from '@/components/chat/ChatComposer'
-import { ShieldCheck, Sparkles, Zap } from 'lucide-react'
 import Logo from '@/components/Logo'
 import { useTranslation } from '@/lib/i18n/LanguageContext'
+import ClinicalHistory from '@/components/ui/ClinicalHistory'
+import { History, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 
 interface ChatInterfaceProps {
   messages: Message[]
@@ -40,6 +41,7 @@ interface ChatInterfaceProps {
   onSpeakText: (text: string) => void
   onSelectSource: (source: ChatSource) => void
   analyser?: AnalyserNode | null
+  userId?: string
 }
 
 export default function ChatInterface({
@@ -72,7 +74,9 @@ export default function ChatInterface({
   onSpeakText,
   onSelectSource,
   analyser,
+  userId
 }: ChatInterfaceProps) {
+  const [historyOpen, setHistoryOpen] = React.useState(false)
   const doshaColor = dosha === 'Vata' ? '#6abf8a' : dosha === 'Pitta' ? '#f59e0b' : '#3b82f6'
   const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -130,6 +134,28 @@ export default function ChatInterface({
               <ShieldCheck size={14} style={{ color: 'var(--accent-main)' }} />
               <span style={{ fontSize: '0.7rem', color: 'var(--text-main)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Active</span>
             </div>
+
+            {userId && (
+              <button
+                onClick={() => setHistoryOpen(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.4rem 0.8rem',
+                  background: 'var(--surface-mid)',
+                  borderRadius: '12px',
+                  border: '1px solid var(--border-low)',
+                  cursor: 'pointer',
+                  color: 'var(--text-main)',
+                  transition: 'all 0.2s'
+                }}
+                className="hover-lift"
+              >
+                <History size={14} />
+                <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>History</span>
+              </button>
+            )}
 
             <div style={{ display: 'flex', background: 'var(--bg-main)', padding: '2px', borderRadius: '10px', border: '1px solid var(--border-low)' }}>
               <select
@@ -245,6 +271,14 @@ export default function ChatInterface({
           Ayura Intelligence Lab — Powered by Clinical Synthesis v1.1.0
         </span>
       </div>
+
+      {userId && (
+        <ClinicalHistory 
+          userId={userId} 
+          isOpen={historyOpen} 
+          onClose={() => setHistoryOpen(false)} 
+        />
+      )}
     </div>
   )
 }

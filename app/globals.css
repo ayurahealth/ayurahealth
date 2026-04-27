@@ -645,21 +645,32 @@ body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
+  /* Allow natural scroll on landing, but we'll lock it for chat */
+  overscroll-behavior-y: auto; 
 }
 
 
 
 /* Ensure chat specifically doesn't scroll body */
 .chat-shell {
+  height: 100vh; /* Fallback */
   height: 100dvh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: fixed; /* Lock it to viewport to prevent Safari bounce */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .chat-messages-container {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 2rem;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  touch-action: pan-y;
 }
 
 /* ── Stat number display (premium metric styling) ── */

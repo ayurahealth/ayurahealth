@@ -24,7 +24,7 @@ export default function ConsentBanner() {
   return (
     <div style={{
       position: 'fixed',
-      bottom: '1.5rem',
+      bottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))',
       left: '50%',
       transform: 'translateX(-50%)',
       width: 'calc(100% - 2rem)',

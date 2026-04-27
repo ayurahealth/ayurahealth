@@ -300,6 +300,7 @@ function ChatPageContent() {
           onSpeakText={handleSpeak}
           onSelectSource={() => {}}
           analyser={analyser}
+          userId={clerk.user?.id}
         />
       )}
 
