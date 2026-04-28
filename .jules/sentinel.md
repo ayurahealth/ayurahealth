@@ -1,0 +1,5 @@
+
+## 2025-02-21 - Insecure Randomness and Timing Attack in Razorpay Route
+**Vulnerability:** The Razorpay receipt ID was generated using `Math.random()`, which is a predictable PRNG and unsuitable for generating identifiers in a financial context. Additionally, the Razorpay signature verification (`razorpay_signature`) used the standard equality operator (`===`), leaving the endpoint vulnerable to timing attacks.
+**Learning:** Even though receipt IDs may not appear sensitive, they are part of a payment flow where predictability can be leveraged in broader attacks. More importantly, using standard equality operators for validating HMAC signatures, hashes, or passwords allows attackers to infer the expected signature through timing analysis.
+**Prevention:** Always use cryptographically secure random number generators (`crypto.randomBytes`) for any identifiers involved in financial or security workflows. Always use `crypto.timingSafeEqual` to verify signatures, tokens, or passwords, ensuring that both buffers being compared are of equal length to avoid errors.
