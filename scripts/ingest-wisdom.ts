@@ -64,7 +64,7 @@ async function ingest() {
 
       await client.query(
         `INSERT INTO "KnowledgeChunk" (id, title, content, embedding, source, tradition, tags, "createdAt")
-         VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW())`,
+         VALUES (gen_random_uuid(), $1, $2, $3::extensions.vector, $4, $5, $6, NOW())`,
         [item.title, item.content, vectorString, item.source, item.tradition, item.tags]
       );
     }

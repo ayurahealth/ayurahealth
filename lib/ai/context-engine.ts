@@ -123,9 +123,9 @@ export async function fetchKnowledgeContext(userQuery: string): Promise<{
     const vectorString = `[${queryEmbedding.join(',')}]`
 
     const chunks = await prisma.$queryRawUnsafe<KnowledgeChunkResult[]>(
-      `SELECT title, content, tradition, source, 1 - (embedding <=> $1::vector) as similarity 
+      `SELECT title, content, tradition, source, 1 - (embedding <=> $1::extensions.vector) as similarity 
        FROM "KnowledgeChunk" 
-       WHERE 1 - (embedding <=> $1::vector) > 0.6
+       WHERE 1 - (embedding <=> $1::extensions.vector) > 0.6
        ORDER BY similarity DESC 
        LIMIT 3`,
       vectorString

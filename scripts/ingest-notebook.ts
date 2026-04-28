@@ -63,7 +63,7 @@ async function main() {
           // SQL with parameters for clean upsert
           await client.query(
             `INSERT INTO "KnowledgeChunk" (id, title, content, tradition, source, embedding) 
-             VALUES ($1, $2, $3, $4, $5, $6::vector)
+             VALUES ($1, $2, $3, $4, $5, $6::extensions.vector)
              ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content, embedding = EXCLUDED.embedding`,
             [
               `nb-${tradition.toLowerCase()}-${i}`,
