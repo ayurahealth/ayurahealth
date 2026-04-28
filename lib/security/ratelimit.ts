@@ -18,7 +18,7 @@ try {
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_URL.startsWith('http')) {
     redis = Redis.fromEnv()
   }
-} catch (_e) {
+} catch {
   console.warn("Invalid Upstash Redis configuration detected, falling back to permissive mode.");
 }
 
