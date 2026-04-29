@@ -185,7 +185,7 @@ export async function PUT(request: NextRequest) {
       if (expectedBuffer.length === receivedBuffer.length) {
         isValidSignature = crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
       }
-    } catch (e) {
+    } catch {
       isValidSignature = false
     }
 
