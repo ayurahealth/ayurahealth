@@ -1,0 +1,3 @@
+## 2025-02-12 - Missing memoization for list items in chat component
+**Learning:** `MessageItem` is rendered dynamically from an array mapping. This codebase does not use `React.memo` or `useCallback` for heavily repeated components that do not change based on their parent's props updating unnecessarily, like chat messages, especially when the message list is growing (such as streaming or user input).
+**Action:** When working on lists that update iteratively, ensure to check for memoization optimizations in React functional components, specifically wrapping the item component in `React.memo` and wrapping callbacks with `useCallback`.
