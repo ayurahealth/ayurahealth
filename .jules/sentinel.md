@@ -1,0 +1,4 @@
+## 2025-02-28 - Timing Attack Vulnerability in Webhook Signature Verification
+**Vulnerability:** Insecure, non-constant-time string comparison (`===`) used for verifying Razorpay webhook signatures in `app/api/razorpay/create-order/route.ts`.
+**Learning:** Using simple string equality operators allows an attacker to exploit the timing differences in string comparison to guess the expected signature byte-by-byte (timing attack), compromising the webhook authentication.
+**Prevention:** Always use `crypto.timingSafeEqual` with explicitly sized Buffers (checked for equal lengths) when comparing sensitive tokens, passwords, hashes, or signatures.
