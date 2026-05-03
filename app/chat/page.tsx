@@ -192,7 +192,7 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }, [isSpeaking, setIsSpeaking])
+  }, [isSpeaking, setIsSpeaking, vaidyaVoice])
 
   const handleSelectSource = useCallback(() => {}, [])
 
