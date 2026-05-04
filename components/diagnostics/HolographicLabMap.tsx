@@ -99,6 +99,16 @@ const ConnectionLines = () => {
 export default function HolographicLabMap({ results = [] }: Props) {
   const [hovered, setHovered] = useState<Biomarker | null>(null)
 
+  // 💡 What: Pre-process results array into a lookup record
+  // 🎯 Why: Prevents an O(N * M) nested loop when mapping over BIOMARKER_MAP
+  // 📊 Impact: O(1) lookup during render instead of O(M) .find() on each of N markers
+  const resultsMap = useMemo(() => {
+    return results.reduce((acc, result) => {
+      acc[result.id] = result
+      return acc
+    }, {} as Record<string, LabResult>)
+  }, [results])
+
   return (
     <div style={{ width: '100%', height: '400px', background: 'rgba(0,0,0,0.2)', borderRadius: '20px', position: 'relative', overflow: 'hidden' }}>
       <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
@@ -113,7 +123,7 @@ export default function HolographicLabMap({ results = [] }: Props) {
           <BiomarkerNode 
             key={marker.id} 
             marker={marker} 
-            result={results.find(r => r.id === marker.id)}
+            result={resultsMap[marker.id]}
             onHover={setHovered}
           />
         ))}
