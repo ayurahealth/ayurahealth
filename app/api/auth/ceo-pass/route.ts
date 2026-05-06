@@ -14,7 +14,19 @@ export async function GET(req: NextRequest) {
   
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
   
-  if (!CEO_BYPASS_KEY || key !== CEO_BYPASS_KEY) {
+  let isAuthorized = false;
+  try {
+    const crypto = await import('crypto');
+    const keyBuffer = Buffer.from(key || '');
+    const bypassKeyBuffer = Buffer.from(CEO_BYPASS_KEY || '');
+    if (CEO_BYPASS_KEY && keyBuffer.length === bypassKeyBuffer.length) {
+      isAuthorized = crypto.timingSafeEqual(keyBuffer, bypassKeyBuffer);
+    }
+  } catch {
+    isAuthorized = false;
+  }
+
+  if (!isAuthorized) {
     return NextResponse.json({ error: 'Unauthorized. Please check your CEO_BYPASS_KEY.' }, { status: 401 })
   }
 
