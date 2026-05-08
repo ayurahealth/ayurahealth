@@ -61,6 +61,7 @@ export default function VoiceOutput({ text, language }: VoiceOutputProps) {
         transition: 'all 0.3s',
         boxShadow: isPlaying ? '0 0 10px rgba(232, 131, 90, 0.5)' : 'none',
       }}
+      aria-label={isPlaying ? 'Stop' : 'Listen'}
       title={isPlaying ? 'Stop' : 'Listen'}
     >
       {isPlaying ? '⏹️' : '🔊'}

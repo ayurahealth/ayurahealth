@@ -112,6 +112,7 @@ export default function VoiceInput({ onTranscript, language }: VoiceInputProps) 
           transition: 'all 0.3s',
           boxShadow: isRecording ? '0 0 12px rgba(232, 131, 90, 0.5)' : 'none',
         }}
+        aria-label={isRecording ? 'Stop recording' : 'Start recording'}
         title={isRecording ? 'Stop recording' : 'Start recording'}
       >
         {isRecording ? '🎙️' : '🎤'}
