@@ -1,0 +1,4 @@
+## 2024-05-24 - Insecure Equality Checks for Cryptographic Signatures
+**Vulnerability:** A standard string equality operator (`===`) was used to verify Razorpay payment signatures in `app/api/razorpay/create-order/route.ts`. Additionally, `Math.random()` was used to generate transaction receipt IDs instead of a cryptographically secure random number generator.
+**Learning:** Standard equality checks short-circuit on the first mismatched character, creating a timing side-channel that attackers can exploit to forge signatures byte-by-byte. Using `Math.random()` for critical identifiers introduces predictable IDs that can be guessed or brute-forced.
+**Prevention:** Always use `crypto.timingSafeEqual` with `Buffer.from` to perform constant-time verification when comparing cryptographic tokens or signatures. Additionally, always check the buffer lengths match before comparing. Use `crypto.randomUUID()` for generating secure, random identifiers.
