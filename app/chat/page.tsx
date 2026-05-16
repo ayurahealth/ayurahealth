@@ -70,6 +70,8 @@ function ChatPageContent() {
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [linkInput, setLinkInput] = useState('')
   const [isSharing, setIsSharing] = useState(false)
+  // ⚡ Bolt: Define static noop to maintain stable reference for React.memo
+  const handleSelectSourceNoop = useCallback(() => {}, [])
   const [shareSuccess, setShareSuccess] = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
 
@@ -181,7 +183,8 @@ function ChatPageContent() {
     setShowLinkInput(false)
   }
 
-  const handleSpeak = (text: string) => {
+  // ⚡ Bolt: Memoized handler to prevent MessageItem re-renders
+  const handleSpeak = useCallback((text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
       setIsSpeaking(false)
@@ -192,7 +195,7 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }
+  }, [isSpeaking, setIsSpeaking, vaidyaVoice])
 
   const handleShare = async () => {
     if (!dosha) return
@@ -298,7 +301,7 @@ function ChatPageContent() {
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={() => {}}
+          onSelectSource={handleSelectSourceNoop}
           analyser={analyser}
           userId={clerk.user?.id}
         />
