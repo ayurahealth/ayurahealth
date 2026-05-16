@@ -195,7 +195,7 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }, [isSpeaking, setIsSpeaking, vaidyaVoice])
+  }, [isSpeaking, setIsSpeaking])
 
   const handleShare = async () => {
     if (!dosha) return
