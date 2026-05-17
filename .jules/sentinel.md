@@ -1,0 +1,4 @@
+## 2025-05-17 - Timing Attack Vulnerability in Signature Verification
+**Vulnerability:** Found a timing attack vulnerability in `app/api/razorpay/create-order/route.ts` where the `razorpay_signature` was compared to the `expectedSignature` using standard string equality (`===`).
+**Learning:** Standard equality operators compare strings character by character and return `false` as soon as a mismatch is found. This allows attackers to guess a valid signature by observing the response time, which slightly increases for every character they guess correctly. It existed because standard string equality is the default approach for comparisons in JavaScript, but it shouldn't be used for cryptographic signatures or sensitive tokens.
+**Prevention:** Always use `crypto.timingSafeEqual` with `Buffer.from()` (and verify buffer lengths match first) when comparing sensitive tokens, secrets, or cryptographic signatures in Node.js, to ensure constant-time verification.
