@@ -1,0 +1,3 @@
+## 2026-05-17 - Icon-Only Button Accessibility Pattern
+**Learning:** Found a recurring accessibility anti-pattern in the codebase where critical interactive elements (like those in the `ChatComposer`) use icon-only buttons without `aria-label` or `title` attributes, making them inaccessible to screen readers and difficult to interpret for some users without tooltips.
+**Action:** Always ensure that any icon-only button is double-labeled with both an `aria-label` for screen reader accessibility and a `title` attribute for visual tooltip guidance. This pattern should be proactively checked in all future UI component creation and reviews.
