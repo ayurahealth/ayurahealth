@@ -91,6 +91,8 @@ export default function ClinicalHistory({ userId, isOpen, onClose }: ClinicalHis
               </div>
               <button 
                 onClick={onClose}
+                aria-label="Close Clinical History"
+                title="Close Clinical History"
                 style={{ 
                   background: 'var(--surface-mid)', 
                   border: 'none', 
@@ -173,6 +175,8 @@ export default function ClinicalHistory({ userId, isOpen, onClose }: ClinicalHis
                 >
                   <button 
                     onClick={() => setSelectedSession(null)}
+                    aria-label="Back to Session List"
+                    title="Back to Session List"
                     style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: 'var(--accent-main)', cursor: 'pointer', fontWeight: 600 }}
                   >
                     ← Back to List
