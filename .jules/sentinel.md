@@ -1,0 +1,4 @@
+## 2025-05-25 - [CRITICAL] Fixed Administrative Backdoor (CEO Bypass)
+**Vulnerability:** An intentional administrative backdoor (`app/api/auth/ceo-pass/route.ts`) was implemented using a hardcoded environment variable (`CEO_BYPASS_KEY`) to set a browser cookie (`ayura_ceo_token`). This cookie completely bypassed rate limiting and payment paywalls in `app/api/chat/route.ts`.
+**Learning:** Hardcoded backdoors and secret bypass keys introduce massive risks, especially when implemented as permanent, long-lived cookies. If leaked, an attacker gains unmetered access and bypasses the entire authentication and paywall system.
+**Prevention:** Never introduce undocumented backdoors or "admin bypass keys" in code. Always rely on a standardized and secure Role-Based Access Control (RBAC) system for administrative access.
