@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
 import { checkRateLimit, checkPaymentRateLimit } from '@/lib/rateLimit'
 
 export const dynamic = 'force-dynamic'
@@ -121,6 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Create Razorpay order ────────────────────────────────────────────────
+    const receiptSuffix = globalThis.crypto.randomUUID().slice(0, 8);
     const order = await razorpayApi<{ id: string; amount: number; currency: string }>(
       '/orders',
       {
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           amount: priceInfo.amount, // Always from server, never from client
           currency,
-          receipt: `order_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          receipt: `order_${Date.now()}_${receiptSuffix}`,
           notes: {
             tier,
             email,
@@ -173,12 +173,21 @@ export async function PUT(request: NextRequest) {
     }
 
     // ── Verify signature ─────────────────────────────────────────────────────
+    const crypto = await import('crypto')
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex')
 
-    if (expectedSignature === razorpay_signature) {
+    const expectedBuffer = Buffer.from(expectedSignature)
+    const providedBuffer = Buffer.from(String(razorpay_signature || ''))
+
+    let isSignatureValid = false
+    if (expectedBuffer.length === providedBuffer.length) {
+      isSignatureValid = crypto.timingSafeEqual(expectedBuffer, providedBuffer)
+    }
+
+    if (isSignatureValid) {
       // ── Signature is valid. Now persist the payment state ────────────────
       // Fetch the order to get the tier and user email stored in notes
       const order = await razorpayApi<{ notes?: { tier?: string; email?: string } }>(`/orders/${razorpay_order_id}`)
