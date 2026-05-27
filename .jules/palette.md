@@ -1,0 +1,3 @@
+## 2024-05-27 - Icon-Only Button Accessibility in Chat Components
+**Learning:** Found an accessibility issue pattern specific to this app's chat components (e.g., ChatComposer), where multiple icon-only utility buttons (attach, link, voice, send, remove attachment) lack both `aria-label` and `title` attributes. This breaks the experience for screen reader users and reduces discoverability for sighted users who rely on tooltips.
+**Action:** Consistently enforce the inclusion of both `aria-label` (for screen readers) and `title` (for tooltips) on all icon-only buttons, especially in complex interfaces like chat composers. Ensure these attributes are dynamically updated when the button's action changes (e.g., 'Start listening' vs 'Stop listening').
