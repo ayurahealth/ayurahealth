@@ -136,6 +136,8 @@ export default function MessageItem({
                     key={idx}
                     onClick={() => onSelectSource(src)}
                     className="flat-card"
+                    aria-label={`View source ${src.title}`}
+                    title={`View source ${src.title}`}
                     style={{
                       padding: '0.75rem 1rem',
                       display: 'grid',
@@ -208,6 +210,8 @@ export default function MessageItem({
         {isAssistant && voiceSupported && (
           <button 
             onClick={() => onSpeakText(msg.content)} 
+            aria-label={isSpeaking ? 'Stop speaking' : 'Listen to VAIDYA'}
+            title={isSpeaking ? 'Stop speaking' : 'Listen to VAIDYA'}
             style={{ 
               marginTop: '0.75rem', 
               background: 'none', 

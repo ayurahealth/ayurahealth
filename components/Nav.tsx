@@ -203,7 +203,7 @@ export default function Nav({ showLangPicker = true, links }: NavProps) {
 
         <div className="nav-actions">
           {showLangPicker && (
-            <button className="lang-trigger" onClick={() => setShowPicker(p => !p)}>
+            <button className="lang-trigger" onClick={() => setShowPicker(p => !p)} aria-label="Select language" aria-expanded={showPicker}>
               <Globe size={16} />
               <span>{currentLang.native}</span>
               <ChevronDown size={14} style={{ opacity: 0.5 }} />
