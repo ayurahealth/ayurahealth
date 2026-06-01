@@ -1,0 +1,3 @@
+## 2025-06-01 - Dynamic ARIA Attributes for State-Toggled Buttons
+**Learning:** In highly interactive components like `ChatComposer`, icon-only buttons often toggle states (e.g., listening/stopped, link input open/closed). Static ARIA labels are insufficient. Using React state to dynamically update `aria-label` and `title` ensures both screen readers and visual tooltips stay synchronized with the action's current context.
+**Action:** When auditing icon-only buttons, look for state dependencies (`onClick` handlers that toggle state) and apply ternary operators to `aria-label` and `title` to provide accurate contextual feedback.
