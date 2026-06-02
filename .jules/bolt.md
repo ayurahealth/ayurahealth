@@ -1,0 +1,3 @@
+## 2026-06-02 - Optimize HolographicLabMap Data Lookup
+**Learning:** In visualization components that map a large constant dataset against variable props inside a render loop or nested mapping (like `BIOMARKER_MAP.map` checking `results.find`), it can cause (N \times M)$ operations. Pre-processing the variable arrays into a Map/Record using `useMemo` efficiently converts these nested loops into (N)$ lookup efficiency, which is a key codebase-specific performance pattern.
+**Action:** Always pre-process arrays into Maps (`Record<string, T>`) with `useMemo` when performing lookups inside map operations for rendering large datasets.
