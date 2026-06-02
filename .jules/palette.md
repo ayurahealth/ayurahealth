@@ -1,0 +1,3 @@
+## 2024-05-24 - Icon-only Button Accessibility
+**Learning:** Icon-only buttons without explicit labels (like `aria-label` and `title`) are a common accessibility anti-pattern that hinders screen reader usability and removes helpful tooltips for sighted users. In chat interfaces where icons frequently replace text to save space, this becomes a critical issue.
+**Action:** When creating or reviewing components with icon-only buttons (such as the ChatComposer toolbars), ensure both `aria-label` (for screen readers) and `title` (for visual tooltips) attributes are explicitly provided and dynamically updated to reflect the button's current state (e.g., "Start listening" vs. "Stop listening").
