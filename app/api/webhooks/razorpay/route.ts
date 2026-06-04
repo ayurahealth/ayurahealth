@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { clerkClient } from '@clerk/nextjs/server';
 
 export async function POST(req: Request) {
   try {
+    const crypto = await import('crypto');
     const rawBody = await req.text();
     const signature = req.headers.get('x-razorpay-signature');
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -17,7 +17,13 @@ export async function POST(req: Request) {
       .update(rawBody)
       .digest('hex');
 
-    if (expectedSignature !== signature) {
+    const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+    const signatureBuffer = Buffer.from(String(signature), 'hex');
+
+    if (
+      expectedBuffer.length !== signatureBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
+    ) {
       return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 });
     }
 
