@@ -182,7 +182,7 @@ export default function ClinicPage() {
       {showModal && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowModal(false)}>
           <div className="modal">
-            <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.5rem' }}>×</button>
+            <button aria-label="Close modal" title="Close modal" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.5rem' }}>×</button>
             <h3 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.75rem' }}>Partner with Ayura Intel</h3>
             <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem' }}>Initialize your institutional reasoning environment. Our team will contact you shortly.</p>
             
