@@ -14,14 +14,24 @@ export async function GET(req: NextRequest) {
   
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
   
-  if (!CEO_BYPASS_KEY || key !== CEO_BYPASS_KEY) {
+  let isAuthorized = false;
+  if (CEO_BYPASS_KEY && key) {
+    const crypto = await import('node:crypto')
+    const tokenBuffer = Buffer.from(String(key))
+    const secretBuffer = Buffer.from(String(CEO_BYPASS_KEY))
+    if (tokenBuffer.length === secretBuffer.length) {
+      isAuthorized = crypto.timingSafeEqual(tokenBuffer, secretBuffer)
+    }
+  }
+
+  if (!isAuthorized) {
     return NextResponse.json({ error: 'Unauthorized. Please check your CEO_BYPASS_KEY.' }, { status: 401 })
   }
 
   const response = NextResponse.redirect(new URL('/chat', req.url))
   
   // Set a permanent, secure, HttpOnly cookie for the bypass
-  response.cookies.set('ayura_ceo_token', CEO_BYPASS_KEY, {
+  response.cookies.set('ayura_ceo_token', CEO_BYPASS_KEY as string, {
     path: '/',
     maxAge: 365 * 24 * 60 * 60, // 1 year
     httpOnly: true,
