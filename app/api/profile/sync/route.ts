@@ -45,18 +45,39 @@ export async function POST(req: Request) {
     }
 
     // Batch create memories (basic unique check by content to avoid duplicates)
-    for (const mem of memories) {
-      const existing = await prisma.userMemory.findFirst({
-        where: { userId: user.id, content: mem.content }
+    // ⚡ Bolt Optimization: Replaced O(n) sequential queries with O(1) bulk operations
+    const memoryContents = memories.map(m => m.content)
+
+    if (memoryContents.length > 0) {
+      // 1. Fetch all existing memories in one query
+      const existingMemories = await prisma.userMemory.findMany({
+        where: {
+          userId: user.id,
+          content: { in: memoryContents }
+        },
+        select: { content: true }
       })
-      if (!existing) {
-        await prisma.userMemory.create({
-          data: {
+
+      const existingContentSet = new Set(existingMemories.map(m => m.content))
+
+      // 2. Filter out duplicates in memory (handling intra-payload duplicates as well)
+      const newMemoriesToCreate = memories.reduce((acc, mem) => {
+        if (!existingContentSet.has(mem.content)) {
+          existingContentSet.add(mem.content) // Add to set to prevent duplicate creation
+          acc.push({
             userId: user.id,
             content: mem.content,
             category: mem.category,
             source: 'HealthProfile Sync'
-          }
+          })
+        }
+        return acc
+      }, [] as Array<{userId: string, content: string, category: string, source: string}>)
+
+      // 3. Bulk insert new memories in one query
+      if (newMemoriesToCreate.length > 0) {
+        await prisma.userMemory.createMany({
+          data: newMemoriesToCreate
         })
       }
     }
