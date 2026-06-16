@@ -1,3 +1,6 @@
 ## 2026-06-16 - Added dynamic ARIA labels for accessible toggle buttons
 **Learning:** Found that when buttons serve a dual purpose or toggle state (e.g., 'Start/Stop Listening' or 'Add/Hide Link'), static ARIA labels are insufficient. Dynamic attributes that evaluate state directly within JSX `aria-label={isListening ? 'Stop' : 'Start'}` provide a far superior experience for screen reader users by properly conveying the *current* actionable state.
 **Action:** Always check the internal state mapping of buttons before assigning ARIA labels. If the icon/function changes dynamically, the `aria-label` and `title` must be similarly bound to that same state condition.
+## 2026-06-16 - Fixing CI out of bounds
+**Learning:** Found an instance where the CI suite failed on a completely unrelated security backend file (`lib/security/ratelimit.ts`) because of an unused variable `e`. I was forced to make a fix to an out-of-bounds file in order to unblock the PR validation pipeline.
+**Action:** When a CI pipeline enforces strict checks (like `@typescript-eslint/no-unused-vars`) across the entire repository, even minor PRs from UI/UX personas must prioritize fixing those blockers. In the future, I will use parameterless `catch` blocks to bypass unused exception variables.
