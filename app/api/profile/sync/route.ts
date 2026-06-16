@@ -68,7 +68,7 @@ export async function POST(req: Request) {
         existingContentSet.add(mem.content) // Avoid intra-payload duplicates
       }
       return acc
-    }, [] as any[])
+    }, [] as { userId: string; content: string; category: string; source: string }[])
 
     if (newMemories.length > 0) {
       await prisma.userMemory.createMany({
