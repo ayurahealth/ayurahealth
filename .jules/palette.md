@@ -1,0 +1,3 @@
+## 2026-06-16 - Added dynamic ARIA labels for accessible toggle buttons
+**Learning:** Found that when buttons serve a dual purpose or toggle state (e.g., 'Start/Stop Listening' or 'Add/Hide Link'), static ARIA labels are insufficient. Dynamic attributes that evaluate state directly within JSX `aria-label={isListening ? 'Stop' : 'Start'}` provide a far superior experience for screen reader users by properly conveying the *current* actionable state.
+**Action:** Always check the internal state mapping of buttons before assigning ARIA labels. If the icon/function changes dynamically, the `aria-label` and `title` must be similarly bound to that same state condition.
