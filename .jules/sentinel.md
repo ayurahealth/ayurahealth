@@ -1,0 +1,4 @@
+## 2026-06-18 - Secure Signature Verification & CSPRNG in Financial Transactions
+**Vulnerability:** Razorpay webhook and order verification used standard string equality for HMAC signatures, exposing the endpoints to timing attacks. Additionally, receipt IDs were generated using Math.random(), which is predictable.
+**Learning:** Standard equality operators (===) exit early on the first mismatched character, allowing an attacker to deduce the correct signature character-by-character by measuring response times. Predictable random generation in financial contexts can lead to identifier collisions or predictability.
+**Prevention:** Always use `crypto.timingSafeEqual` with `Buffer.from` for sensitive string/signature comparisons, ensuring constant-time execution. Use cryptographically secure pseudorandom number generators (CSPRNG) like `crypto.randomUUID()` for generating sensitive IDs or receipts.
