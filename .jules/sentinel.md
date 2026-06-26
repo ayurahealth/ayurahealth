@@ -1,0 +1,4 @@
+## 2024-05-18 - Timing attack vulnerability in token/signature comparison
+**Vulnerability:** Several files in the application used standard string comparison (`===` or `!==`) to verify sensitive values like the CEO bypass token and Razorpay webhook/order signatures.
+**Learning:** This exposes the application to timing attacks, where an attacker can guess the token or signature character by character by measuring the exact time the server takes to respond (the comparison short-circuits on the first mismatched character).
+**Prevention:** Always use `crypto.timingSafeEqual` with `Buffer.from` to perform constant-time comparisons when comparing secrets, passwords, or signatures. Always check that the buffer lengths are equal before calling `crypto.timingSafeEqual`, and handle potential null/undefined values by falling back to empty strings before calling `Buffer.from`.
