@@ -107,11 +107,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Too many requests. Please wait 1 minute.' }, { status: 429 })
   }
 
-  const ceoToken = req.cookies.get('ayura_ceo_token')?.value
-  const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
-  const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
-  if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
-
   const clerkUser = await currentUser()
   const tier = (clerkUser?.publicMetadata?.tier as string) || 'free'
 
