@@ -1,0 +1,3 @@
+## 2026-07-07 - WebGL Buffer Attribute Optimization
+**Learning:** In @react-three/fiber, passing a new array reference like `[new Float32Array(...)]` to the `args` prop of `<bufferAttribute>` inside a component triggers costly WebGL buffer reallocation on every frame render, even if the underlying coordinates haven't changed. Also, creating intermediate objects like `THREE.Vector3` inside iteration loops just to extract their components creates unnecessary memory allocation and garbage collection overhead.
+**Action:** Fully memoize typed arrays (`Float32Array`) holding flat coordinates and pass the stable reference to `args`. Push or spread primitive coordinate values directly into flat arrays instead of creating intermediate 3D objects.
