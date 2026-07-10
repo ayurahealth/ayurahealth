@@ -1,0 +1,4 @@
+## 2026-07-10 - Remove hardcoded CEO bypass administrative backdoor
+**Vulnerability:** A hardcoded backdoor (CEO_BYPASS_KEY) was present, allowing complete bypass of authentication, paywalls, and rate limiting by setting a specific cookie.
+**Learning:** Hardcoding administrative bypass keys and coupling them with rate limiting and authentication logic creates critical vulnerabilities. If the key is leaked, the entire application's security and monetization models are compromised. The documentation actually highlighted that setting this key bypasses Clerk authentication for protected routes, though the actual middleware implementation didn't explicitly check for it.
+**Prevention:** Never use hardcoded keys to bypass core security systems. Rely solely on robust Role-Based Access Control (RBAC) mechanisms and centralized authentication systems (like Clerk).
