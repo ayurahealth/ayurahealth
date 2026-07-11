@@ -46,6 +46,9 @@ export default function VoiceOutput({ text, language }: VoiceOutputProps) {
   return (
     <button
       onClick={isPlaying ? stop : speak}
+      aria-label={isPlaying ? 'Stop listening' : 'Start listening'}
+      title={isPlaying ? 'Stop listening' : 'Start listening'}
+      aria-pressed={isPlaying}
       style={{
         background: isPlaying ? '#e8835a' : '#6abf8a',
         color: '#fff',
@@ -61,7 +64,6 @@ export default function VoiceOutput({ text, language }: VoiceOutputProps) {
         transition: 'all 0.3s',
         boxShadow: isPlaying ? '0 0 10px rgba(232, 131, 90, 0.5)' : 'none',
       }}
-      title={isPlaying ? 'Stop' : 'Listen'}
     >
       {isPlaying ? '⏹️' : '🔊'}
     </button>
