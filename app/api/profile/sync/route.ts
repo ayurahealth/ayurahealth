@@ -71,7 +71,7 @@ export async function POST(req: Request) {
 
     if (newMemoriesToCreate.length > 0) {
       await prisma.userMemory.createMany({
-        data: newMemoriesToCreate.map((mem) => ({
+        data: newMemoriesToCreate.map((mem: { content: string, category: string }) => ({
           userId: user.id,
           content: mem.content,
           category: mem.category,
