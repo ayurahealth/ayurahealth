@@ -1,0 +1,1 @@
+## 2024-05-18 - Avoid buffer reallocation in R3F\n**Learning:** Passing a new array reference to args in r3f (e.g. `[new Float32Array(...)]`) inside `<bufferAttribute>` triggers costly WebGL buffer reallocation on every render.\n**Action:** Fully memoize typed arrays and pass the stable reference to args.
