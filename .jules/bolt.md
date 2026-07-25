@@ -1,0 +1,3 @@
+## 2024-05-24 - WebGL Buffer Reallocation in @react-three/fiber
+**Learning:** In `@react-three/fiber`, passing a dynamically created array reference to `args` (e.g., `[new Float32Array(...)]`) inside `<bufferAttribute>` triggers costly WebGL buffer reallocation on every render. Also, creating intermediate 3D objects (like `new THREE.Vector3(...)`) just to extract coordinates creates unnecessary garbage collection overhead.
+**Action:** Always fully memoize typed arrays (e.g., `[Float32Array, number]`) and pass the stable reference to `args`. Extract primitive coordinates directly instead of allocating intermediate 3D objects inside loops.
