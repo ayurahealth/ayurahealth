@@ -298,6 +298,8 @@ export default function ChatComposer({
                   background: 'transparent', color: 'var(--text-muted)', border: 'none',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
                 }}
+                title="Attach file"
+                aria-label="Attach file"
               >
                 <Paperclip size={18} />
               </button>
@@ -310,6 +312,9 @@ export default function ChatComposer({
                   background: 'transparent', color: showLinkInput ? 'var(--accent-main)' : 'var(--text-muted)', border: 'none',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
                 }}
+                title="Toggle link input"
+                aria-label="Toggle link input"
+                aria-pressed={showLinkInput}
               >
                 <LinkIcon size={18} />
               </button>
@@ -322,6 +327,9 @@ export default function ChatComposer({
                     background: 'transparent', color: isListening ? 'var(--accent-secondary)' : 'var(--text-muted)', border: 'none',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
                   }}
+                  title={isListening ? 'Stop recording' : 'Start recording'}
+                  aria-label={isListening ? 'Stop recording' : 'Start recording'}
+                  aria-pressed={isListening}
                 >
                   {isListening ? <Square size={16} fill="currentColor" /> : <Mic size={18} />}
                 </button>
