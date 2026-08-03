@@ -1,0 +1,4 @@
+## 2024-05-18 - [Remove Hardcoded Administrative Backdoor]
+**Vulnerability:** A hardcoded `CEO_BYPASS_KEY` was found in `app/api/auth/ceo-pass/route.ts` and `app/api/chat/route.ts`, allowing an unauthenticated user to bypass rate limits and potentially access premium features by supplying a known environment variable value.
+**Learning:** Hardcoded access keys, even if intended for administrative purposes or specific individuals, act as a single point of failure and violate the principle of least privilege. They can easily leak or be abused.
+**Prevention:** Never use hardcoded bypass tokens or keys for administrative access. Implement proper Role-Based Access Control (RBAC) and authenticate users securely using established providers (like Clerk, which is already in the project). Rely on robust authorization logic tied to user roles rather than static keys.
