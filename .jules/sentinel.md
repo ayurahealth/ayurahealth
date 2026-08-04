@@ -1,0 +1,4 @@
+## 2025-02-28 - Hardcoded Admin Bypass Authentication Vulnerability
+**Vulnerability:** A backdoor authentication endpoint and cookie-based access bypass was hardcoded in the codebase using `CEO_BYPASS_KEY`. This permitted anyone with the secret key to obtain an `ayura_ceo_token` cookie and bypass authentication and rate limits.
+**Learning:** Adding special administrative backdoors using environment variables and cookies sidesteps standard Role-Based Access Control (RBAC) structures and rate limiting, creating a critical vulnerability footprint. Administrative functions should never use bespoke logic outside the standardized auth flow.
+**Prevention:** Rely strictly on established identity providers (Clerk) and standardize Role-Based Access Control to manage elevated permissions instead of deploying bespoke backend administrative bypass logic.
