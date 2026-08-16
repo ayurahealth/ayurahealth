@@ -1,0 +1,4 @@
+## 2024-05-15 - Insecure Direct Object Reference (IDOR) in Chat History API
+**Vulnerability:** The GET endpoint at `/api/chat/history` accepted a `userId` query parameter and fetched records for that user without authenticating the requester or verifying that the requester's ID matched the requested ID. This allowed any user to fetch any other user's clinical chat history.
+**Learning:** Even internal API routes that seem implicitly protected by UI state must still enforce strict authentication and authorization checks at the server level, especially when dealing with sensitive medical or conversational data.
+**Prevention:** Always use `@clerk/nextjs/server` `currentUser()` to authenticate API requests and ensure the authenticated `user.id` strictly matches the target resource's owner before returning data.
