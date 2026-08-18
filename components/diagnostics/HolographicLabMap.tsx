@@ -71,6 +71,7 @@ const BiomarkerNode = React.memo(({
     </group>
   )
 })
+BiomarkerNode.displayName = 'BiomarkerNode'
 
 // ⚡ Bolt: Wrapped ConnectionLines in React.memo since it renders static geometry.
 const ConnectionLines = React.memo(() => {
@@ -97,6 +98,7 @@ const ConnectionLines = React.memo(() => {
     </lineSegments>
   )
 })
+ConnectionLines.displayName = 'ConnectionLines'
 
 export default function HolographicLabMap({ results = [] }: Props) {
   const [hovered, setHovered] = useState<Biomarker | null>(null)
