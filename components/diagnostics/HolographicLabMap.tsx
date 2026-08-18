@@ -16,7 +16,8 @@ interface Props {
   results?: LabResult[]
 }
 
-const BiomarkerNode = ({ 
+// ⚡ Bolt: Wrapped BiomarkerNode in React.memo to prevent unnecessary re-renders of all 3D nodes when hovering over a single node.
+const BiomarkerNode = React.memo(({
   marker, 
   result, 
   onHover 
@@ -69,9 +70,10 @@ const BiomarkerNode = ({
       </mesh>
     </group>
   )
-}
+})
 
-const ConnectionLines = () => {
+// ⚡ Bolt: Wrapped ConnectionLines in React.memo since it renders static geometry.
+const ConnectionLines = React.memo(() => {
   const points = useMemo(() => {
     const p = []
     for (let i = 0; i < BIOMARKER_MAP.length; i++) {
@@ -94,7 +96,7 @@ const ConnectionLines = () => {
       <lineBasicMaterial attach="material" color="#6abf8a" transparent opacity={0.1} />
     </lineSegments>
   )
-}
+})
 
 export default function HolographicLabMap({ results = [] }: Props) {
   const [hovered, setHovered] = useState<Biomarker | null>(null)
