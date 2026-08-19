@@ -192,7 +192,9 @@ export function useChat() {
         throw err
       }
 
-      const displayError = 'Connection interrupted. Please try again.'
+      const displayError = (err instanceof Error && err.message && err.message !== 'API error' && err.message !== 'Failed to fetch')
+        ? err.message
+        : 'Connection interrupted. Please try again.'
       setMessages(prev => [...prev, { role: 'assistant', content: displayError }])
       setStreaming('')
       throw err

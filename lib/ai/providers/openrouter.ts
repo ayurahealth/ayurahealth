@@ -20,10 +20,10 @@ function getApiKey(): string {
 
 /** Maps user-facing model preference to OpenRouter model IDs */
 export const OPENROUTER_MODEL_MAP: Record<string, string> = {
-  auto: 'google/gemini-2.5-pro',
-  claude: 'anthropic/claude-3.7-sonnet',
-  gpt: 'openai/chatgpt-4o-latest',
-  gemini: 'google/gemini-2.5-flash',
+  auto: 'meta-llama/llama-3.3-70b-instruct',
+  claude: 'anthropic/claude-3.5-sonnet',
+  gpt: 'openai/gpt-4o-mini',
+  gemini: 'google/gemini-2.0-flash-001',
   deepseek: 'deepseek/deepseek-r1',
   mistral: 'mistralai/mistral-large-2411',
   llama: 'meta-llama/llama-3.3-70b-instruct',

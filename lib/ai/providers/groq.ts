@@ -119,28 +119,33 @@ export class GroqProvider implements LLMProvider {
 
   async fetchStreamingCompletion(request: CompletionRequest): Promise<ReadableStream<Uint8Array>> {
     const encoder = new TextEncoder()
+    const payload: Record<string, unknown> = {
+      model: request.model,
+      messages: this.flattenMessages(request.messages),
+      max_tokens: request.maxTokens,
+      temperature: request.temperature,
+      stream: true,
+    }
+    if (request.tools && request.tools.length > 0) {
+      payload.tools = request.tools.map(t => ({
+        type: 'function' as const,
+        function: {
+          name: t.name,
+          description: t.description,
+          parameters: t.parameters
+        }
+      }))
+    }
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: this.buildHeaders(),
-      body: JSON.stringify({
-        model: request.model,
-        messages: this.flattenMessages(request.messages),
-        max_tokens: request.maxTokens,
-        temperature: request.temperature,
-        stream: true,
-        tools: request.tools?.map(t => ({
-          type: 'function' as const,
-          function: {
-            name: t.name,
-            description: t.description,
-            parameters: t.parameters
-          }
-        })),
-      }),
+      body: JSON.stringify(payload),
     })
 
     if (!response.ok || !response.body) {
-      throw new Error(`Groq streaming error ${response.status}`)
+      const errorText = await response.text().catch(() => response.statusText)
+      throw new Error(`Groq streaming error ${response.status}: ${errorText}`)
     }
 
     const reader = response.body.getReader()
