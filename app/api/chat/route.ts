@@ -101,21 +101,26 @@ const STREAM_HEADERS = {
 
 // ── Main Handler ────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
-  const isAllowed = await checkRateLimitDistributed(ip)
-  if (!isAllowed) {
-    return NextResponse.json({ error: 'Too many requests. Please wait 1 minute.' }, { status: 429 })
-  }
-
-  const ceoToken = req.cookies.get('ayura_ceo_token')?.value
-  const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
-  const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
-  if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
-
-  const clerkUser = await currentUser()
-  const tier = (clerkUser?.publicMetadata?.tier as string) || 'free'
-
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anonymous'
+    const isAllowed = await checkRateLimitDistributed(ip)
+    if (!isAllowed) {
+      return NextResponse.json({ error: 'Too many requests. Please wait 1 minute.' }, { status: 429 })
+    }
+
+    const ceoToken = req.cookies.get('ayura_ceo_token')?.value
+    const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
+    const isCeo = Boolean(CEO_BYPASS_KEY && ceoToken === CEO_BYPASS_KEY)
+    if (isCeo) log.info('CEO_BYPASS_ACTIVE', { ip })
+
+    let clerkUser = null
+    try {
+      clerkUser = await currentUser()
+    } catch (err) {
+      console.warn('Failed to fetch clerk user, continuing as guest:', err)
+    }
+    const tier = (clerkUser?.publicMetadata?.tier as string) || 'free'
+
     const body = await req.text()
     if (body.length > MAX_CONTENT_BYTES) {
       return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
@@ -330,14 +335,17 @@ function createCompositeStream(args: {
       controller.enqueue(encoder.encode(`data: ${metaStr}\n\n`))
 
       const reader = args.llmStream.getReader()
+      let streamBuffer = ''
       try {
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
           if (!firstTokenAt) firstTokenAt = Date.now()
 
-          const chunk = decoder.decode(value)
-          const lines = chunk.split('\n')
+          streamBuffer += decoder.decode(value, { stream: true })
+          const lines = streamBuffer.split('\n')
+          streamBuffer = lines.pop() || ''
+
           for (const line of lines) {
             const trimmed = line.trim()
             if (!trimmed || !trimmed.startsWith('data: ')) continue
@@ -350,8 +358,8 @@ function createCompositeStream(args: {
             } catch {}
           }
         }
-      } catch {
-        log.error('LLM_STREAM_ERROR', { error: 'Stream interrupted' })
+      } catch (err) {
+        log.error('LLM_STREAM_ERROR', { error: String(err) })
       } finally {
         if (activeSessionId && fullText) {
           const sanitizedText = sanitizeAIResponse(fullText)
