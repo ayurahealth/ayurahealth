@@ -47,7 +47,12 @@ export async function getDeepChecks(): Promise<DeepChecks> {
   const vaidya = getVaidyaCheck()
 
   let database: DeepChecks['database'] = 'skipped'
-  if (hasEnv(process.env.DATABASE_URL)) {
+  const dbUrl =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_URL_NON_POOLING
+  if (hasEnv(dbUrl)) {
     try {
       const { prisma } = await import('./prisma')
       await prisma.$queryRaw`SELECT 1`
@@ -70,8 +75,8 @@ export async function getDeepChecks(): Promise<DeepChecks> {
       publishableConfigured: hasEnv(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY),
     },
     razorpay: {
-      keyIdConfigured: hasEnv(process.env.RAZORPAY_KEY_ID),
-      keySecretConfigured: hasEnv(process.env.RAZORPAY_KEY_SECRET),
+      keyIdConfigured: hasEnv(process.env.RAZORPAY_KEY_ID) || hasEnv(process.env.razorpay_Live_API_Key),
+      keySecretConfigured: hasEnv(process.env.RAZORPAY_KEY_SECRET) || hasEnv(process.env.razorpay_Live_Key_Secret),
     },
     appUrlConfigured: hasEnv(process.env.NEXT_PUBLIC_APP_URL),
     huggingfaceEmbeddingsConfigured: hasEnv(process.env.HUGGINGFACE_API_KEY),

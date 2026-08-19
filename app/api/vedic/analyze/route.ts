@@ -8,8 +8,19 @@ export const maxDuration = 30
 export async function POST(request: NextRequest) {
   try {
     const origin = request.headers.get('origin')
-    const allowed = ['https://ayurahealth.com', 'http://localhost:3000']
-    if (origin && !allowed.includes(origin) && process.env.NODE_ENV !== 'development') {
+    const allowed = [
+      process.env.NEXT_PUBLIC_APP_URL,
+      'https://ayurahealth.com',
+      'https://www.ayurahealth.com',
+      'http://localhost:3000',
+    ].filter(Boolean)
+    const isAllowed =
+      !origin ||
+      allowed.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      (process.env.NODE_ENV === 'development' && origin.startsWith('http://localhost:'))
+
+    if (!isAllowed) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

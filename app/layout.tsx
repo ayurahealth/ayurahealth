@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-export const dynamic = 'force-static'
 
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'

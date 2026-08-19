@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/prisma'
 import { currentUser } from '@clerk/nextjs/server'
