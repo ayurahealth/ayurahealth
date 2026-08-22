@@ -1,0 +1,3 @@
+## 2024-10-24 - Memoize Nav variables
+**Learning:** `Nav` component recomputes `currentLang`, `filtered` (using `Array.prototype.filter`), and `defaultLinks` on every render. Because `search` updates on every keystroke, these recalculations happen very frequently when a user is searching. This causes unnecessary work, especially since `Nav` is rendered on almost every page.
+**Action:** Wrap these variables (`currentLang`, `filtered`, and `defaultLinks`) in `useMemo` to prevent recalculation on every re-render and keystroke when their dependencies (`lang`, `search`, `t`, `links`) haven't changed.
