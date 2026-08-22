@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,8 +21,11 @@ export async function GET(req: NextRequest) {
 
   const response = NextResponse.redirect(new URL('/chat', req.url))
   
+  // Hash the secret to prevent exposing it to the client
+  const hashedKey = crypto.createHash('sha256').update(CEO_BYPASS_KEY).digest('hex')
+
   // Set a permanent, secure, HttpOnly cookie for the bypass
-  response.cookies.set('ayura_ceo_token', CEO_BYPASS_KEY, {
+  response.cookies.set('ayura_ceo_token', hashedKey, {
     path: '/',
     maxAge: 365 * 24 * 60 * 60, // 1 year
     httpOnly: true,
