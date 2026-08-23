@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { currentUser } from '@clerk/nextjs/server'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // 🛡️ Sentinel fix: Fetch by authenticated user to prevent IDOR
     const user = await currentUser()
