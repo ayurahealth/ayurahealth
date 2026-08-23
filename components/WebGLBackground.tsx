@@ -17,7 +17,10 @@ function LiquidBrain() {
 
   return (
     <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5}>
-      <Sphere ref={meshRef} args={[1, 128, 128]} scale={2.2}>
+      {/* ⚡ Bolt Perf Optimization: Reduced Sphere args from [1,128,128] to [1,64,64].
+          This drops vertex count from ~16k to ~4k, saving ~75% vertex shader processing
+          for MeshDistortMaterial without noticeable loss of visual quality. */}
+      <Sphere ref={meshRef} args={[1, 64, 64]} scale={2.2}>
         <MeshDistortMaterial
           color="#050a07"
           attach="material"
