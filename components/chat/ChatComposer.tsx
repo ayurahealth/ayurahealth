@@ -190,6 +190,7 @@ export default function ChatComposer({
                 <button 
                   onClick={() => onRemoveAttachment(att.id)} 
                   style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2, display: 'flex' }}
+                  aria-label="Remove attachment"
                 >
                   <X size={12} />
                 </button>
@@ -293,6 +294,7 @@ export default function ChatComposer({
               <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={onFileSelect} style={{ display: 'none' }} />
               <button 
                 onClick={() => fileInputRef.current?.click()} 
+                aria-label="Attach file"
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
                   background: 'transparent', color: 'var(--text-muted)', border: 'none',
@@ -304,6 +306,7 @@ export default function ChatComposer({
               
               <button 
                 onClick={onToggleLinkInput} 
+                aria-label="Add link"
                 className={showLinkInput ? 'active' : ''}
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
@@ -317,6 +320,7 @@ export default function ChatComposer({
               {voiceSupported && (
                 <button 
                   onClick={onStartListening} 
+                  aria-label={isListening ? "Stop listening" : "Start voice input"}
                   style={{ 
                     width: 36, height: 36, borderRadius: '10px', 
                     background: 'transparent', color: isListening ? 'var(--accent-secondary)' : 'var(--text-muted)', border: 'none',
@@ -346,6 +350,7 @@ export default function ChatComposer({
               </div>
               <button 
                 onClick={onSendMessage} 
+                aria-label="Send message"
                 disabled={loading || (!input.trim() && attachments.length === 0)} 
                 className="btn-primary"
                 style={{ 
