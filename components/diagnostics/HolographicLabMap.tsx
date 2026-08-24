@@ -72,15 +72,24 @@ const BiomarkerNode = ({
 }
 
 const ConnectionLines = () => {
-  const points = useMemo(() => {
-    const p = []
-    for (let i = 0; i < BIOMARKER_MAP.length; i++) {
-      for (let j = i + 1; j < BIOMARKER_MAP.length; j++) {
-        p.push(new THREE.Vector3(...BIOMARKER_MAP[i].position))
-        p.push(new THREE.Vector3(...BIOMARKER_MAP[j].position))
+  const positions = useMemo(() => {
+    const numMarkers = BIOMARKER_MAP.length
+    const numLines = (numMarkers * (numMarkers - 1)) / 2
+    const pos = new Float32Array(numLines * 2 * 3)
+    let index = 0
+    for (let i = 0; i < numMarkers; i++) {
+      const p1 = BIOMARKER_MAP[i].position
+      for (let j = i + 1; j < numMarkers; j++) {
+        const p2 = BIOMARKER_MAP[j].position
+        pos[index++] = p1[0]
+        pos[index++] = p1[1]
+        pos[index++] = p1[2]
+        pos[index++] = p2[0]
+        pos[index++] = p2[1]
+        pos[index++] = p2[2]
       }
     }
-    return p
+    return pos
   }, [])
 
   return (
@@ -88,7 +97,7 @@ const ConnectionLines = () => {
       <bufferGeometry attach="geometry">
         <bufferAttribute
           attach="attributes-position"
-          args={[new Float32Array(points.flatMap(p => [p.x, p.y, p.z])), 3]}
+          args={[positions, 3]}
         />
       </bufferGeometry>
       <lineBasicMaterial attach="material" color="#6abf8a" transparent opacity={0.1} />
