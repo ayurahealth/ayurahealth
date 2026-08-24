@@ -149,6 +149,7 @@ export default function LandingPage() {
                     disabled={!teaserPrompt.trim()} 
                     className="btn-primary" 
                     style={{ height: 48, width: 48, padding: 0, borderRadius: 14, opacity: teaserPrompt.trim() ? 1 : 0.4 }}
+                    aria-label="Submit teaser prompt"
                   >
                     <ArrowRight size={22} />
                   </button>
