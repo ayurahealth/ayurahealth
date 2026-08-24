@@ -5,7 +5,31 @@ export async function POST(req: NextRequest) {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
 
-    const res = await fetch(url, {
+    let parsedUrl: URL
+    try {
+      parsedUrl = new URL(url)
+    } catch {
+      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+    }
+
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      return NextResponse.json({ error: 'Invalid protocol' }, { status: 400 })
+    }
+
+    // Security Fix: Parse URL and block local/internal domains to prevent SSRF
+    const hostname = parsedUrl.hostname
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname === '169.254.169.254' ||
+      hostname.endsWith('.internal') ||
+      hostname.endsWith('.local')
+    ) {
+      return NextResponse.json({ error: 'Invalid domain' }, { status: 403 })
+    }
+
+    const res = await fetch(parsedUrl.toString(), {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
       signal: AbortSignal.timeout(8000),
     })
