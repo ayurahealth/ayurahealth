@@ -17,8 +17,25 @@ export default function VedicClockWidget({ guidance }: Props) {
   const [currentHour, setCurrentHour] = useState(new Date().getHours())
 
   useEffect(() => {
-    const interval = setInterval(() => setCurrentHour(new Date().getHours()), 60000)
-    return () => clearInterval(interval)
+    let timeoutId: NodeJS.Timeout
+    let intervalId: NodeJS.Timeout
+
+    const syncToNextHour = () => {
+      const now = new Date()
+      const msUntilNextHour = (60 - now.getMinutes()) * 60000 - now.getSeconds() * 1000 - now.getMilliseconds()
+
+      timeoutId = setTimeout(() => {
+        setCurrentHour(new Date().getHours())
+        intervalId = setInterval(() => setCurrentHour(new Date().getHours()), 3600000) // 1 hour
+      }, msUntilNextHour)
+    }
+
+    syncToNextHour()
+
+    return () => {
+      clearTimeout(timeoutId)
+      clearInterval(intervalId)
+    }
   }, [])
 
   const currentDosha = DOSHA_TIMES.find(d => {
