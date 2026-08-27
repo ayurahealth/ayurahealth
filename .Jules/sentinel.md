@@ -1,0 +1,4 @@
+## 2024-08-28 - SSRF Vulnerability in Link Fetcher
+**Vulnerability:** The `/api/fetch-link` endpoint accepted arbitrary URLs from user input and fetched them without validating the hostname or protocol, allowing Server-Side Request Forgery (SSRF) against internal networks, loopback addresses, and cloud metadata services.
+**Learning:** Even simple utility endpoints for fetching website metadata can be weaponized if they don't restrict the requested destination. Lack of input validation beyond `typeof url === 'string'` left the server exposed.
+**Prevention:** Always parse untrusted URLs, validate the protocol (only allow `http`/`https`), and block hostnames resolving to private/local IP ranges (`127.0.0.0/8`, `10.0.0.0/8`, `169.254.0.0/16`, etc.) or internal domains (`.local`, `.internal`) before initiating outbound requests.
