@@ -5,6 +5,18 @@ export async function POST(req: NextRequest) {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
 
+    try {
+      const parsedUrl = new URL(url);
+      const isHttp = parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+      const isLocalhost = parsedUrl.hostname === 'localhost' || parsedUrl.hostname.endsWith('.local') || parsedUrl.hostname.endsWith('.internal');
+      const isPrivateIP = /^(127\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|169\.254\.|0\.|::1)/.test(parsedUrl.hostname);
+      if (!isHttp || isLocalhost || isPrivateIP) {
+        return NextResponse.json({ error: 'Invalid or restricted URL' }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ error: 'Malformed URL' }, { status: 400 });
+    }
+
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
       signal: AbortSignal.timeout(8000),
