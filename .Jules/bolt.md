@@ -1,0 +1,3 @@
+## 2024-05-13 - [ClinicalMarkdown Render Optimization]
+**Learning:** `ClinicalMarkdown` is a core component used in chat message rendering, often for long streaming content. It recreates the `components` prop object containing all Markdown custom renderers on every single render. This forces ReactMarkdown to re-evaluate and re-render everything repeatedly, especially expensive during streaming responses.
+**Action:** Extract the `components` object outside the component or use `useMemo` so the reference remains stable across renders, drastically reducing re-renders during streaming. Also wrap the component in `React.memo`.
