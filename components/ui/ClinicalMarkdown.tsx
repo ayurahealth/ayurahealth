@@ -27,17 +27,17 @@ const ClinicalMarkdown = React.memo(function ClinicalMarkdown({
     .replace(/\*\*📚 Verified Lineage\*\*/g, '### 📚 EVIDENCE & PROOF')
 
   const components = React.useMemo(() => ({
-    h1: ({ children }: { children: React.ReactNode }) => (
+    h1: ({ children }: { children?: React.ReactNode }) => (
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: 'var(--markdown-accent)', marginBottom: '1.5rem', fontWeight: 500 }}>
         {children}
       </h1>
     ),
-    h2: ({ children }: { children: React.ReactNode }) => (
+    h2: ({ children }: { children?: React.ReactNode }) => (
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--markdown-accent)', marginTop: '2rem', marginBottom: '1rem', fontWeight: 500 }}>
         {children}
       </h2>
     ),
-    h3: ({ children }: { children: React.ReactNode }) => {
+    h3: ({ children }: { children?: React.ReactNode }) => {
       const text = String(children)
       let icon = null
 
@@ -68,48 +68,48 @@ const ClinicalMarkdown = React.memo(function ClinicalMarkdown({
         </h3>
       )
     },
-    p: ({ children }: { children: React.ReactNode }) => (
+    p: ({ children }: { children?: React.ReactNode }) => (
       <p style={{ color: 'var(--text-main)', lineHeight: 1.7, marginBottom: '1.25rem', fontSize: '1rem' }}>
         {children}
       </p>
     ),
-    strong: ({ children }: { children: React.ReactNode }) => (
+    strong: ({ children }: { children?: React.ReactNode }) => (
       <strong style={{ color: 'var(--markdown-accent)', fontWeight: 600 }}>
         {children}
       </strong>
     ),
-    em: ({ children }: { children: React.ReactNode }) => (
+    em: ({ children }: { children?: React.ReactNode }) => (
       <em style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
         {children}
       </em>
     ),
-    ul: ({ children }: { children: React.ReactNode }) => (
+    ul: ({ children }: { children?: React.ReactNode }) => (
       <ul style={{ listStyle: 'none', padding: 0, margin: '1rem 0' }}>
         {children}
       </ul>
     ),
-    ol: ({ children }: { children: React.ReactNode }) => (
+    ol: ({ children }: { children?: React.ReactNode }) => (
       <ol style={{ paddingLeft: '1.5rem', margin: '1rem 0', color: 'var(--text-main)' }}>
         {children}
       </ol>
     ),
-    li: ({ children }: { children: React.ReactNode }) => (
+    li: ({ children }: { children?: React.ReactNode }) => (
       <li style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>
         <span style={{ color: 'var(--markdown-accent)', opacity: 0.6, marginTop: '0.2rem' }}>•</span>
         <span>{children}</span>
       </li>
     ),
     hr: () => <hr style={{ border: 'none', borderTop: '1px solid var(--border-low)', margin: '2rem 0' }} />,
-    table: ({ children }: { children: React.ReactNode }) => (
+    table: ({ children }: { children?: React.ReactNode }) => (
       <div style={{ overflowX: 'auto', marginBottom: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-low)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
           {children}
         </table>
       </div>
     ),
-    thead: ({ children }: { children: React.ReactNode }) => <thead style={{ background: 'var(--surface-mid)', borderBottom: '1px solid var(--border-low)' }}>{children}</thead>,
-    th: ({ children }: { children: React.ReactNode }) => <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: 'var(--text-main)' }}>{children}</th>,
-    td: ({ children }: { children: React.ReactNode }) => <td style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--border-low)', color: 'var(--text-muted)' }}>{children}</td>,
+    thead: ({ children }: { children?: React.ReactNode }) => <thead style={{ background: 'var(--surface-mid)', borderBottom: '1px solid var(--border-low)' }}>{children}</thead>,
+    th: ({ children }: { children?: React.ReactNode }) => <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: 'var(--text-main)' }}>{children}</th>,
+    td: ({ children }: { children?: React.ReactNode }) => <td style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--border-low)', color: 'var(--text-muted)' }}>{children}</td>,
   }), []);
 
   return (
