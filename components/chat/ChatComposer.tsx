@@ -293,6 +293,8 @@ export default function ChatComposer({
               <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={onFileSelect} style={{ display: 'none' }} />
               <button 
                 onClick={() => fileInputRef.current?.click()} 
+                aria-label="Attach file"
+                title="Attach file"
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
                   background: 'transparent', color: 'var(--text-muted)', border: 'none',
@@ -305,6 +307,9 @@ export default function ChatComposer({
               <button 
                 onClick={onToggleLinkInput} 
                 className={showLinkInput ? 'active' : ''}
+                aria-label={showLinkInput ? "Close link input" : "Add source link"}
+                title={showLinkInput ? "Close link input" : "Add source link"}
+                aria-expanded={showLinkInput}
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
                   background: 'transparent', color: showLinkInput ? 'var(--accent-main)' : 'var(--text-muted)', border: 'none',
@@ -317,6 +322,9 @@ export default function ChatComposer({
               {voiceSupported && (
                 <button 
                   onClick={onStartListening} 
+                  aria-label={isListening ? "Stop voice input" : "Start voice input"}
+                  title={isListening ? "Stop voice input" : "Start voice input"}
+                  aria-pressed={isListening}
                   style={{ 
                     width: 36, height: 36, borderRadius: '10px', 
                     background: 'transparent', color: isListening ? 'var(--accent-secondary)' : 'var(--text-muted)', border: 'none',
@@ -348,6 +356,14 @@ export default function ChatComposer({
                 onClick={onSendMessage} 
                 disabled={loading || (!input.trim() && attachments.length === 0)} 
                 className="btn-primary"
+                aria-label="Send message"
+                title={
+                  loading
+                    ? "Sending message..."
+                    : (!input.trim() && attachments.length === 0)
+                      ? "Enter a message or attach a file to send"
+                      : "Send message"
+                }
                 style={{ 
                   width: 40, height: 40, borderRadius: '12px', padding: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
