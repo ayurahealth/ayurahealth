@@ -293,6 +293,8 @@ export default function ChatComposer({
               <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={onFileSelect} style={{ display: 'none' }} />
               <button 
                 onClick={() => fileInputRef.current?.click()} 
+                aria-label="Add attachment"
+                title="Add attachment"
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
                   background: 'transparent', color: 'var(--text-muted)', border: 'none',
@@ -305,6 +307,8 @@ export default function ChatComposer({
               <button 
                 onClick={onToggleLinkInput} 
                 className={showLinkInput ? 'active' : ''}
+                aria-label="Add link"
+                title="Add link"
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
                   background: 'transparent', color: showLinkInput ? 'var(--accent-main)' : 'var(--text-muted)', border: 'none',
@@ -317,6 +321,8 @@ export default function ChatComposer({
               {voiceSupported && (
                 <button 
                   onClick={onStartListening} 
+                  aria-label={isListening ? "Stop listening" : "Start listening"}
+                  title={isListening ? "Stop listening" : "Start listening"}
                   style={{ 
                     width: 36, height: 36, borderRadius: '10px', 
                     background: 'transparent', color: isListening ? 'var(--accent-secondary)' : 'var(--text-muted)', border: 'none',
