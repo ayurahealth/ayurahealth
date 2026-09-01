@@ -1,0 +1,3 @@
+## 2024-05-24 - Avoid O(N x M) loops in large visualization component renders
+**Learning:** Found an anti-pattern in `components/diagnostics/HolographicLabMap.tsx` where an $O(N)$ lookup (`results.find`) was nested within the `BIOMARKER_MAP.map` function. This translates into $O(N \times M)$ operation complexity (where N is the map length and M is the results size) executed on every render cycle. This is problematic since map loops inside React renders need to be as fast as possible to maintain high framerates in WebGL contexts.
+**Action:** Always pre-process array inputs mapping against constant datasets using `useMemo` to generate an $O(1)$ lookup table (`Record` or `Map`) converting the operational time complexity from $O(N \times M)$ to $O(N + M)$.
