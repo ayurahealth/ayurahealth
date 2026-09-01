@@ -1,0 +1,4 @@
+## 2025-05-28 - Timing Attack Vulnerability in Razorpay Signature Verification
+**Vulnerability:** Razorpay webhook and order creation endpoints used standard string comparison (`===` and `!==`) to verify HMAC signatures instead of a constant-time comparison, making them susceptible to timing attacks.
+**Learning:** The built-in Node.js `crypto` module requires `crypto.timingSafeEqual` with matching `Buffer` lengths to securely verify signatures. Standard equality checks exit early on the first non-matching character, leaking information about the expected hash through response time variations.
+**Prevention:** Always use `crypto.timingSafeEqual` with `Buffer.from` for comparing sensitive tokens, secrets, or signatures in Next.js API routes. Ensure you explicitly check buffer lengths (`a.length === b.length`) before calling it to prevent thrown errors.
