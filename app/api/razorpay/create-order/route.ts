@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           amount: priceInfo.amount, // Always from server, never from client
           currency,
-          receipt: `order_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          receipt: `order_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
           notes: {
             tier,
             email,
