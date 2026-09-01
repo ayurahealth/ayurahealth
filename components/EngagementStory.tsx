@@ -84,6 +84,7 @@ export default function EngagementStory() {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3rem', alignItems: 'center' }}>
         <button 
           onClick={() => setPage(p => Math.max(0, p - 1))}
+          aria-label="Previous page"
           style={{ 
             background: 'none', 
             border: 'none', 
@@ -117,6 +118,7 @@ export default function EngagementStory() {
         {page === pages.length - 1 ? (
           <button 
             onClick={() => setPage(0)}
+            aria-label="Replay story"
             style={{ 
               background: 'none', 
               border: 'none', 
@@ -131,6 +133,7 @@ export default function EngagementStory() {
         ) : (
           <button 
             onClick={() => setPage(p => p + 1)}
+            aria-label="Next page"
             style={{ 
               background: 'var(--accent-main)', 
               border: 'none', 

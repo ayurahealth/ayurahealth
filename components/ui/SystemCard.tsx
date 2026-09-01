@@ -13,6 +13,9 @@ export default function SystemCard({ label, icon, active, onClick, style }: Syst
     <button
       onClick={onClick}
       className={`ios-chip${active ? ' active premium-glass' : ''}`}
+      aria-label={`${label} system${active ? ' active' : ''}`}
+      title={`${label} system`}
+      aria-pressed={active}
       style={{
         padding: '0.65rem 0.5rem',
         borderRadius: 'var(--ios-radius-lg)',
