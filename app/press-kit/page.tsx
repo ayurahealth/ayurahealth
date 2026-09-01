@@ -35,7 +35,7 @@ export default function PressKitPage() {
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{a.desc}</p>
                 </div>
               </div>
-              <button style={{ background: 'transparent', border: 'none', color: 'var(--accent-main)', cursor: 'pointer', padding: '0.5rem' }}>
+              <button aria-label={`Download ${a.title}`} title="Download" style={{ background: 'transparent', border: 'none', color: 'var(--accent-main)', cursor: 'pointer', padding: '0.5rem' }}>
                 <Download size={20} />
               </button>
             </div>
