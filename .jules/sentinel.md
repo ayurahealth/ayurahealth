@@ -1,0 +1,4 @@
+## 2025-02-20 - Fix Timing Attack in Signature Verification
+**Vulnerability:** Signature verification in webhook and create-order endpoints used standard string comparison (`!==` and `===`), making them susceptible to timing attacks.
+**Learning:** Comparing cryptographic signatures using standard string comparison operators allows attackers to guess the signature byte-by-byte by observing the time taken to reject invalid signatures, because standard comparison returns false as soon as it encounters the first mismatched byte.
+**Prevention:** Always use `crypto.timingSafeEqual` to compare sensitive tokens and signatures. Ensure the input buffers are verified to be the same length before comparison to prevent the function from throwing an error. When working with Next.js edge functions, use dynamic imports for the `crypto` module to prevent edge resolution errors.
