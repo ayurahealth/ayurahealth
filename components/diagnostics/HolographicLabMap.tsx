@@ -72,15 +72,17 @@ const BiomarkerNode = ({
 }
 
 const ConnectionLines = () => {
-  const points = useMemo(() => {
-    const p = []
+  const bufferArgs = useMemo(() => {
+    // ⚡ Bolt: Prepare flat coordinate arrays directly to avoid intermediate Vector3 allocations.
+    const coords = []
     for (let i = 0; i < BIOMARKER_MAP.length; i++) {
       for (let j = i + 1; j < BIOMARKER_MAP.length; j++) {
-        p.push(new THREE.Vector3(...BIOMARKER_MAP[i].position))
-        p.push(new THREE.Vector3(...BIOMARKER_MAP[j].position))
+        coords.push(...BIOMARKER_MAP[i].position)
+        coords.push(...BIOMARKER_MAP[j].position)
       }
     }
-    return p
+    // ⚡ Bolt: Fully memoize the Float32Array and pass its stable reference to args to avoid costly WebGL buffer reallocation on every render.
+    return [new Float32Array(coords), 3] as const
   }, [])
 
   return (
@@ -88,7 +90,7 @@ const ConnectionLines = () => {
       <bufferGeometry attach="geometry">
         <bufferAttribute
           attach="attributes-position"
-          args={[new Float32Array(points.flatMap(p => [p.x, p.y, p.z])), 3]}
+          args={bufferArgs}
         />
       </bufferGeometry>
       <lineBasicMaterial attach="material" color="#6abf8a" transparent opacity={0.1} />
