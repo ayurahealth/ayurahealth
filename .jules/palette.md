@@ -1,0 +1,3 @@
+## 2024-05-13 - [ChatComposer Accessibility]
+**Learning:** Found multiple icon-only action buttons across the core `ChatComposer` interactive element lacking screen reader and visual tooltip context. Even custom-styled, standard functional buttons (like mic input, attachment handling, and submit actions) commonly get missed when icons are used dynamically via standard `<button>` containers without `aria-label` tags.
+**Action:** Always include both `aria-label` and `title` attributes on icon-only buttons as a standard component practice across interactive panels to support both accessibility tools and clear visual states.
