@@ -1,0 +1,4 @@
+## 2026-05-24 - [Fix timing attack in payment signature verification and implement CSPRNG for receipts]
+**Vulnerability:** Razorpay signature verification used standard equality `===` (vulnerable to timing attacks), and receipt IDs used `Math.random()` (not cryptographically secure).
+**Learning:** Next.js API routes handling sensitive signature verification (like webhooks or payment confirmations) must use constant-time comparison to prevent timing attacks. Additionally, all financial transaction identifiers (receipts, orders) require CSPRNGs instead of predictable random number generators.
+**Prevention:** Always use `crypto.timingSafeEqual` with identical length buffers (with explicit string casting to handle `undefined`) for secret comparisons. Replace `Math.random()` with `crypto.randomUUID()` for generating secure, unpredictable identifiers.
