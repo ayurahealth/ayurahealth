@@ -1,0 +1,3 @@
+## 2023-10-27 - Icon-only buttons lack ARIA and tooltips in Ayura Intelligence Lab
+**Learning:** Found an accessibility issue pattern in the app's components, where complex interactive interfaces like the Chat Composer rely heavily on icon-only buttons (e.g., attach, link, voice, send) without providing accessible names (`aria-label`) or tooltips (`title`). This makes the interface confusing for screen reader users and those seeking clarification on button functions.
+**Action:** Always ensure that icon-only interactive elements in complex components, especially stateful ones (like 'Stop/Start voice input'), have dynamically updating `aria-label` and `title` attributes.
