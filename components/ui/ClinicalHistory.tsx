@@ -103,6 +103,8 @@ export default function ClinicalHistory({ userId, isOpen, onClose }: ClinicalHis
                   cursor: 'pointer',
                   color: 'var(--text-muted)'
                 }}
+                aria-label="Close clinical history"
+                title="Close"
               >
                 ✕
               </button>
