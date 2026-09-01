@@ -1,0 +1,3 @@
+## 2024-05-15 - [Avoid WebGL buffer reallocation and intermediate 3D objects in @react-three/fiber]
+**Learning:** In `@react-three/fiber`, creating intermediate 3D objects (e.g., `new THREE.Vector3(...)`) inside loops just to extract their components causes memory allocation and garbage collection overhead. Furthermore, passing a new array reference to `args` (e.g., `[new Float32Array(...)]`) inside `<bufferAttribute>` triggers costly WebGL buffer reallocation on every render.
+**Action:** When preparing flat coordinate arrays for WebGL buffers, push primitive coordinate values directly into the array. Fully memoize typed arrays and pass the stable reference to `args` to optimize rendering performance.
