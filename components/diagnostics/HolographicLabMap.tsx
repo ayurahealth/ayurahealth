@@ -83,12 +83,18 @@ const ConnectionLines = () => {
     return p
   }, [])
 
+  // Memoize the Float32Array to avoid recreating it on every render,
+  // which causes React-Three-Fiber to re-upload the buffer to the GPU.
+  const positionArray = useMemo(() => {
+    return new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))
+  }, [points])
+
   return (
     <lineSegments>
       <bufferGeometry attach="geometry">
         <bufferAttribute
           attach="attributes-position"
-          args={[new Float32Array(points.flatMap(p => [p.x, p.y, p.z])), 3]}
+          args={[positionArray, 3]}
         />
       </bufferGeometry>
       <lineBasicMaterial attach="material" color="#6abf8a" transparent opacity={0.1} />
