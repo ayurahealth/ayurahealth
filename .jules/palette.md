@@ -1,0 +1,3 @@
+## 2025-05-19 - Missing ARIA Labels on Icon-only Buttons Pattern
+**Learning:** Found a widespread pattern across interactive application components (like ChatComposer, ClinicalHistory, and Voice inputs) where icon-only buttons were missing necessary `aria-label` and `title` attributes, severely reducing accessibility for screen reader users and missing helpful tooltips for sighted users.
+**Action:** Implemented a codebase-wide pattern to ensure both `aria-label` (for screen readers) and `title` (for tooltips) are consistently added to all icon-only buttons. For dynamically updating buttons (like "Start/Stop recording" or "Listen/Stop"), these attributes must be dynamically updated using state variables to accurately reflect the button's current action.
