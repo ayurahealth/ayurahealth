@@ -1,0 +1,3 @@
+## 2026-05-12 - Dependency Installation Side Effects in Monorepos
+**Learning:** Running blanket commands like `pnpm install --no-frozen-lockfile` (or modifying `package.json` to fix CI errors) just to pass local verification steps can accidentally generate massive `pnpm-lock.yaml` files and pollute PRs, directly violating the constraint to never modify `package.json` or `tsconfig.json`.
+**Action:** Always ignore pre-existing linting or build dependency errors if they are not regressions caused by the current PR. Never install new dependencies globally or modify package configuration files to appease local linters. Always run `git status` or `git diff` before submitting to ensure only the strictly authorized files are staged.
