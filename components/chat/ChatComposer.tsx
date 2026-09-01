@@ -188,6 +188,8 @@ export default function ChatComposer({
                 )}
                 <div style={{ color: 'var(--text-main)', fontSize: '0.75rem', fontWeight: 500, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{att.name}</div>
                 <button 
+                  aria-label="Remove attachment"
+                  title="Remove attachment"
                   onClick={() => onRemoveAttachment(att.id)} 
                   style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2, display: 'flex' }}
                 >
@@ -292,6 +294,8 @@ export default function ChatComposer({
             <div style={{ display: 'flex', gap: '0.4rem' }}>
               <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={onFileSelect} style={{ display: 'none' }} />
               <button 
+                aria-label="Attach file"
+                title="Attach file"
                 onClick={() => fileInputRef.current?.click()} 
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
@@ -303,6 +307,8 @@ export default function ChatComposer({
               </button>
               
               <button 
+                aria-label={showLinkInput ? "Close link input" : "Add source link"}
+                title={showLinkInput ? "Close link input" : "Add source link"}
                 onClick={onToggleLinkInput} 
                 className={showLinkInput ? 'active' : ''}
                 style={{ 
@@ -316,6 +322,8 @@ export default function ChatComposer({
 
               {voiceSupported && (
                 <button 
+                  aria-label={isListening ? "Stop listening" : "Start voice input"}
+                  title={isListening ? "Stop listening" : "Start voice input"}
                   onClick={onStartListening} 
                   style={{ 
                     width: 36, height: 36, borderRadius: '10px', 
@@ -345,6 +353,8 @@ export default function ChatComposer({
                 {isListening ? 'Voice Synthesis Active' : 'Intelligence Active'}
               </div>
               <button 
+                aria-label="Send message"
+                title="Send message"
                 onClick={onSendMessage} 
                 disabled={loading || (!input.trim() && attachments.length === 0)} 
                 className="btn-primary"
