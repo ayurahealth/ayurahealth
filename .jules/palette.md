@@ -1,0 +1,3 @@
+## 2023-10-27 - ChatComposer Icon Button Accessibility
+**Learning:** Found that multiple critical interaction buttons in ChatComposer (attach, link, voice, send) relied solely on icons without accessible names, making the core chat experience unusable for screen readers. Using dynamic aria-labels (like `aria-label={showLinkInput ? "Close link input" : "Add link"}`) alongside `aria-expanded` and `aria-pressed` successfully communicated complex toggle states to assistive technologies without altering the visual design.
+**Action:** Always verify icon-only buttons have accessible names, and for buttons that toggle state or interface panels, explicitly pair the dynamic `aria-label` with structural attributes like `aria-expanded` or `aria-pressed`.
