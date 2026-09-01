@@ -92,6 +92,8 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
                 Assessment
               </h2>
               <button 
+                aria-label="Refine Clinical Profile"
+                title="Refine Clinical Profile"
                 onClick={() => setIsEditing(true)}
                 style={{ 
                   background: 'none', 
@@ -302,7 +304,7 @@ export function DashboardContent({ user, dbProfile }: { user: { firstName?: stri
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--text-main)' }}>Refine Health Profile</h3>
-                <button onClick={() => setIsEditing(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
+                <button aria-label="Close modal" title="Close modal" onClick={() => setIsEditing(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
               </div>
 
               <div style={{ marginBottom: '2rem' }}>
