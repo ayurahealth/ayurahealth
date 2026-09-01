@@ -99,6 +99,16 @@ const ConnectionLines = () => {
 export default function HolographicLabMap({ results = [] }: Props) {
   const [hovered, setHovered] = useState<Biomarker | null>(null)
 
+  // ⚡ Bolt Optimization: Pre-process results into a Map for O(1) lookups during render,
+  // preventing O(N * M) bottlenecks when iterating over BIOMARKER_MAP.
+  const resultsMap = useMemo(() => {
+    const map = new Map<string, LabResult>()
+    for (const r of results) {
+      map.set(r.id, r)
+    }
+    return map
+  }, [results])
+
   return (
     <div style={{ width: '100%', height: '400px', background: 'rgba(0,0,0,0.2)', borderRadius: '20px', position: 'relative', overflow: 'hidden' }}>
       <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
@@ -113,7 +123,7 @@ export default function HolographicLabMap({ results = [] }: Props) {
           <BiomarkerNode 
             key={marker.id} 
             marker={marker} 
-            result={results.find(r => r.id === marker.id)}
+            result={resultsMap.get(marker.id)}
             onHover={setHovered}
           />
         ))}
