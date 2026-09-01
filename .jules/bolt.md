@@ -1,0 +1,3 @@
+## 2024-05-22 - [Optimizing Map Render Loops]
+**Learning:** Performance Optimization Pattern: In visualization components like `HolographicLabMap.tsx` that map a large constant dataset (e.g., `BIOMARKER_MAP`) against variable props (e.g., `results`), avoid $O(N \times M)$ nested `.find()` operations.
+**Action:** Pre-processing arrays into a `Map` or `Record` using `useMemo` achieves $O(N)$ lookup efficiency and prevents significant slowdowns as the input arrays grow larger.
