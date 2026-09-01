@@ -44,19 +44,37 @@ export async function POST(req: Request) {
       memories.push({ content: `User follows ${profile.lifestyle.diet} diet`, category: 'Lifestyle' })
     }
 
-    // Batch create memories (basic unique check by content to avoid duplicates)
-    for (const mem of memories) {
-      const existing = await prisma.userMemory.findFirst({
-        where: { userId: user.id, content: mem.content }
+    // Batch create memories using bulk operations to prevent N+1 queries
+    if (memories.length > 0) {
+      const memoryContents = memories.map(m => m.content)
+      const existingMemories = await prisma.userMemory.findMany({
+        where: {
+          userId: user.id,
+          content: { in: memoryContents }
+        },
+        select: { content: true }
       })
-      if (!existing) {
-        await prisma.userMemory.create({
-          data: {
+
+      const existingSet = new Set(existingMemories.map(m => m.content))
+
+      // Deduplicate memories to create (both against DB and intra-payload duplicates)
+      const uniqueMemoriesToCreate = memories.reduce((acc, current) => {
+        if (!existingSet.has(current.content)) {
+          acc.push({
             userId: user.id,
-            content: mem.content,
-            category: mem.category,
+            content: current.content,
+            category: current.category,
             source: 'HealthProfile Sync'
-          }
+          })
+          // Add to set to prevent intra-payload duplicates
+          existingSet.add(current.content)
+        }
+        return acc
+      }, [] as { userId: string, content: string, category: string, source: string }[])
+
+      if (uniqueMemoriesToCreate.length > 0) {
+        await prisma.userMemory.createMany({
+          data: uniqueMemoriesToCreate
         })
       }
     }
