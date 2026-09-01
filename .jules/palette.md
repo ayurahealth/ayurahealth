@@ -1,0 +1,3 @@
+## 2023-10-27 - Icon-Only Button Accessibility in Press Kit
+**Learning:** Icon-only buttons used in repeated map iterations (like the download button in the press kit assets map) frequently lack programmatically determinable names, making them invisible to assistive technologies. Lack of explicit `title` attributes also removes native tooltips which explain the specific download target.
+**Action:** Always verify icon-only buttons have dynamic `aria-label` and `title` attributes tied to their context (e.g., `aria-label="Download ${asset.title}"`) to provide explicit context for both screen readers and sighted users on hover.
