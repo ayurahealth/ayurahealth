@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix Timing Attack in Razorpay Signature Verification
+**Vulnerability:** Razorpay webhook/payment signatures were being verified using standard string equality (`===`).
+**Learning:** String equality (`===`) exits early as soon as it finds a mismatched character, meaning the time it takes to return false reveals how many prefix characters match. This exposes the signature to timing attacks, allowing an attacker to theoretically forge signatures and authorize fraudulent payments.
+**Prevention:** Always use `crypto.timingSafeEqual` to verify cryptographic hashes, HMACs, or any security tokens. First ensure both buffers are of equal length to avoid `timingSafeEqual` throwing an error, then perform the constant-time comparison. Additionally, safely cast user inputs to strings and handle potentially null inputs before creating `Buffer`s.

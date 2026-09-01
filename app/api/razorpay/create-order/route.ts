@@ -178,7 +178,14 @@ export async function PUT(request: NextRequest) {
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex')
 
-    if (expectedSignature === razorpay_signature) {
+    const expectedSignatureBuffer = Buffer.from(expectedSignature)
+    const razorpaySignatureBuffer = Buffer.from(String(razorpay_signature || ''))
+
+    const isSignatureValid =
+      expectedSignatureBuffer.length === razorpaySignatureBuffer.length &&
+      crypto.timingSafeEqual(expectedSignatureBuffer, razorpaySignatureBuffer)
+
+    if (isSignatureValid) {
       // ── Signature is valid. Now persist the payment state ────────────────
       // Fetch the order to get the tier and user email stored in notes
       const order = await razorpayApi<{ notes?: { tier?: string; email?: string } }>(`/orders/${razorpay_order_id}`)
