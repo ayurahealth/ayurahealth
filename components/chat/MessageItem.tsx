@@ -208,6 +208,8 @@ export default function MessageItem({
         {isAssistant && voiceSupported && (
           <button 
             onClick={() => onSpeakText(msg.content)} 
+            aria-label={isSpeaking ? "Stop reading message aloud" : "Read message aloud"}
+            title={isSpeaking ? "Stop reading message aloud" : "Read message aloud"}
             style={{ 
               marginTop: '0.75rem', 
               background: 'none', 
