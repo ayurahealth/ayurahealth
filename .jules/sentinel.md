@@ -1,0 +1,4 @@
+## 2024-05-16 - Prevent Cross-Origin Attacks via Permissive Vercel CORS Wildcards
+**Vulnerability:** The Razorpay order creation endpoint (`app/api/razorpay/create-order/route.ts`) allowed cross-origin requests from *any* Vercel deployment (`origin.endsWith('.vercel.app')`).
+**Learning:** Developers often use `endsWith('.vercel.app')` to support preview deployments without realizing that *anyone* can spin up a free Vercel project (e.g., `attacker-app.vercel.app`) to bypass CORS and exploit sensitive endpoints (like initiating orders).
+**Prevention:** Avoid wildcard suffix checks for domains outside organizational control. Rely on specific whitelisted domains (e.g., `ayurahealth.com`) or specific environment variables that are tied to the actual trusted deployment (`NEXT_PUBLIC_APP_URL`).
