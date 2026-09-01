@@ -1,0 +1,3 @@
+## 2024-05-19 - React Three Fiber Buffer Reallocation
+**Learning:** Passing a new array reference like `[new Float32Array(...)]` directly into `<bufferAttribute args={...}>` in `@react-three/fiber` triggers costly WebGL buffer reallocation on every render, rather than just updating the geometry. Additionally, creating intermediate `THREE.Vector3` objects in iteration loops before converting to flat arrays causes significant memory allocation and garbage collection overhead.
+**Action:** Always fully memoize the final `Float32Array` or `BufferAttribute` itself, and push primitive coordinate values directly into the array structure rather than allocating intermediate objects.
