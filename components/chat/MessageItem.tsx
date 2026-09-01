@@ -51,7 +51,7 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+function MessageItemComponent({
   msg,
   doshaColor,
   voiceSupported,
@@ -228,3 +228,5 @@ export default function MessageItem({
     </motion.div>
   )
 }
+
+export default React.memo(MessageItemComponent)
