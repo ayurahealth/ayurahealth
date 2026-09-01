@@ -1,0 +1,20 @@
+
+> ayuraintelligence@1.1.0 start /app
+> next start -p 3002
+
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3002
+   - Network:      http://192.168.0.2:3002
+
+ ✓ Starting...
+ ✓ Ready in 901ms
+Error: Publishable key not valid.
+    at bm (.next/server/middleware.js:13:39877)
+    at ct.initPublishableKeyValues (.next/server/middleware.js:24:17934)
+    at new ct (.next/server/middleware.js:24:16388)
+    at cu (.next/server/middleware.js:24:20522)
+    at async fA (.next/server/middleware.js:32:1463)
+    at async (.next/server/middleware.js:74:2426)
+    at async handler (.next/server/middleware.js:74:4343)
+    at async (.next/server/middleware.js:13:32773)
+    at async a4 (.next/server/middleware.js:13:29461)
