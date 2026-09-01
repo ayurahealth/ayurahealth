@@ -1,0 +1,4 @@
+## 2024-05-01 - Constant-Time String Comparison Vulnerability
+**Vulnerability:** Timing attack vulnerabilities found in Razorpay payment validation and webhooks where cryptographic signatures were compared using standard string equality (`===`).
+**Learning:** Standard string equality operators fail fast on the first mismatched character, allowing attackers to measure comparison time and brute-force expected signatures character-by-character. Additionally, Node.js `crypto.timingSafeEqual` requires identical buffer lengths; failure to check lengths will throw exceptions that can cause 500 errors and be used for denial-of-service.
+**Prevention:** Always convert security tokens, hashes, or signatures to buffers using `Buffer.from(value, 'utf-8')`. Validate buffer length equality (`bufferA.length === bufferB.length`) prior to passing them into `crypto.timingSafeEqual(bufferA, bufferB)`.
