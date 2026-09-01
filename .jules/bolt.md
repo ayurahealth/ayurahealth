@@ -1,0 +1,3 @@
+## 2025-02-28 - Avoid WebGL Buffer Reallocation in @react-three/fiber
+**Learning:** Passing a new array instance (e.g., `[new Float32Array(...)]`) inline to `<bufferAttribute args={...} />` triggers a costly WebGL buffer reallocation on every single frame render within `useFrame` or when the component updates, severely degrading frame rates and creating massive garbage collection overhead.
+**Action:** Always memoize the underlying typed array (like `Float32Array`) directly and pass the stable array reference to the `args` prop, instead of memoizing an intermediate structure and constructing the typed array in the render function.
