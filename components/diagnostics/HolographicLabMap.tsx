@@ -72,15 +72,16 @@ const BiomarkerNode = ({
 }
 
 const ConnectionLines = () => {
-  const points = useMemo(() => {
-    const p = []
+  const bufferArgs = useMemo(() => {
+    const coords: number[] = []
     for (let i = 0; i < BIOMARKER_MAP.length; i++) {
       for (let j = i + 1; j < BIOMARKER_MAP.length; j++) {
-        p.push(new THREE.Vector3(...BIOMARKER_MAP[i].position))
-        p.push(new THREE.Vector3(...BIOMARKER_MAP[j].position))
+        coords.push(...BIOMARKER_MAP[i].position)
+        coords.push(...BIOMARKER_MAP[j].position)
       }
     }
-    return p
+    // Fully memoize the args array to prevent WebGL buffer reallocation in R3F
+    return [new Float32Array(coords), 3] as [Float32Array, number]
   }, [])
 
   return (
@@ -88,7 +89,7 @@ const ConnectionLines = () => {
       <bufferGeometry attach="geometry">
         <bufferAttribute
           attach="attributes-position"
-          args={[new Float32Array(points.flatMap(p => [p.x, p.y, p.z])), 3]}
+          args={bufferArgs}
         />
       </bufferGeometry>
       <lineBasicMaterial attach="material" color="#6abf8a" transparent opacity={0.1} />
@@ -96,7 +97,7 @@ const ConnectionLines = () => {
   )
 }
 
-export default function HolographicLabMap({ results = [] }: Props) {
+export default React.memo(function HolographicLabMap({ results = [] }: Props) {
   const [hovered, setHovered] = useState<Biomarker | null>(null)
 
   return (
@@ -154,4 +155,4 @@ export default function HolographicLabMap({ results = [] }: Props) {
       </div>
     </div>
   )
-}
+})
