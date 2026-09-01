@@ -1,0 +1,3 @@
+## 2024-03-24 - HolographicLabMap O(N) Lookup Optimization
+**Learning:** In visualization components mapping large constant datasets against variable props (like `HolographicLabMap` mapping `BIOMARKER_MAP` to `results`), rendering elements using `results.find()` scales poorly, causing an $O(N \times M)$ nested lookup on every render.
+**Action:** Use `useMemo` to pre-process the variable array (e.g. `results`) into a `Record` or `Map`, allowing constant-time O(1) lookups during the render map step. This reduces iteration from $O(N \times M)$ to $O(N + M)$ and saves substantial compute cycles during animations or frequent state updates.
