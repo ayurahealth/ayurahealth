@@ -1,0 +1,3 @@
+## 2026-04-27 - Preventing Heavy List Re-renders during Next.js App Router Streaming
+**Learning:** In Next.js App Router client components that handle streaming AI responses, every streamed chunk updates the parent component's state (e.g., `streaming` state). If the parent also maps over a history array to render heavy items like `ReactMarkdown` (e.g., `MessageItem`), the *entire list* will needlessly re-render on every chunk unless explicitly memoized. This caused significant client-side latency.
+**Action:** Always wrap list items in `React.memo` and memoize any passed callback functions (using `useCallback`) when rendering history components that sit alongside actively updating streaming state.
