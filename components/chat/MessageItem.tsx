@@ -51,16 +51,21 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+const MessageItem = ({
   msg,
   doshaColor,
   voiceSupported,
   isSpeaking,
   onSpeakText,
   onSelectSource,
-}: MessageItemProps) {
+}: MessageItemProps) => {
   const isAssistant = msg.role === 'assistant'
 
+  // ⚡ Bolt Optimization:
+  // Wrapped MessageItem in React.memo to prevent unnecessary re-renders of the expensive
+  // Markdown content (ClinicalMarkdown) inside chat messages when the parent (ChatMessagesPanel)
+  // updates, such as during streaming or input typing.
+  // Expected impact: Significant reduction in CPU time during rapid text streaming.
   return (
     <motion.div
       initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -228,3 +233,5 @@ export default function MessageItem({
     </motion.div>
   )
 }
+
+export default React.memo(MessageItem)

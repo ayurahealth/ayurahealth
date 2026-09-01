@@ -181,7 +181,10 @@ function ChatPageContent() {
     setShowLinkInput(false)
   }
 
-  const handleSpeak = (text: string) => {
+  // ⚡ Bolt Optimization:
+  // Memoize the handlers passed to MessageItem so that React.memo() functions properly
+  // and prevents re-renders on every parent state update.
+  const handleSpeak = useCallback((text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
       setIsSpeaking(false)
@@ -192,7 +195,10 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }
+  }, [isSpeaking, setIsSpeaking]) // vaidyaVoice is imported globally
+
+  // ⚡ Bolt Optimization: Memoized inline function passed to child components
+  const handleSelectSource = useCallback(() => {}, [])
 
   const handleShare = async () => {
     if (!dosha) return
@@ -298,7 +304,7 @@ function ChatPageContent() {
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={() => {}}
+          onSelectSource={handleSelectSource}
           analyser={analyser}
           userId={clerk.user?.id}
         />
