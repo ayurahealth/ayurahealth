@@ -1,0 +1,3 @@
+## 2024-06-04 - Adding ARIA labels to dynamically changing buttons
+**Learning:** In highly interactive components like `ChatComposer.tsx`, buttons that toggle state (like the microphone recording button) need dynamic `aria-label` and `title` attributes (e.g., `aria-label={isListening ? "Stop listening" : "Start listening"}`) to accurately announce the current state to screen readers and provide contextually correct tooltips.
+**Action:** When adding accessibility attributes to buttons that manage boolean states, always ensure the attributes rely on the state variable rather than statically hardcoding a generic label.

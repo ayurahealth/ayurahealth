@@ -190,6 +190,8 @@ export default function ChatComposer({
                 <button 
                   onClick={() => onRemoveAttachment(att.id)} 
                   style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2, display: 'flex' }}
+                  aria-label="Remove attachment"
+                  title="Remove attachment"
                 >
                   <X size={12} />
                 </button>
@@ -234,6 +236,8 @@ export default function ChatComposer({
               disabled={!isValidUrl(linkInput)} 
               className="btn-primary"
               style={{ padding: '0 1rem', borderRadius: 10, fontSize: '0.8rem', height: 36, opacity: isValidUrl(linkInput) ? 1 : 0.5 }}
+              aria-label="Trace URL"
+              title="Trace URL"
             >
               Trace
             </button>
@@ -298,6 +302,8 @@ export default function ChatComposer({
                   background: 'transparent', color: 'var(--text-muted)', border: 'none',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
                 }}
+                aria-label="Attach file"
+                title="Attach file"
               >
                 <Paperclip size={18} />
               </button>
@@ -310,6 +316,8 @@ export default function ChatComposer({
                   background: 'transparent', color: showLinkInput ? 'var(--accent-main)' : 'var(--text-muted)', border: 'none',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
                 }}
+                aria-label="Toggle link input"
+                title="Toggle link input"
               >
                 <LinkIcon size={18} />
               </button>
@@ -322,6 +330,8 @@ export default function ChatComposer({
                     background: 'transparent', color: isListening ? 'var(--accent-secondary)' : 'var(--text-muted)', border: 'none',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
                   }}
+                  aria-label={isListening ? "Stop listening" : "Start listening"}
+                  title={isListening ? "Stop listening" : "Start listening"}
                 >
                   {isListening ? <Square size={16} fill="currentColor" /> : <Mic size={18} />}
                 </button>
@@ -354,6 +364,8 @@ export default function ChatComposer({
                   opacity: loading || (!input.trim() && attachments.length === 0) ? 0.3 : 1,
                   boxShadow: !input.trim() ? 'none' : '0 10px 20px hsla(144, 20%, 60%, 0.1)'
                 }}
+                aria-label="Send message"
+                title="Send message"
               >
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={20} strokeWidth={2.5} />}
               </button>
