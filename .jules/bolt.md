@@ -1,0 +1,3 @@
+## 2025-05-16 - Chat List React.memo Optimization
+**Learning:** In Next.js App Router client components, long lists of complex elements (like chat messages rendering Markdown) must be wrapped in `React.memo` with memoized event handler props (`useCallback`). Without this, the entire list forces a full re-render on every keystroke or streaming text chunk update, severely bottlenecking main thread performance. Inline empty functions for props also break memoization.
+**Action:** Always wrap heavy list items in `React.memo` and define event handler callbacks outside the JSX payload using `useCallback` when passing them as props to memoized components.

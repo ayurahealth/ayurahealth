@@ -18,7 +18,7 @@ try {
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_URL.startsWith('http')) {
     redis = Redis.fromEnv()
   }
-} catch (e) {
+} catch {
   console.warn("Invalid Upstash Redis configuration detected, falling back to permissive mode.");
 }
 
@@ -42,8 +42,8 @@ export async function checkRateLimitDistributed(identifier: string): Promise<boo
   try {
     const { success } = await ratelimit.limit(identifier)
     return success
-  } catch (err) {
-    console.error('RATE_LIMIT_ERROR', err)
+  } catch {
+    console.error('RATE_LIMIT_ERROR')
     // Fail open if Redis is down
     return true 
   }

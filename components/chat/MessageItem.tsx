@@ -51,7 +51,8 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+// ⚡ Bolt: Wrapped MessageItem with React.memo to avoid re-rendering entire chat list during streaming and user typing
+const MessageItem = React.memo(function MessageItem({
   msg,
   doshaColor,
   voiceSupported,
@@ -227,4 +228,6 @@ export default function MessageItem({
       </div>
     </motion.div>
   )
-}
+})
+
+export default MessageItem
