@@ -1,0 +1,3 @@
+## 2024-07-13 - N+1 Queries in Prisma Sync Loops
+**Learning:** Found an N+1 query bottleneck in `app/api/profile/sync/route.ts` where sequential `findFirst` and `create` operations were used inside a loop for syncing user memories. In Next.js/Prisma APIs, doing this can drastically slow down bulk sync operations and overload the database connection.
+**Action:** Always replace N+1 loops with a single `findMany` using an `in:` clause, perform in-memory difference checking using a `Set` (updated during iteration using `.reduce()` to handle intra-payload duplicates), and execute a bulk `createMany`.
