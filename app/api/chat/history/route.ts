@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { currentUser } from '@clerk/nextjs/server'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -7,6 +8,12 @@ export async function GET(req: NextRequest) {
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
+  }
+
+  // 🛡️ Sentinel: Enforce authorization to prevent IDOR
+  const user = await currentUser()
+  if (!user || user.id !== userId) {
+    return NextResponse.json({ error: 'Unauthorized access to clinical history' }, { status: 401 })
   }
 
   try {
