@@ -11,7 +11,7 @@ interface ClinicalMarkdownProps {
   className?: string
 }
 
-export default function ClinicalMarkdown({ 
+const ClinicalMarkdown = React.memo(function ClinicalMarkdown({
   content, 
   doshaColor = 'var(--accent-main)',
   className = '' 
@@ -120,4 +120,6 @@ export default function ClinicalMarkdown({
       </ReactMarkdown>
     </div>
   )
-}
+})
+
+export default ClinicalMarkdown

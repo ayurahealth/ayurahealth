@@ -1,0 +1,3 @@
+## 2024-05-24 - React.memo on ClinicalMarkdown
+**Learning:** ReactMarkdown inside `ClinicalMarkdown` is an expensive component to re-render, especially with complex custom component mappings and regex pre-processing. Since it is rendered for every message in the chat and during streaming, and its props (`content` and `doshaColor`) are often static after streaming finishes, not memoizing it causes unnecessary re-renders of the entire markdown tree when the parent `MessageItem` or `ChatMessagesPanel` re-renders.
+**Action:** Always wrap heavy markdown rendering components with `React.memo`, especially when they are part of a list or chat interface where parent state changes frequently.
