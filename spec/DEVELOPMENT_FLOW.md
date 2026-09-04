@@ -84,7 +84,7 @@ docs(spec): add architecture and agent documentation
 
 ```
 1. audit-and-guard
-   ├── Secret Scan (grep for sk_live, hardcoded keys)
+   ├── Secret Scan (grep for sk_***, hardcoded keys)
    └── Branch Policy Guard
 
 2. build-and-verify

@@ -1,0 +1,3 @@
+## 2024-09-04 - ARIA labels in Chat Composer
+**Learning:** Found that core action buttons (attach file, add link, voice input, send message) in the complex `ChatComposer` component are entirely reliant on SVG icons (`Paperclip`, `LinkIcon`, `Mic`, `ArrowRight`) without any accessible names (aria-labels). This makes the primary interaction point of the application completely inaccessible to screen reader users, who will just hear "button" for each of these distinct actions.
+**Action:** When auditing highly interactive components, especially those with multiple icon-only buttons clustered together, always prioritize checking for aria-labels.
