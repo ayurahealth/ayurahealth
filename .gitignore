@@ -1,6 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# ── Dependencies ─────────────────────────────────────────────
 /node_modules
 /.pnp
 .pnp.*
@@ -10,53 +8,39 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# ── Build outputs ────────────────────────────────────────────
 /.next/
 /out/
-
-# production
 /build
+.vercel
 
-# misc
+# ── Environment files (NEVER commit real secrets) ────────────
+.env
+.env.*
+.envrc
+!.env.example
+
+# ── TypeScript ───────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Database ─────────────────────────────────────────────────
+/lib/generated/prisma
+*.db
+*.db-journal
+
+# ── OS files ─────────────────────────────────────────────────
 .DS_Store
-*.pem
+Thumbs.db
 
-# debug
+# ── Debug logs ───────────────────────────────────────────────
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 build_log*.txt
 
-# env files (can opt-in for committing if needed)
-.env*
-.envrc
-.env.local
-.env.production
-.env.development
-.env.test
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-/lib/generated/prisma
-*.db
-*.db-journal
-.env*.local
-
-# AyuraHealth Temp Metadata
-.payment-flow-report.json
-.security-audit-report.json
-.antigravityrc
-
-# secrets and credentials
+# ── Secrets and credentials ──────────────────────────────────
 *.key
 *.p12
 *.pfx
@@ -66,8 +50,24 @@ credentials*.json
 service-account*.json
 secrets*.json
 
-# IDEs
+# ── IDE ──────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# ── Project-specific ─────────────────────────────────────────
+.payment-flow-report.json
+.security-audit-report.json
+.antigravityrc
+scratch.js
+
+# ── iOS / Capacitor ──────────────────────────────────────────
+ios/Pods/
+ios/.xcode.env.local
+ios/App/App/public/
+
+# ── Testing ──────────────────────────────────────────────────
+/coverage
+/playwright-report
+/test-results
