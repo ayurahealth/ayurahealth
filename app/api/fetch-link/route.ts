@@ -10,8 +10,9 @@ export async function POST(req: NextRequest) {
     let res: Response | null = null;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
-    const dns = require('dns/promises');
+    const dns = await import('dns/promises');
 
+    let html = '';
     try {
       for (let i = 0; i < 3; i++) {
         let parsedUrl: URL;
@@ -21,7 +22,8 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
         }
 
-        const host = parsedUrl.hostname.replace(/\.$/, '').replace(/^\[(.*)\]$/, '$1');
+        const originalHost = parsedUrl.hostname;
+        const host = originalHost.replace(/\.$/, '').replace(/^\[(.*)\]$/, '$1');
 
         let address, family;
         try {
@@ -32,26 +34,38 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: 'DNS resolution failed' }, { status: 400 });
         }
 
+        let checkAddress = address;
+        let checkFamily = family;
+        if (family === 6 && address.startsWith('::ffff:')) {
+          checkAddress = address.substring(7);
+          checkFamily = 4;
+        }
+
         let isPrivate = false;
-        if (family === 4) {
-          const parts = address.split('.').map(Number);
+        if (checkFamily === 4) {
+          const parts = checkAddress.split('.').map(Number);
           isPrivate = parts[0] === 127 || parts[0] === 10 ||
             (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
             (parts[0] === 192 && parts[1] === 168) ||
             (parts[0] === 169 && parts[1] === 254) ||
             parts[0] === 0;
-        } else if (family === 6) {
-          isPrivate = address === '::1' || address === '::' ||
-            address.startsWith('fe80:') || address.startsWith('fc00:') || address.startsWith('fd00:') ||
-            address.startsWith('::ffff:127.');
+        } else if (checkFamily === 6) {
+          isPrivate = checkAddress === '::1' || checkAddress === '::' ||
+            checkAddress.startsWith('fe80:') || checkAddress.startsWith('fc00:') || checkAddress.startsWith('fd00:');
         }
 
         if (isPrivate) {
           return NextResponse.json({ error: 'Fetching private IP addresses is blocked' }, { status: 403 });
         }
 
-        res = await fetch(currentUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
+        const fetchUrl = new URL(currentUrl);
+        fetchUrl.hostname = checkFamily === 6 ? `[${address}]` : address;
+
+        res = await fetch(fetchUrl.toString(), {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0',
+            'Host': parsedUrl.host
+          },
           signal: controller.signal,
           redirect: 'manual'
         });
@@ -63,13 +77,13 @@ export async function POST(req: NextRequest) {
 
         break;
       }
+
+      if (!res || !res.ok) return NextResponse.json({ error: 'Could not fetch URL' }, { status: 400 })
+
+      html = await res.text()
     } finally {
       clearTimeout(timeoutId);
     }
-
-    if (!res || !res.ok) return NextResponse.json({ error: 'Could not fetch URL' }, { status: 400 })
-
-    const html = await res.text()
 
     // Extract title
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
