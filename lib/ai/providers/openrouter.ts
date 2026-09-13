@@ -14,8 +14,17 @@ import type {
 
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
+function cleanKey(val?: string): string {
+  if (!val) return ''
+  let k = val.trim()
+  if ((k.startsWith('"') && k.endsWith('"')) || (k.startsWith("'") && k.endsWith("'"))) {
+    k = k.slice(1, -1).trim()
+  }
+  return k
+}
+
 function getApiKey(): string {
-  return process.env.OPENROUTER_API_KEY || ''
+  return cleanKey(process.env.OPENROUTER_API_KEY || '')
 }
 
 /** Maps user-facing model preference to OpenRouter model IDs */
