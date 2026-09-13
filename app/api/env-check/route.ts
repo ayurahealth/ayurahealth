@@ -32,8 +32,13 @@ export async function GET() {
     RAZORPAY_KEY_SECRET: !!(process.env.RAZORPAY_KEY_SECRET || process.env.razorpay_Live_Key_Secret),
   }
 
+  const definedKeys = Object.keys(process.env)
+    .filter(k => !k.startsWith('npm_') && !k.startsWith('__') && !k.startsWith('NODE_') && !k.startsWith('VERCEL_') && !k.startsWith('AWS_'))
+    .sort()
+
   return NextResponse.json({
     status: 'diagnostic',
     environment: envStatus,
+    configuredVariableNames: definedKeys,
   })
 }
