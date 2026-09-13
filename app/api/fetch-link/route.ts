@@ -15,7 +15,7 @@ function isPrivateIP(ip: string) {
   return /^(fc|fd|fe80)/i.test(ip)
 }
 
-function fetchSafe(url: string, signal: AbortSignal): Promise<{ status: number, headers: any, text: () => Promise<string> }> {
+function fetchSafe(url: string, signal: AbortSignal): Promise<{ status: number, headers: http.IncomingHttpHeaders, text: () => Promise<string> }> {
   return new Promise(async (resolve, reject) => {
     try {
       const parsedUrl = new URL(url);
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
 
     let currentUrl = url;
-    let res: { status: number, headers: any, text: () => Promise<string> } | null = null;
+    let res: { status: number, headers: http.IncomingHttpHeaders, text: () => Promise<string> } | null = null;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
