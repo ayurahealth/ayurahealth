@@ -29,13 +29,13 @@ function getApiKey(): string {
 
 /** Maps user-facing model preference to OpenRouter model IDs */
 export const OPENROUTER_MODEL_MAP: Record<string, string> = {
-  auto: 'meta-llama/llama-3.3-70b-instruct',
+  auto: 'meta-llama/llama-3.3-70b-instruct:free',
   claude: 'anthropic/claude-3.5-sonnet',
   gpt: 'openai/gpt-4o-mini',
-  gemini: 'google/gemini-2.0-flash-001',
-  deepseek: 'deepseek/deepseek-r1',
-  mistral: 'mistralai/mistral-large-2411',
-  llama: 'meta-llama/llama-3.3-70b-instruct',
+  gemini: 'google/gemini-2.0-flash-lite:free',
+  deepseek: 'deepseek/deepseek-r1:free',
+  mistral: 'mistralai/mistral-small-24b-instruct-2501:free',
+  llama: 'meta-llama/llama-3.3-70b-instruct:free',
 }
 
 interface OpenRouterChoice {
@@ -168,29 +168,34 @@ export class OpenRouterProvider implements LLMProvider {
 
   async fetchStreamingCompletion(request: CompletionRequest): Promise<ReadableStream<Uint8Array>> {
     const encoder = new TextEncoder()
+    const payload: Record<string, unknown> = {
+      model: request.model,
+      messages: this.formatMessages(request.messages),
+      max_tokens: request.maxTokens,
+      temperature: request.temperature,
+      stream: true,
+    }
+    if (request.tools && request.tools.length > 0) {
+      payload.tools = request.tools.map(t => ({
+        type: 'function' as const,
+        function: {
+          name: t.name,
+          description: t.description,
+          parameters: t.parameters
+        }
+      }))
+    }
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: this.buildHeaders(),
-      body: JSON.stringify({
-        model: request.model,
-        messages: this.formatMessages(request.messages),
-        tools: request.tools?.map(t => ({
-          type: 'function' as const,
-          function: {
-            name: t.name,
-            description: t.description,
-            parameters: t.parameters
-          }
-        })),
-        max_tokens: request.maxTokens,
-        temperature: request.temperature,
-        stream: true,
-      }),
+      body: JSON.stringify(payload),
       signal: request.signal,
     })
 
     if (!response.ok || !response.body) {
-      throw new Error(`OpenRouter streaming error ${response.status}`)
+      const errorText = await response.text().catch(() => response.statusText)
+      throw new Error(`OpenRouter streaming error ${response.status}: ${errorText}`)
     }
 
     const reader = response.body.getReader()
