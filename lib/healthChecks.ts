@@ -14,7 +14,12 @@ function hasEnv(key: string | undefined): boolean {
 }
 
 export function getVaidyaCheck(): VaidyaCheck {
-  const groqConfigured = hasEnv(process.env.GROQ_API_KEY)
+  const groqConfigured = hasEnv(
+    process.env.GROQ_API_KEY ||
+    process.env.GROK_API_KEY ||
+    process.env.GROQ_KEY ||
+    process.env.GROQ_APIKEY
+  )
   const openRouterConfigured = hasEnv(process.env.OPENROUTER_API_KEY)
   return {
     groqConfigured,

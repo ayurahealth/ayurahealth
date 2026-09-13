@@ -18,7 +18,12 @@ export async function GET() {
     POSTGRES_URL: !!process.env.POSTGRES_URL,
     UPSTASH_REDIS_REST_URL: !!process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_URL_VALID: process.env.UPSTASH_REDIS_REST_URL?.startsWith('http') || false,
-    GROQ_API_KEY: !!process.env.GROQ_API_KEY,
+    GROQ_API_KEY: !!(
+      process.env.GROQ_API_KEY ||
+      process.env.GROK_API_KEY ||
+      process.env.GROQ_KEY ||
+      process.env.GROQ_APIKEY
+    ),
     OPENROUTER_API_KEY: !!process.env.OPENROUTER_API_KEY,
     HUGGINGFACE_API_KEY: !!process.env.HUGGINGFACE_API_KEY,
     CLERK_SECRET_KEY: !!process.env.CLERK_SECRET_KEY,

@@ -14,7 +14,13 @@ import type {
 const API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
 function getApiKey(): string {
-  return process.env.GROQ_API_KEY || ''
+  return (
+    process.env.GROQ_API_KEY ||
+    process.env.GROK_API_KEY ||
+    process.env.GROQ_KEY ||
+    process.env.GROQ_APIKEY ||
+    ''
+  ).trim()
 }
 
 interface GroqChoice {

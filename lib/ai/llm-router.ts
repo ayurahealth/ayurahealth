@@ -95,7 +95,12 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
   }
 
   // Auto mode: Groq first (fastest), then OpenRouter, then Ollama
-  const hasGroq = Boolean(process.env.GROQ_API_KEY)
+  const hasGroq = Boolean(
+    process.env.GROQ_API_KEY ||
+    process.env.GROK_API_KEY ||
+    process.env.GROQ_KEY ||
+    process.env.GROQ_APIKEY
+  )
   const hasOpenRouter = Boolean(process.env.OPENROUTER_API_KEY)
 
   if (hasGroq) {
