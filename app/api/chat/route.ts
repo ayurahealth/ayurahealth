@@ -249,16 +249,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    let streamFailureReason = ''
     const streamResult = await executeStreamingCompletion(
       { model: '', messages: currentMessages, maxTokens, temperature },
       { modelPreference: preferredModel, hasImages, deepThink: effectiveDeepThink },
     ).catch(err => {
-      log.error('ALL_PROVIDERS_FAILED', { error: String(err) })
+      streamFailureReason = err instanceof Error ? err.message : String(err)
+      log.error('ALL_PROVIDERS_FAILED', { error: streamFailureReason })
       return null
     })
 
     if (!streamResult) {
-      return NextResponse.json({ error: 'AI service temporarily unavailable.' }, { status: 500 })
+      return NextResponse.json({ 
+        error: streamFailureReason || 'AI service temporarily unavailable. Please verify your Groq/OpenRouter API key.' 
+      }, { status: 500 })
     }
 
     return new NextResponse(createCompositeStream({

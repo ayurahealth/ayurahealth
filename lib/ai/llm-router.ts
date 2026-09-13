@@ -190,6 +190,7 @@ export async function executeStreamingCompletion(
 ): Promise<{ stream: ReadableStream<Uint8Array>; provider: string; model: string }> {
   const { provider, model, fallbackChain } = routeRequest(config)
   const requestWithModel = { ...request, model }
+  const errors: string[] = []
 
   // Try primary provider
   try {
@@ -197,10 +198,12 @@ export async function executeStreamingCompletion(
     log.info('LLM_STREAM_START', { provider: provider.name, model })
     return { stream, provider: provider.name, model }
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    errors.push(`${provider.name}: ${msg}`)
     log.warn('LLM_STREAM_PRIMARY_FAILED', {
       provider: provider.name,
       model,
-      error: err instanceof Error ? err.message : String(err),
+      error: msg,
     })
   }
 
@@ -215,15 +218,17 @@ export async function executeStreamingCompletion(
       })
       return { stream, provider: fallback.provider.name, model: fallback.model }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      errors.push(`${fallback.provider.name}: ${msg}`)
       log.warn('LLM_STREAM_FALLBACK_FAILED', {
         provider: fallback.provider.name,
         model: fallback.model,
-        error: err instanceof Error ? err.message : String(err),
+        error: msg,
       })
     }
   }
 
-  throw new Error('All AI providers failed to start streaming.')
+  throw new Error(`All AI providers failed. ${errors.join(' | ')}`)
 }
 
 /**
