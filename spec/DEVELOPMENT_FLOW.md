@@ -37,25 +37,74 @@ npm run dev
 # Opens at http://localhost:3000
 ```
 
-## Feature Development Workflow
+## Mandatory Development Lifecycle Protocol
 
-```bash
-# Create feature branch
-git checkout -b feature/your-feature-name
+For every single task, feature, or bug fix, we strictly follow this end-to-end lifecycle:
 
-# ... develop and test locally ...
-
-# Type check before committing
-npm run typecheck
-
-# Stage and commit
-git add -A
-git commit -m "feat: your description"
-
-# Push and open PR
-git push origin feature/your-feature-name
-# Open PR on GitHub → merge to main
 ```
+ 1. 📝 CREATE ISSUE       → Define the problem / feature on GitHub
+ 2. 📋 REVIEW REQS        → Analyze requirements and constraints
+ 3. 🌿 CREATE BRANCH      → Checkout `feat/xyz` or `fix/issue-123`
+ 4. 📐 IMPLEMENTATION PLAN → Draft technical plan and changes
+ 5. 👤 HUMAN APPROVAL     → Present plan and obtain explicit approval
+ 6. 💻 DEVELOPMENT        → Write clean, type-safe code
+ 7. 🧪 TEST & VERIFY      → Run `npm run typecheck` & smoke checks
+ 8. 📦 COMMIT & PUSH      → Conventional commit & push branch to origin
+ 9. 🔀 CREATE PR          → Open Pull Request against `main`
+10. 🧐 REVIEW PR          → Inspect diff & ensure CI checks pass
+11. 🚀 MERGE PR           → Merge into `main` & sync `deploy/production-gold`
+12. 🧹 DELETE BRANCH      → Remove merged local & remote feature branches
+13. ✅ CLOSE ISSUE        → Update and close the GitHub issue
+14. 🔄 NEXT TASK          → Return to step 1 for the next item
+```
+
+---
+
+## Step-by-Step Command Guide
+
+### 1. Issue & Branch Creation
+```bash
+# Checkout latest main
+git checkout main
+git pull origin main
+
+# Create dedicated feature/fix branch
+git checkout -b fix/issue-description # or feat/feature-name
+```
+
+### 2. Plan & Human Approval
+- In Planning Mode, create the design doc / implementation plan.
+- Wait for the user's explicit approval before writing code.
+
+### 3. Development & Local Testing
+```bash
+# Execute changes...
+# Verify zero TypeScript errors
+npm run typecheck
+```
+
+### 4. Commit & Push Branch
+```bash
+git add -A
+git commit -m "feat(scope): concise description"
+git push origin feat/feature-name
+```
+
+### 5. Pull Request, Merge & Branch Cleanup
+```bash
+# Merge to main
+git checkout main
+git pull origin main
+git merge feat/feature-name
+git push origin main
+git push origin main:deploy/production-gold
+
+# Delete feature branch locally and remotely
+git branch -d feat/feature-name
+git push origin --delete feat/feature-name
+```
+
+---
 
 ## Commit Convention (Conventional Commits)
 

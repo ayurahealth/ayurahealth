@@ -8,6 +8,24 @@ This file provides context for AI coding assistants (Claude, Gemini, etc.) worki
 
 **Stack**: Next.js 15 (App Router) · TypeScript · Prisma · Supabase (PostgreSQL + pgvector) · Clerk Auth · Groq/OpenRouter LLMs · Vercel
 
+## Mandatory Development Lifecycle Protocol
+
+For every new task or feature:
+1. **Create/Identify Issue** on GitHub
+2. **Review Requirements** & dependencies
+3. **Create Branch** (`feat/...` or `fix/...`)
+4. **Draft Implementation Plan** in Planning Mode
+5. **Obtain Human Approval** before modifying code
+6. **Development** with TypeScript strict safety
+7. **Test Locally** (`npm run typecheck`)
+8. **Commit & Push Branch** (Conventional Commits)
+9. **Create PR** on GitHub
+10. **Review PR** & ensure CI passes
+11. **Merge PR** to `main` & sync `deploy/production-gold`
+12. **Delete Feature Branch**
+13. **Update & Close Issue**
+14. **Cycle** $\rightarrow$ Return to step 1 for the next task
+
 ## Critical Rules for AI Assistants
 
 ### 1. Never break the build
