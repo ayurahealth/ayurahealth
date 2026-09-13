@@ -1,0 +1,4 @@
+## 2026-09-13 - SSRF Vulnerability in Next.js API Routes
+**Vulnerability:** Found a critical Server-Side Request Forgery (SSRF) vulnerability in `/api/fetch-link` where user-provided URLs were fetched directly. An attacker could bypass perimeter defenses and access internal networks (like cloud metadata endpoints 169.254.169.254, internal services, etc.).
+**Learning:** Next.js `fetch()` can be manipulated via DNS rebinding and redirect chains to point to internal services.
+**Prevention:** Always use `redirect: 'manual'` with a redirect loop (max 3 hops) to prevent redirect bypasses. To prevent DNS rebinding (TOCTOU), use `dns.lookup` to resolve the hostname, validate the IP against private blocks, and construct the final fetch URL using the resolved IP (`http://${address}${url.pathname}`) while explicitly maintaining the original `Host` header. Wrap the entire operation in a single `AbortController`/`setTimeout`.
