@@ -1,3 +1,4 @@
+import { IncomingMessage } from 'http';
 import { NextRequest, NextResponse } from 'next/server'
 import dns from 'dns';
 import { promisify } from 'util';
@@ -82,7 +83,7 @@ async function safeFetchWithNative(urlStr: string, maxRedirects = 3): Promise<st
         };
 
         const result: { redirect?: string, data?: string } = await new Promise((resolve, reject) => {
-            const req = client.request(options, (res: any) => {
+            const req = client.request(options, (res: IncomingMessage) => {
                 if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                     const nextUrl = new URL(res.headers.location, currentUrl).toString();
                     resolve({ redirect: nextUrl });
@@ -95,7 +96,7 @@ async function safeFetchWithNative(urlStr: string, maxRedirects = 3): Promise<st
                 }
 
                 let data = '';
-                res.on('data', (chunk: any) => data += chunk);
+                res.on('data', (chunk: Buffer) => data += chunk);
                 res.on('end', () => resolve({ data }));
             });
 
