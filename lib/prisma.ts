@@ -12,7 +12,14 @@ const createPrismaClient = () => {
     process.env.POSTGRES_URL_NON_POOLING
   if (!connectionString) {
     console.warn('⚠️ WARNING: DATABASE_URL / POSTGRES_PRISMA_URL is not set. Prisma operations will fail if executed.');
+
+    // Pass a dummy connection string instead of no adapter to bypass Prisma 7 validation
+    // The client will fail if actually used, which matches the previous behavior.
+    const pool = new pg.Pool({ connectionString: 'postgres://dummy:dummy@localhost:5432/dummy' })
+    const adapter = new PrismaPg(pool)
+
     return new PrismaClient({
+      adapter,
       log: process.env.NODE_ENV === 'development' ? ['error'] : [],
     });
   }
