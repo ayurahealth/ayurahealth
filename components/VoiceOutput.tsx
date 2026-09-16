@@ -45,6 +45,7 @@ export default function VoiceOutput({ text, language }: VoiceOutputProps) {
 
   return (
     <button
+      aria-label={isPlaying ? 'Stop' : 'Listen'}
       onClick={isPlaying ? stop : speak}
       style={{
         background: isPlaying ? '#e8835a' : '#6abf8a',
