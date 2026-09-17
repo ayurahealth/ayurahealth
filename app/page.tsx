@@ -8,15 +8,8 @@ import { CreditCard, Hospital, Zap, Activity, BookOpen, ArrowRight, MessageSquar
 
 import { useTranslation } from '@/lib/i18n/LanguageContext'
 
-export default function LandingPage() {
-  const { language: lang, t } = useTranslation()
-  const isRTL = ['ar', 'fa', 'ur', 'he'].includes(lang)
-  const [teaserPrompt, setTeaserPrompt] = useState('')
-  const [isFocused, setIsFocused] = useState(false)
+const TerminalTypist = React.memo(() => {
   const [terminalText, setTerminalText] = useState('')
-  const router = useRouter()
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
   const fullTerminalText = `> INITIALIZING TRADITION SYNERGY...
 > CROSS-REFERENCING: CHARAKA SAMHITA [CH. 1-4], NEI JING [SEC 2]
 > DETECTING PHYSIOLOGICAL SYNERGY... [VAT+PIT]
@@ -35,6 +28,26 @@ export default function LandingPage() {
     return () => clearInterval(intervalId)
   }, [fullTerminalText])
 
+  return (
+    <>
+      {terminalText}
+      <motion.span
+        animate={{ opacity: [1, 0, 1] }}
+        transition={{ repeat: Infinity, duration: 0.8 }}
+        style={{ display: 'inline-block', width: 8, height: 15, background: 'var(--accent-main)', marginLeft: 4, verticalAlign: 'middle' }}
+      />
+    </>
+  )
+})
+TerminalTypist.displayName = 'TerminalTypist'
+
+export default function LandingPage() {
+  const { language: lang, t } = useTranslation()
+  const isRTL = ['ar', 'fa', 'ur', 'he'].includes(lang)
+  const [teaserPrompt, setTeaserPrompt] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
+  const router = useRouter()
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleTeaserSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -204,12 +217,8 @@ export default function LandingPage() {
               <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'monospace', opacity: 0.6 }}>ayura_neural_engine_synthesis.v1</span>
             </div>
             <div style={{ padding: '3rem', whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--accent-main)', opacity: 0.8, lineHeight: 1.8 }}>
-              {terminalText}
-              <motion.span 
-                animate={{ opacity: [1, 0, 1] }} 
-                transition={{ repeat: Infinity, duration: 0.8 }}
-                style={{ display: 'inline-block', width: 8, height: 15, background: 'var(--accent-main)', marginLeft: 4, verticalAlign: 'middle' }}
-              />
+              {/* ⚡ Bolt: Render isolated typist to prevent parent LandingPage re-renders */}
+              <TerminalTypist />
             </div>
           </div>
         </div>

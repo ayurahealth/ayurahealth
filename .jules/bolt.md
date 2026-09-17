@@ -1,0 +1,3 @@
+## 2024-09-17 - React full text re-render bottleneck on Landing Page
+**Learning:** Found a classic performance anti-pattern on the `app/page.tsx` landing page where a typewriter effect `setInterval` updates state (`terminalText`) 45ms causing the entire `LandingPage` component to re-render for every character added. The `LandingPage` component contains many other static and animated components.
+**Action:** Extract the typewriter effect into its own specialized, isolated component (`TerminalTypist`) that handles its own local state. This prevents the frequent state updates from triggering re-renders in the parent `LandingPage` component.
