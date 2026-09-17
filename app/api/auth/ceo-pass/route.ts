@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +15,17 @@ export async function GET(req: NextRequest) {
   
   const CEO_BYPASS_KEY = process.env.CEO_BYPASS_KEY
   
-  if (!CEO_BYPASS_KEY || key !== CEO_BYPASS_KEY) {
+  let isAuthorized = false;
+  if (CEO_BYPASS_KEY && key) {
+    const keyBuf = Buffer.from(key);
+    const bypassBuf = Buffer.from(CEO_BYPASS_KEY);
+    if (keyBuf.length === bypassBuf.length) {
+      // Security: Use timingSafeEqual to mitigate timing attacks against the bypass token
+      isAuthorized = crypto.timingSafeEqual(keyBuf, bypassBuf);
+    }
+  }
+
+  if (!isAuthorized) {
     return NextResponse.json({ error: 'Unauthorized. Please check your CEO_BYPASS_KEY.' }, { status: 401 })
   }
 
