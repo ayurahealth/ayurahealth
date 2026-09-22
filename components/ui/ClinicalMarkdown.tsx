@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo } from 'react'
+import type { Components } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Activity, Beaker, BookOpen, BarChart2, Zap } from 'lucide-react'
@@ -26,11 +27,8 @@ export default function ClinicalMarkdown({
     .replace(/\*\*⚡ Integrated Regimen \(Priority Actions\)\*\*/g, '### ⚡ PRIORITIZED REGIMEN')
     .replace(/\*\*📚 Verified Lineage\*\*/g, '### 📚 EVIDENCE & PROOF')
 
-  return (
-    <div className={`clinical-markdown clinical-report ${className}`} style={{ '--markdown-accent': doshaColor } as React.CSSProperties}>
-      <ReactMarkdown 
-        remarkPlugins={[remarkGfm]}
-        components={{
+  // Optimize ReactMarkdown by memoizing components to prevent unmounts/remounts during typing/streaming
+  const memoizedComponents: Components = useMemo(() => ({
           h1: ({ children }) => (
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: 'var(--markdown-accent)', marginBottom: '1.5rem', fontWeight: 500 }}>
               {children}
@@ -114,7 +112,13 @@ export default function ClinicalMarkdown({
           thead: ({ children }) => <thead style={{ background: 'var(--surface-mid)', borderBottom: '1px solid var(--border-low)' }}>{children}</thead>,
           th: ({ children }) => <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 700, color: 'var(--text-main)' }}>{children}</th>,
           td: ({ children }) => <td style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--border-low)', color: 'var(--text-muted)' }}>{children}</td>,
-        }}
+  }), [])
+
+  return (
+    <div className={`clinical-markdown clinical-report ${className}`} style={{ '--markdown-accent': doshaColor } as React.CSSProperties}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={memoizedComponents}
       >
         {processedContent}
       </ReactMarkdown>
