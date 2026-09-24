@@ -1,4 +1,5 @@
-import dns from 'dns/promises';
+import dns from 'node:dns/promises';
+import type { LookupAddress } from 'node:dns';
 import http from 'http';
 import https from 'https';
 
@@ -75,11 +76,11 @@ async function requestWithRedirects(
   const hostname = parsedUrl.hostname.replace(/\.$/, '').replace(/^\[(.*)\]$/, '$1');
 
   // Resolve DNS
-  let addresses: dns.LookupAddress[];
+  let addresses: LookupAddress[];
   try {
     addresses = await dns.lookup(hostname, { all: true });
-  } catch (err: any) {
-    throw new SSRFError(`DNS lookup failed: ${err.message}`);
+  } catch (err: unknown) {
+    throw new SSRFError(`DNS lookup failed: ${(err as Error).message}`);
   }
 
   if (!addresses || addresses.length === 0) {
