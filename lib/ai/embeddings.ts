@@ -17,12 +17,11 @@ export async function getEmbedding(text: string): Promise<number[]> {
   // ── High Speed Mode: HuggingFace Inference (Recommended for Production) ───
   const hfKey = process.env.HUGGINGFACE_API_KEY
   if (hfKey || process.env.NODE_ENV === 'production') {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000)
-
       const response = await fetch(
-        'https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2',
+        'https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2',
         {
           method: 'POST',
           headers: { 
@@ -35,12 +34,26 @@ export async function getEmbedding(text: string): Promise<number[]> {
       )
       clearTimeout(timeoutId)
       if (response.ok) {
-        const result = await response.json()
-        if (Array.isArray(result)) return result
+        const result: unknown = await response.json()
+        if (Array.isArray(result)) {
+          const vector = Array.isArray(result[0]) ? result[0] : result
+          if (vector.length > 0 && vector.every((value: unknown) => typeof value === 'number')) {
+            return vector as number[]
+          }
+        }
+      } else {
+        console.warn(`HF_INFERENCE_FAILED: status ${response.status}`)
       }
     } catch (err) {
-      console.warn('HF_INFERENCE_FAILED, falling back to local:', err)
+      clearTimeout(timeoutId)
+      console.warn('HF_INFERENCE_FAILED, falling back to local:', err instanceof Error ? err.name : 'unknown error')
     }
+  }
+
+  // Serverless production filesystems are read-only and local model downloads
+  // are too large for a request fallback. Keep this path for local development.
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Hugging Face embeddings are unavailable. Check HUGGINGFACE_API_KEY and provider access.')
   }
 
   // ── Legacy Mode: Local Transformers.js ─────────────────────────────────────

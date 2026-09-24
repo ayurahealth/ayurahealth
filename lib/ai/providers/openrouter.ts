@@ -27,17 +27,19 @@ function getApiKey(): string {
   return cleanKey(process.env.OPENROUTER_API_KEY || '')
 }
 
+export const OPENROUTER_FREE_ROUTER_MODEL = 'openrouter/free'
+
 /** Maps user-facing model preference to OpenRouter model IDs */
 export const OPENROUTER_MODEL_MAP: Record<string, string> = {
-  // Use OpenRouter's free router so auto mode tracks available free models
-  // instead of pinning a free endpoint that may disappear.
-  auto: 'openrouter/free',
+  // Use a currently available free endpoint; fallbacks also use OpenRouter's
+  // dynamic free router so the app does not depend on a stale :free model slug.
+  auto: 'google/gemma-4-31b-it:free',
   claude: 'anthropic/claude-3.5-sonnet',
   gpt: 'openai/gpt-4o-mini',
   gemini: 'google/gemini-2.0-flash-lite:free',
   deepseek: 'deepseek/deepseek-r1:free',
   mistral: 'mistralai/mistral-small-24b-instruct-2501:free',
-  llama: 'openrouter/free',
+  llama: 'google/gemma-4-31b-it:free',
 }
 
 interface OpenRouterChoice {

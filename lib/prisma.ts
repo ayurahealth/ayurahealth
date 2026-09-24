@@ -17,8 +17,22 @@ const createPrismaClient = () => {
     });
   }
 
-  const pool = new pg.Pool({ 
-    connectionString,
+  let poolConnectionString = connectionString
+  let ssl: { ca: string; rejectUnauthorized: true } | undefined
+  if (process.env.DATABASE_SSL_CA_CERT) {
+    // pg-connection-string replaces the `ssl` object when SSL parameters remain
+    // in the URL. Use the explicitly configured Supabase CA for verification.
+    const parsed = new URL(connectionString)
+    for (const key of ['sslmode', 'sslrootcert', 'sslcert', 'sslkey']) {
+      parsed.searchParams.delete(key)
+    }
+    poolConnectionString = parsed.toString()
+    ssl = { ca: process.env.DATABASE_SSL_CA_CERT, rejectUnauthorized: true }
+  }
+
+  const pool = new pg.Pool({
+    connectionString: poolConnectionString,
+    ...(ssl ? { ssl } : {}),
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,

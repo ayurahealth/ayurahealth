@@ -18,7 +18,7 @@ import type {
 } from './providers/types'
 import { ollamaProvider } from './providers/ollama'
 import { groqProvider } from './providers/groq'
-import { openRouterProvider, OPENROUTER_MODEL_MAP } from './providers/openrouter'
+import { openRouterProvider, OPENROUTER_FREE_ROUTER_MODEL, OPENROUTER_MODEL_MAP } from './providers/openrouter'
 import { huggingFaceProvider } from './providers/huggingface'
 import { log } from '../logger'
 
@@ -42,6 +42,79 @@ const PROVIDER_DEFAULTS = {
   groq: 'llama-3.3-70b-versatile',
   huggingface: 'google/gemma-4-31B-it:novita',
 } as const
+
+const FIRST_CHUNK_TIMEOUT_MS = 20_000
+
+async function fetchResponsiveStream(
+  provider: LLMProvider,
+  request: CompletionRequest,
+): Promise<ReadableStream<Uint8Array>> {
+  const controller = new AbortController()
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
+  const timeoutError = new Error(`${provider.name} did not begin responding within ${FIRST_CHUNK_TIMEOUT_MS / 1000} seconds`)
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort()
+      reject(timeoutError)
+    }, FIRST_CHUNK_TIMEOUT_MS)
+  })
+  const abortFromRequest = () => controller.abort(request.signal?.reason)
+  request.signal?.addEventListener('abort', abortFromRequest, { once: true })
+  if (request.signal?.aborted) abortFromRequest()
+
+  try {
+    const upstream = await Promise.race([
+      provider.fetchStreamingCompletion({ ...request, signal: controller.signal }),
+      timeoutPromise,
+    ])
+    reader = upstream.getReader()
+    const first = await Promise.race([reader.read(), timeoutPromise])
+    if (first.done || !first.value) {
+      throw new Error(`${provider.name} returned an empty response`)
+    }
+
+    let firstChunkPending = true
+    return new ReadableStream<Uint8Array>({
+      async pull(streamController) {
+        if (firstChunkPending) {
+          firstChunkPending = false
+          streamController.enqueue(first.value)
+          return
+        }
+        try {
+          const next = await reader!.read()
+          if (next.done) {
+            reader!.releaseLock()
+            streamController.close()
+          } else if (next.value) {
+            streamController.enqueue(next.value)
+          }
+        } catch (error) {
+          streamController.error(error)
+        }
+      },
+      async cancel(reason) {
+        controller.abort(reason)
+        try {
+          await reader!.cancel(reason)
+        } finally {
+          reader!.releaseLock()
+        }
+      },
+    })
+  } catch (error) {
+    controller.abort()
+    if (reader) {
+      await reader.cancel().catch(() => undefined)
+      try { reader.releaseLock() } catch { /* Reader may already be released. */ }
+    }
+    throw error
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId)
+    request.signal?.removeEventListener('abort', abortFromRequest)
+  }
+}
 
 function isConfigured(...values: Array<string | undefined>): boolean {
   return values.some(value => Boolean(value?.trim()))
@@ -69,7 +142,10 @@ function hasOllamaConfig(): boolean {
 function cloudFallbacks(includeOpenRouter: boolean, includeGroq: boolean, includeOllama = true) {
   return [
     ...(includeOpenRouter && hasOpenRouterConfig()
-      ? [{ provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto }]
+      ? [
+          { provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto },
+          { provider: openRouterProvider, model: OPENROUTER_FREE_ROUTER_MODEL },
+        ]
       : []),
     ...(includeGroq && hasGroqConfig()
       ? [{ provider: groqProvider, model: PROVIDER_DEFAULTS.groq }]
@@ -132,7 +208,12 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
       provider: groqProvider,
       model: PROVIDER_DEFAULTS.groq,
       fallbackChain: [
-        ...(hasOpenRouter ? [{ provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto }] : []),
+        ...(hasOpenRouter
+          ? [
+              { provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto },
+              { provider: openRouterProvider, model: OPENROUTER_FREE_ROUTER_MODEL },
+            ]
+          : []),
         ...(ollamaFallback ? [{ provider: ollamaProvider, model: PROVIDER_DEFAULTS.ollama }] : []),
       ],
     }
@@ -143,6 +224,7 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
       provider: openRouterProvider,
       model: OPENROUTER_MODEL_MAP.auto,
       fallbackChain: [
+        { provider: openRouterProvider, model: OPENROUTER_FREE_ROUTER_MODEL },
         ...(ollamaFallback ? [{ provider: ollamaProvider, model: PROVIDER_DEFAULTS.ollama }] : []),
       ],
     }
@@ -226,7 +308,7 @@ export async function executeStreamingCompletion(
 
   // Try primary provider
   try {
-    const stream = await provider.fetchStreamingCompletion(requestWithModel)
+    const stream = await fetchResponsiveStream(provider, requestWithModel)
     log.info('LLM_STREAM_START', { provider: provider.name, model })
     return { stream, provider: provider.name, model }
   } catch (err) {
@@ -243,7 +325,7 @@ export async function executeStreamingCompletion(
   for (const fallback of fallbackChain) {
     try {
       const fbRequest = { ...request, model: fallback.model }
-      const stream = await fallback.provider.fetchStreamingCompletion(fbRequest)
+      const stream = await fetchResponsiveStream(fallback.provider, fbRequest)
       log.info('LLM_STREAM_FALLBACK_SUCCESS', {
         provider: fallback.provider.name,
         model: fallback.model,
