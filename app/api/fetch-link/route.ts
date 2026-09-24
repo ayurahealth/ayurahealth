@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { fetchWithSSRFProtection, SSRFError } from '@/lib/security/ssrf'
 
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
 
-    const res = await fetch(url, {
+    const res = await fetchWithSSRFProtection(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
-      signal: AbortSignal.timeout(8000),
+      timeout: 8000,
     })
     if (!res.ok) return NextResponse.json({ error: 'Could not fetch URL' }, { status: 400 })
 
@@ -27,7 +28,10 @@ export async function POST(req: NextRequest) {
       .substring(0, 3000)
 
     return NextResponse.json({ title, text, url })
-  } catch {
+  } catch (err) {
+    if (err instanceof SSRFError) {
+      return NextResponse.json({ error: 'Forbidden URL' }, { status: 403 })
+    }
     return NextResponse.json({ error: 'Failed to fetch link' }, { status: 500 })
   }
 }
