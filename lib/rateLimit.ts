@@ -40,8 +40,13 @@ let paymentRatelimit: Ratelimit | null = null
 
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
   try {
+    const redisUrl = new URL(process.env.UPSTASH_REDIS_REST_URL)
+    if (redisUrl.protocol !== 'https:' || !redisUrl.hostname) {
+      throw new Error('Expected a valid HTTPS REST URL')
+    }
+
     redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
+      url: redisUrl.toString(),
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     })
 
@@ -58,8 +63,12 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
       analytics: true,
       prefix: 'ayura:ratelimit:pay',
     })
-  } catch (err) {
-    log.error('REDIS_INIT_FAILED', { error: String(err) })
+  } catch {
+    // Don't echo malformed environment values: they may accidentally contain
+    // a token. Fall back to the in-memory limiter with an actionable message.
+    log.error('REDIS_INIT_FAILED', {
+      error: 'UPSTASH_REDIS_REST_URL must be a valid HTTPS URL; using in-memory rate limits.',
+    })
   }
 }
 

@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
+function isValidHttpsUrl(value?: string): boolean {
+  if (!value) return false
+  try {
+    return new URL(value).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 export async function GET() {
   const dbUrl =
     process.env.DATABASE_URL ||
@@ -17,7 +26,7 @@ export async function GET() {
     POSTGRES_PRISMA_URL: !!process.env.POSTGRES_PRISMA_URL,
     POSTGRES_URL: !!process.env.POSTGRES_URL,
     UPSTASH_REDIS_REST_URL: !!process.env.UPSTASH_REDIS_REST_URL,
-    UPSTASH_REDIS_REST_URL_VALID: process.env.UPSTASH_REDIS_REST_URL?.startsWith('http') || false,
+    UPSTASH_REDIS_REST_URL_VALID: isValidHttpsUrl(process.env.UPSTASH_REDIS_REST_URL),
     GROQ_API_KEY: !!(
       process.env.GROQ_API_KEY ||
       process.env.GROK_API_KEY ||

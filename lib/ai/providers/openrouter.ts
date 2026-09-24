@@ -29,13 +29,15 @@ function getApiKey(): string {
 
 /** Maps user-facing model preference to OpenRouter model IDs */
 export const OPENROUTER_MODEL_MAP: Record<string, string> = {
-  auto: 'meta-llama/llama-3.3-70b-instruct:free',
+  // Use OpenRouter's free router so auto mode tracks available free models
+  // instead of pinning a free endpoint that may disappear.
+  auto: 'openrouter/free',
   claude: 'anthropic/claude-3.5-sonnet',
   gpt: 'openai/gpt-4o-mini',
   gemini: 'google/gemini-2.0-flash-lite:free',
   deepseek: 'deepseek/deepseek-r1:free',
   mistral: 'mistralai/mistral-small-24b-instruct-2501:free',
-  llama: 'meta-llama/llama-3.3-70b-instruct:free',
+  llama: 'openrouter/free',
 }
 
 interface OpenRouterChoice {

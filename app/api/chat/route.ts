@@ -26,6 +26,16 @@ function sanitizeAIResponse(text: string): string {
     .replace(/VAIDYA CLINICAL MEMORY \(PATIENT FILE\):[^\n]*/gi, '')
 }
 
+function getPublicProviderError(error: string): string {
+  if (/OpenRouter[^|]*\b401\b|\b401\b[^|]*OpenRouter/i.test(error)) {
+    return 'OpenRouter rejected its credentials (401). Update OPENROUTER_API_KEY in the production environment, or configure GROQ_API_KEY as a fallback.'
+  }
+  if (/No AI provider is configured/i.test(error)) {
+    return error
+  }
+  return 'AI service is unavailable. Check that a configured provider has valid credentials and is reachable.'
+}
+
 import {
   validateLang,
   validateSystems,
@@ -261,8 +271,8 @@ export async function POST(req: NextRequest) {
 
     if (!streamResult) {
       return NextResponse.json({ 
-        error: streamFailureReason || 'AI service temporarily unavailable. Please verify your Groq/OpenRouter API key.' 
-      }, { status: 500 })
+        error: getPublicProviderError(streamFailureReason || 'AI service temporarily unavailable.')
+      }, { status: 503 })
     }
 
     return new NextResponse(createCompositeStream({

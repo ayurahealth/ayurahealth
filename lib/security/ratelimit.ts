@@ -13,9 +13,18 @@ import { Redis } from "@upstash/redis"
 let redis: Redis | null = null;
 
 try {
-  // Only attempt to initialize if the URL actually looks like a URL
-  // This prevents build crashes when the user misconfigures environment variables in Vercel
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_URL.startsWith('http')) {
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
+  let validHttpsUrl = false
+  if (redisUrl) {
+    try {
+      validHttpsUrl = new URL(redisUrl).protocol === 'https:'
+    } catch {
+      // Invalid configuration falls back to allowing the request.
+    }
+  }
+
+  if (validHttpsUrl && redisToken) {
     redis = Redis.fromEnv()
   }
 } catch (e) {

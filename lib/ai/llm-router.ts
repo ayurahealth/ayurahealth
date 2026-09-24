@@ -43,6 +43,43 @@ const PROVIDER_DEFAULTS = {
   huggingface: 'google/gemma-4-31B-it:novita',
 } as const
 
+function isConfigured(...values: Array<string | undefined>): boolean {
+  return values.some(value => Boolean(value?.trim()))
+}
+
+function hasGroqConfig(): boolean {
+  return isConfigured(
+    process.env.GROQ_API_KEY,
+    process.env.GROK_API_KEY,
+    process.env.GROQ_KEY,
+    process.env.GROQ_APIKEY,
+  )
+}
+
+function hasOpenRouterConfig(): boolean {
+  return isConfigured(process.env.OPENROUTER_API_KEY)
+}
+
+/** Ollama's localhost default is useful in development, but points at the app
+ * server in production. In production it must be explicitly configured. */
+function hasOllamaConfig(): boolean {
+  return isConfigured(process.env.OLLAMA_BASE_URL) || process.env.NODE_ENV !== 'production'
+}
+
+function cloudFallbacks(includeOpenRouter: boolean, includeGroq: boolean, includeOllama = true) {
+  return [
+    ...(includeOpenRouter && hasOpenRouterConfig()
+      ? [{ provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto }]
+      : []),
+    ...(includeGroq && hasGroqConfig()
+      ? [{ provider: groqProvider, model: PROVIDER_DEFAULTS.groq }]
+      : []),
+    ...(includeOllama && hasOllamaConfig()
+      ? [{ provider: ollamaProvider, model: PROVIDER_DEFAULTS.ollama }]
+      : []),
+  ]
+}
+
 /**
  * Determine which provider and model to use for a given request.
  */
@@ -54,9 +91,7 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
     return {
       provider: huggingFaceProvider,
       model: PROVIDER_DEFAULTS.huggingface,
-      fallbackChain: [
-        { provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto },
-      ],
+      fallbackChain: cloudFallbacks(true, false, false),
     }
   }
 
@@ -65,10 +100,7 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
     return {
       provider: ollamaProvider,
       model: PROVIDER_DEFAULTS.ollama,
-      fallbackChain: [
-        { provider: groqProvider, model: PROVIDER_DEFAULTS.groq },
-        { provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto },
-      ],
+      fallbackChain: cloudFallbacks(true, true, false),
     }
   }
 
@@ -77,9 +109,7 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
     return {
       provider: groqProvider,
       model: PROVIDER_DEFAULTS.groq,
-      fallbackChain: [
-        { provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto },
-      ],
+      fallbackChain: cloudFallbacks(true, false),
     }
   }
 
@@ -88,20 +118,14 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
     return {
       provider: openRouterProvider,
       model: OPENROUTER_MODEL_MAP[modelPreference],
-      fallbackChain: [
-        { provider: groqProvider, model: PROVIDER_DEFAULTS.groq },
-      ],
+      fallbackChain: cloudFallbacks(false, true),
     }
   }
 
   // Auto mode: Groq first (fastest), then OpenRouter, then Ollama
-  const hasGroq = Boolean(
-    process.env.GROQ_API_KEY ||
-    process.env.GROK_API_KEY ||
-    process.env.GROQ_KEY ||
-    process.env.GROQ_APIKEY
-  )
-  const hasOpenRouter = Boolean(process.env.OPENROUTER_API_KEY)
+  const hasGroq = hasGroqConfig()
+  const hasOpenRouter = hasOpenRouterConfig()
+  const ollamaFallback = hasOllamaConfig()
 
   if (hasGroq) {
     return {
@@ -109,7 +133,7 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
       model: PROVIDER_DEFAULTS.groq,
       fallbackChain: [
         ...(hasOpenRouter ? [{ provider: openRouterProvider, model: OPENROUTER_MODEL_MAP.auto }] : []),
-        { provider: ollamaProvider, model: PROVIDER_DEFAULTS.ollama },
+        ...(ollamaFallback ? [{ provider: ollamaProvider, model: PROVIDER_DEFAULTS.ollama }] : []),
       ],
     }
   }
@@ -119,12 +143,15 @@ export function routeRequest(config: RoutingConfig): RoutingResult {
       provider: openRouterProvider,
       model: OPENROUTER_MODEL_MAP.auto,
       fallbackChain: [
-        { provider: ollamaProvider, model: PROVIDER_DEFAULTS.ollama },
+        ...(ollamaFallback ? [{ provider: ollamaProvider, model: PROVIDER_DEFAULTS.ollama }] : []),
       ],
     }
   }
 
-  // Last resort: Ollama
+  // Last resort: local Ollama in development, or explicitly configured Ollama.
+  if (!ollamaFallback) {
+    throw new Error('No AI provider is configured. Add a valid GROQ_API_KEY or OPENROUTER_API_KEY in the deployment environment.')
+  }
   return {
     provider: ollamaProvider,
     model: PROVIDER_DEFAULTS.ollama,
@@ -233,7 +260,17 @@ export async function executeStreamingCompletion(
     }
   }
 
-  throw new Error(`All AI providers failed. ${errors.join(' | ')}`)
+  const attemptedProviders = errors.map(error => error.slice(0, error.indexOf(':'))).join(', ')
+  const diagnostic = errors.join(' | ')
+  log.error('LLM_ALL_PROVIDERS_FAILED', { error: diagnostic })
+  if (errors.some(error => /OpenRouter[^|]*\b401\b/i.test(error))) {
+    throw new Error('OpenRouter rejected its credentials (401). Update OPENROUTER_API_KEY or configure GROQ_API_KEY as a fallback.')
+  }
+  throw new Error(
+    attemptedProviders
+      ? `No configured AI provider could complete the request (${attemptedProviders}). Check provider credentials and deployment configuration.`
+      : 'No AI provider is configured. Add a valid GROQ_API_KEY or OPENROUTER_API_KEY in the deployment environment.'
+  )
 }
 
 /**
