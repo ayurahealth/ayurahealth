@@ -70,6 +70,9 @@ export async function fetchWithSSRFProtection(urlStr: string, options: RequestIn
           if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
              clearTimeout(timeoutId);
 
+             // Consume the response stream to prevent socket leaks before processing redirect
+             res.resume();
+
              if (maxRedirects <= 0) {
                  return reject(new Error('Maximum redirects exceeded'));
              }
@@ -89,10 +92,19 @@ export async function fetchWithSSRFProtection(urlStr: string, options: RequestIn
           res.on('data', (chunk) => {
              dataSize += chunk.length;
              if (dataSize > MAX_SIZE) {
-                 res.destroy(new Error('Response size limit exceeded'));
+                 // Destroy the stream securely and emit an error only if it's handled.
+                 res.destroy();
+                 clearTimeout(timeoutId);
+                 reject(new Error('Response size limit exceeded'));
                  return;
              }
              data += chunk;
+          });
+
+          // Handle errors on the response stream to avoid uncaught exceptions
+          res.on('error', (err) => {
+             clearTimeout(timeoutId);
+             reject(err);
           });
 
           res.on('end', () => {
@@ -119,11 +131,6 @@ export async function fetchWithSSRFProtection(urlStr: string, options: RequestIn
              response.json = async () => JSON.parse(data);
              // ArrayBuffer is technically needed for a full mock, but text/json is enough for fetch-link
              response.arrayBuffer = async () => new TextEncoder().encode(data).buffer as ArrayBuffer;
-
-             // Make sure response.ok reflects statusCode
-             Object.defineProperty(response, 'ok', {
-                get: () => res.statusCode ? res.statusCode >= 200 && res.statusCode < 300 : false
-             });
 
              resolve(response);
           });
