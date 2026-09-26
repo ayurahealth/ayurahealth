@@ -1,0 +1,3 @@
+## 2026-09-26 - Memoize markdown components to avoid DOM remounts
+**Learning:** In React, passing an inline object to the `components` prop of `ReactMarkdown` causes the object to be recreated on every render. Because the `components` map determines how the DOM is structured, this breaks referential equality and forces React to completely unmount and remount the entire markdown DOM tree on every state change, severely degrading performance during typing or updates.
+**Action:** Always extract the `components` object into a `useMemo` hook (or outside the component if it has no dependencies) when using `react-markdown` to preserve referential equality and enable efficient DOM diffing.
