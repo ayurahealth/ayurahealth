@@ -292,6 +292,7 @@ export default function ChatComposer({
             <div style={{ display: 'flex', gap: '0.4rem' }}>
               <input ref={fileInputRef} type="file" accept="image/*,.pdf" multiple onChange={onFileSelect} style={{ display: 'none' }} />
               <button 
+                aria-label="Add attachment"
                 onClick={() => fileInputRef.current?.click()} 
                 style={{ 
                   width: 36, height: 36, borderRadius: '10px', 
