@@ -1,0 +1,4 @@
+## 2024-05-24 - IDOR in Chat History API
+**Vulnerability:** Missing authentication and authorization checks in `app/api/chat/history/route.ts`. The endpoint relied entirely on the `userId` query parameter to fetch chat sessions, allowing any user to fetch any other user's chat history by simply providing their `userId`.
+**Learning:** Endpoints that fetch user-specific data must never trust the user ID provided in the request payload or query parameters without verifying it against the authenticated session token (e.g., Clerk's `auth()`). Trusting client-provided IDs leads to Insecure Direct Object Reference (IDOR) vulnerabilities.
+**Prevention:** Always extract the authenticated user's ID from the session token on the server side. If a `userId` is passed as a parameter for administrative purposes or specific workflows, strictly validate that the authenticated user matches the requested `userId` or has the necessary administrative privileges before proceeding.
