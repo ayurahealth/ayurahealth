@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { fetchWithSSRFProtection } from '@/lib/security/ssrf'
 
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
 
-    const res = await fetch(url, {
+    const res = await fetchWithSSRFProtection(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
       signal: AbortSignal.timeout(8000),
     })
