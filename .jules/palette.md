@@ -1,0 +1,3 @@
+## 2023-10-27 - [Missing ARIA labels on Icon-only Buttons in Chat Composer]
+**Learning:** Icon-only buttons used extensively in the app's `ChatComposer` component (e.g., attachment, link toggle, mic toggle) lacked `aria-label` attributes, creating a significant accessibility barrier. Screen reader users would have no context on what these critical actions do, making the primary chat interface unusable.
+**Action:** When implementing icon-only interactive elements anywhere in the app, always include a descriptive `aria-label` that dynamically updates if the action state changes (e.g., "Start listening" vs "Stop listening").
