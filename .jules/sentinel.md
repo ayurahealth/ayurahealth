@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix IDOR in Chat History API
+**Vulnerability:** Insecure Direct Object Reference (IDOR) and Missing Authentication on `/api/chat/history`. The endpoint allowed fetching chat sessions for any user ID by passing a `userId` query parameter without checking if the requester is authenticated or if they own that `userId`.
+**Learning:** Parameterized data endpoints that access user-specific resources need explicit checks. Missing these allows an attacker to extract any user's chat history simply by changing the query parameter. Next.js App Router API handlers don't enforce route-level authorization for query parameters without explicit `auth()` checks from `@clerk/nextjs/server`.
+**Prevention:** Always authenticate requests with `auth()` and strictly validate that any client-provided user IDs match the `authUserId` before returning sensitive data.
