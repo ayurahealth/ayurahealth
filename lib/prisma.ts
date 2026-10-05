@@ -9,12 +9,11 @@ const createPrismaClient = () => {
     process.env.DATABASE_URL ||
     process.env.POSTGRES_PRISMA_URL ||
     process.env.POSTGRES_URL ||
-    process.env.POSTGRES_URL_NON_POOLING
-  if (!connectionString) {
+    process.env.POSTGRES_URL_NON_POOLING ||
+    'postgres://dummy:dummy@localhost:5432/dummy'
+
+  if (connectionString === 'postgres://dummy:dummy@localhost:5432/dummy') {
     console.warn('⚠️ WARNING: DATABASE_URL / POSTGRES_PRISMA_URL is not set. Prisma operations will fail if executed.');
-    return new PrismaClient({
-      log: process.env.NODE_ENV === 'development' ? ['error'] : [],
-    });
   }
 
   let poolConnectionString = connectionString
