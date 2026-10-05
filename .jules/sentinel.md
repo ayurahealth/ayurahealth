@@ -1,0 +1,4 @@
+## 2023-10-06 - Missing Route-Level Authorization (IDOR)
+**Vulnerability:** Found an Insecure Direct Object Reference (IDOR) in `app/api/chat/history/route.ts`. The endpoint fetched chat histories based solely on the `userId` query parameter without verifying if the requested ID matched the currently authenticated user.
+**Learning:** Next.js App Router API endpoints in this application do not enforce global authorization middleware for all endpoints. Each route is responsible for manually validating the authentication state. If a developer forgets to add `currentUser()` or `auth()`, the endpoint becomes entirely unprotected.
+**Prevention:** Always use `@clerk/nextjs/server`'s `auth()` or `currentUser()` at the beginning of sensitive API routes to verify the requester's identity. If an endpoint accepts a user ID as a parameter, strictly validate that it matches `authUserId`.
