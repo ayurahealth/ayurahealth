@@ -20,7 +20,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install -g pnpm && pnpm config set ignore-scripts true && pnpm install
+        run: npm install -g pnpm && pnpm install && pnpm install @eslint/eslintrc@^3.1.0 -D && pnpm install @clerk/react@^6.0.0 -D
 
       - name: Generate Prisma Client
         run: npx prisma generate
