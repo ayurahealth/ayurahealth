@@ -20,7 +20,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install -g pnpm && pnpm install
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -28,16 +28,16 @@ jobs:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Type Check
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: SEO Guard
-        run: npm run seo:guard
+        run: pnpm run seo:guard
 
       - name: Build Validation
-        run: npm run build
+        run: pnpm run build
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
           CLERK_SECRET_KEY: sk_test_dummy
