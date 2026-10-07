@@ -1,0 +1,3 @@
+## 2026-10-07 - Memoizing inline react-markdown components
+**Learning:** In React implementations using `react-markdown`, passing an inline object literal to the `components` prop causes severe rendering penalties. Because React recreates this object on every render cycle, `react-markdown` (which relies on referential equality to manage its custom component mapping) registers a change and fully unmounts and remounts the entire parsed Markdown DOM tree, bypassing normal virtual DOM diffing.
+**Action:** Always extract the `components` mapping object to a stable reference (e.g., via `useMemo` with an empty dependency array or defining it statically outside the component body) to ensure referential stability and prevent expensive, unnecessary DOM repaints.
