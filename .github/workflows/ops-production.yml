@@ -26,7 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install -g pnpm && pnpm install
+        run: npm install -g pnpm && pnpm config set ignore-scripts true && pnpm install
 
       - name: Secret Scan
         run: |
@@ -60,7 +60,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install -g pnpm && pnpm install
+        run: npm install -g pnpm && pnpm config set ignore-scripts true && pnpm install
 
       - name: Generate Prisma Client
         run: npx prisma generate
