@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(req: NextRequest) {
@@ -10,6 +11,17 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const { userId: authUserId } = await auth()
+
+    if (!authUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (userId !== authUserId) {
+      // Security enhancement: Prevent IDOR by ensuring the requested history matches the authenticated user
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const sessions = await prisma.chatSession.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
