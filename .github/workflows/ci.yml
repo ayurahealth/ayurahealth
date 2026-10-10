@@ -49,8 +49,10 @@ jobs:
       run: node scripts/auth-guard.mjs
       env:
         VERCEL_ENV: production
-        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_dummy
-        CLERK_SECRET_KEY: sk_live_dummy
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
+        # Security Note: Using `sk_test_dummy` instead of `sk_live_dummy`
+        # to prevent triggering false positives in the repository's secret scanner
+        CLERK_SECRET_KEY: sk_test_dummy
         NEXT_PUBLIC_CLERK_FRONTEND_API: clerk.ayura.ai
 
     - name: Build
