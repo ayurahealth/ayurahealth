@@ -1,0 +1,4 @@
+## 2024-10-10 - [IDOR in API Routes via Missing Global Auth Middleware]
+**Vulnerability:** Next.js API endpoints in this app (e.g., `/api/chat/history`) process requests based on `userId` from query params or request bodies without verifying that the authenticated user matches the requested `userId`. This allows an attacker to query and retrieve other users' data (Insecure Direct Object Reference).
+**Learning:** Because the Next.js App Router API endpoints here do not enforce global authorization middleware, any endpoint that uses `userId` must manually validate it against the authenticated user's ID.
+**Prevention:** Always manually call `auth()` from `@clerk/nextjs/server` in each endpoint, retrieve the authenticated `authUserId`, and enforce `if (!authUserId || authUserId !== requestedUserId) return 401`. Note that `auth()` is asynchronous in Next.js 15+ / Clerk v7+ and must be `await`ed.
