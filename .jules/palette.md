@@ -1,0 +1,3 @@
+## 2024-05-15 - Missing ARIA Labels on Icon-only Buttons
+**Learning:** In the AyuraHealth platform, many interactive components, such as `ChatComposer`, `VoiceInput`, and `VoiceOutput`, rely on icon-only buttons (like a microphone, play/stop, or paperclip) without accessible text. This pattern significantly hurts accessibility for screen-reader users, as they are not provided context for what the button does.
+**Action:** Always ensure that icon-only interactive elements contain a descriptive `aria-label`. For elements with dynamic states (e.g. "Start listening" vs "Stop listening"), the `aria-label` must also update dynamically.
