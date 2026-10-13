@@ -44,21 +44,38 @@ export async function POST(req: Request) {
       memories.push({ content: `User follows ${profile.lifestyle.diet} diet`, category: 'Lifestyle' })
     }
 
-    // Batch create memories (basic unique check by content to avoid duplicates)
-    for (const mem of memories) {
-      const existing = await prisma.userMemory.findFirst({
-        where: { userId: user.id, content: mem.content }
-      })
-      if (!existing) {
-        await prisma.userMemory.create({
-          data: {
-            userId: user.id,
-            content: mem.content,
-            category: mem.category,
-            source: 'HealthProfile Sync'
-          }
-        })
+    // Optimization: Batch create memories to fix N+1 query problem.
+    // Fetch all existing memory contents for this user first, then filter and createMany.
+    // Use a Set to handle intra-request duplicate content strings that the sequential loop naturally skipped.
+    const memoryContents = memories.map(m => m.content)
+    const existingMemories = await prisma.userMemory.findMany({
+      where: {
+        userId: user.id,
+        content: { in: memoryContents }
+      },
+      select: { content: true }
+    })
+
+    const existingContentSet = new Set(existingMemories.map(m => m.content))
+    const seenInRequest = new Set<string>()
+
+    const newMemories = memories.filter(mem => {
+      if (existingContentSet.has(mem.content) || seenInRequest.has(mem.content)) {
+        return false
       }
+      seenInRequest.add(mem.content)
+      return true
+    })
+
+    if (newMemories.length > 0) {
+      await prisma.userMemory.createMany({
+        data: newMemories.map(mem => ({
+          userId: user.id,
+          content: mem.content,
+          category: mem.category,
+          source: 'HealthProfile Sync'
+        }))
+      })
     }
 
     return NextResponse.json({ success: true, message: 'Clinical memory synchronized.' })
