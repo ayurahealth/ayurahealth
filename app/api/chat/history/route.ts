@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@clerk/nextjs/server'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -7,6 +8,19 @@ export async function GET(req: NextRequest) {
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
+  }
+
+  // Security: Prevent Insecure Direct Object Reference (IDOR)
+  // Ensure the user requesting the history is the authenticated user
+  const { userId: authUserId } = await auth()
+
+  if (!authUserId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (authUserId !== userId) {
+    // Security: Prevent unauthorized access to other users' chat history
+    return NextResponse.json({ error: 'Forbidden: Cannot access other users data' }, { status: 403 })
   }
 
   try {
