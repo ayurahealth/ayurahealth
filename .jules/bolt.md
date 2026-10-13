@@ -1,0 +1,3 @@
+## 2024-05-24 - N+1 Batched Query Deduplication Edge Case
+**Learning:** When fixing N+1 query problems by replacing a sequential `findFirst` and `create` loop with batched `findMany` and `createMany` operations, explicitly handling intra-request duplicates in the input array is critical. The original sequential loop inherently prevents duplicates if the input contains identical items (because the second iteration checks the DB after the first inserted it), whereas a naive batched approach does not, which can cause duplicate inserts.
+**Action:** When refactoring sequential database operations to batched operations, use a `Set` during the filtering step to track and skip duplicate entries within the same request.
