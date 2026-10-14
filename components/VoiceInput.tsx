@@ -96,6 +96,7 @@ export default function VoiceInput({ onTranscript, language }: VoiceInputProps) 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
       <button
+        aria-label={isRecording ? 'Stop recording' : 'Start recording'}
         onClick={toggleRecording}
         style={{
           background: isRecording ? '#e8835a' : '#6abf8a',
