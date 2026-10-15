@@ -51,14 +51,14 @@ interface MessageItemProps {
   onSelectSource: (source: ChatSource) => void
 }
 
-export default function MessageItem({
+const MessageItem = ({
   msg,
   doshaColor,
   voiceSupported,
   isSpeaking,
   onSpeakText,
   onSelectSource,
-}: MessageItemProps) {
+}: MessageItemProps) => {
   const isAssistant = msg.role === 'assistant'
 
   return (
@@ -228,3 +228,7 @@ export default function MessageItem({
     </motion.div>
   )
 }
+
+// ⚡ Optimization: Memoize MessageItem to prevent re-rendering of the entire
+// chat history when new messages are added or streaming occurs in parent component.
+export default React.memo(MessageItem)
