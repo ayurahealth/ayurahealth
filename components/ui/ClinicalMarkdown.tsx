@@ -11,11 +11,11 @@ interface ClinicalMarkdownProps {
   className?: string
 }
 
-export default function ClinicalMarkdown({ 
+const ClinicalMarkdown = ({
   content, 
   doshaColor = 'var(--accent-main)',
   className = '' 
-}: ClinicalMarkdownProps) {
+}: ClinicalMarkdownProps) => {
   
   // Pre-process headers to add custom clinical styles
   const processedContent = content
@@ -121,3 +121,7 @@ export default function ClinicalMarkdown({
     </div>
   )
 }
+
+// ⚡ Optimization: Memoize ClinicalMarkdown to prevent unnecessary re-rendering
+// of expensive markdown parsing and regex string replacement operations when parent re-renders.
+export default React.memo(ClinicalMarkdown)

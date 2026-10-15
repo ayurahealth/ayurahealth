@@ -1,0 +1,3 @@
+## 2025-02-13 - Memoizing chat history and markdown parsing
+**Learning:** In a chat interface with streaming responses, modifying the `streaming` state in the parent container causes every previously completed message item (and its expensive sub-components like Markdown parsers) to needlessly re-render. Since `ClinicalMarkdown` executes multiple regex replacements on large text blocks every render, this compounds the performance cost heavily during rapid token streams.
+**Action:** Wrap chat list items and computationally expensive formatting components with `React.memo()`. This ensures that historical message blocks remain static while only the active streaming block and container handle the re-render cycles, preserving UI responsiveness.
