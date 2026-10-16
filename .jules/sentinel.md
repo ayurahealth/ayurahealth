@@ -1,0 +1,4 @@
+## 2024-05-18 - Missing Authorization on Chat History Endpoint
+**Vulnerability:** Insecure Direct Object Reference (IDOR) on the `app/api/chat/history/route.ts` endpoint allowed any user (or unauthenticated user) to retrieve the chat history of any other user by simply providing their `userId` in the query parameters.
+**Learning:** The endpoint relied solely on the `userId` query parameter to fetch records from the database without verifying if the user requesting the data was authenticated and if they owned the requested data. Next.js App Router API endpoints do not enforce global authorization middleware in this application by default.
+**Prevention:** Always use `auth()` from `@clerk/nextjs/server` to retrieve the authenticated user's ID (`authUserId`) and validate that it matches any user ID provided in the request parameters or body before returning sensitive data.
