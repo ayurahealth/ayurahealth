@@ -1,0 +1,3 @@
+## 2025-01-20 - Handle Intra-Request Duplicates When Fixing N+1 Queries
+**Learning:** When fixing N+1 query problems by replacing a sequential `findFirst` and `create` loop with batched `findMany` and `createMany` operations, a naive batched approach does not inherently prevent intra-request duplicates if the input contains identical items, whereas the original sequential loop does.
+**Action:** Use a `Set` during the filtering step to track and skip duplicate entries within the same request.
