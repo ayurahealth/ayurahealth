@@ -1,0 +1,4 @@
+## 2025-02-26 - [IDOR in Chat History Endpoint]
+**Vulnerability:** The `/api/chat/history` endpoint allowed fetching chat sessions using only a `userId` query parameter without verifying if the authenticated user matches that `userId`, exposing all user chat sessions to an Insecure Direct Object Reference (IDOR) attack.
+**Learning:** Next.js App Router API endpoints in this application do not enforce global authorization middleware. Trusting client-provided user IDs without server-side validation against the authentication context creates severe data leakage risks.
+**Prevention:** Always use `auth()` from `@clerk/nextjs/server` within each Next.js API route to explicitly retrieve the authenticated user's ID (`authUserId`) and validate any requested user IDs against it before returning sensitive data.
