@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@clerk/nextjs/server'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -10,6 +11,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // 🛡️ Sentinel: Fix IDOR Vulnerability
+    // Ensure the user is authenticated and is only requesting their own chat history.
+    const session = await auth()
+    if (!session || session.userId !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const sessions = await prisma.chatSession.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
