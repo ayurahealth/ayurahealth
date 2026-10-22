@@ -1,9 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
+import dns from 'dns/promises'
 
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+
+    // Security: Prevent SSRF by validating the resolved IP address
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(url)
+      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        return NextResponse.json({ error: 'Invalid protocol' }, { status: 400 })
+      }
+
+      const lookup = await dns.lookup(parsedUrl.hostname)
+      const ip = lookup.address
+
+      if (
+        ip === '::1' ||
+        ip.startsWith('127.') ||
+        ip.startsWith('169.254.') ||
+        ip.startsWith('10.') ||
+        ip.startsWith('192.168.') ||
+        /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(ip)
+      ) {
+        return NextResponse.json({ error: 'Access to internal network is blocked' }, { status: 403 })
+      }
+    } catch {
+      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+    }
 
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
