@@ -113,6 +113,7 @@ export default function ChatMessagesPanel({
       <div className="no-print" style={{ position: 'absolute', top: '1.5rem', right: '2rem', zIndex: 10, display: 'flex', gap: '0.75rem' }}>
         {messages.length > 0 && (
           <button 
+            aria-label="Print chat history"
             onClick={handlePrint}
             style={{ 
               display: 'flex', 
