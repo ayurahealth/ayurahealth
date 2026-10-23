@@ -1,12 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@clerk/nextjs/server'
 
 export async function GET(req: NextRequest) {
+  const { userId: authUserId } = await auth()
+
+  if (!authUserId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const { searchParams } = new URL(req.url)
   const userId = searchParams.get('userId')
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
+  }
+
+  // Security: Prevent IDOR (Insecure Direct Object Reference)
+  // Ensure the requested user ID matches the authenticated user ID
+  if (userId !== authUserId) {
+    return NextResponse.json({ error: 'Forbidden: Access denied to other user data' }, { status: 403 })
   }
 
   try {
