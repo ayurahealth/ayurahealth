@@ -44,20 +44,35 @@ export async function POST(req: Request) {
       memories.push({ content: `User follows ${profile.lifestyle.diet} diet`, category: 'Lifestyle' })
     }
 
-    // Batch create memories (basic unique check by content to avoid duplicates)
-    for (const mem of memories) {
-      const existing = await prisma.userMemory.findFirst({
-        where: { userId: user.id, content: mem.content }
-      })
-      if (!existing) {
-        await prisma.userMemory.create({
-          data: {
+    // ⚡ Bolt: Batch create memories to fix N+1 query problem. Reduces DB calls from O(N) to O(1)
+    if (memories.length > 0) {
+      const existingMemories = await prisma.userMemory.findMany({
+        where: {
+          userId: user.id,
+          content: { in: memories.map(m => m.content) }
+        },
+        select: { content: true }
+      });
+      const existingContentSet = new Set(existingMemories.map(m => m.content));
+      const memoriesToCreate = [];
+      const intraRequestSet = new Set<string>();
+
+      for (const mem of memories) {
+        if (!existingContentSet.has(mem.content) && !intraRequestSet.has(mem.content)) {
+          memoriesToCreate.push({
             userId: user.id,
             content: mem.content,
             category: mem.category,
             source: 'HealthProfile Sync'
-          }
-        })
+          });
+          intraRequestSet.add(mem.content);
+        }
+      }
+
+      if (memoriesToCreate.length > 0) {
+        await prisma.userMemory.createMany({
+          data: memoriesToCreate
+        });
       }
     }
 
