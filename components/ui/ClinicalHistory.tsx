@@ -90,6 +90,7 @@ export default function ClinicalHistory({ userId, isOpen, onClose }: ClinicalHis
                 <h2 style={{ fontSize: '1.4rem', fontWeight: 600, margin: 0 }}>Clinical History</h2>
               </div>
               <button 
+                aria-label="Close"
                 onClick={onClose}
                 style={{ 
                   background: 'var(--surface-mid)', 
