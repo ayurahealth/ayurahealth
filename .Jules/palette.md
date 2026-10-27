@@ -1,0 +1,3 @@
+## 2026-05-15 - Missing ARIA Labels on Icon-only Buttons
+**Learning:** Found multiple instances where `button` elements containing only an icon (like `<X />`) do not have an `aria-label`, making them completely inaccessible to screen reader users who cannot understand their purpose. Examples include "Close" buttons in modals (like `ClinicalHistory` and `dashboard-content`).
+**Action:** Always verify that buttons have discernible text. If a button only contains an icon (no visible text), ensure it has an appropriate `aria-label` attribute describing its function (e.g., `aria-label="Close modal"`).
