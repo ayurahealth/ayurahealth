@@ -44,21 +44,34 @@ export async function POST(req: Request) {
       memories.push({ content: `User follows ${profile.lifestyle.diet} diet`, category: 'Lifestyle' })
     }
 
-    // Batch create memories (basic unique check by content to avoid duplicates)
-    for (const mem of memories) {
-      const existing = await prisma.userMemory.findFirst({
-        where: { userId: user.id, content: mem.content }
-      })
-      if (!existing) {
-        await prisma.userMemory.create({
-          data: {
-            userId: user.id,
-            content: mem.content,
-            category: mem.category,
-            source: 'HealthProfile Sync'
-          }
-        })
+    // ⚡ Bolt: Batch create memories to avoid N+1 queries.
+    // Fetch all existing contents in one go, then create the missing ones.
+    const contents = memories.map(m => m.content);
+    const existing = await prisma.userMemory.findMany({
+      where: { userId: user.id, content: { in: contents } },
+      select: { content: true }
+    });
+
+    const existingContents = new Set(existing.map(e => e.content));
+    const processedContents = new Set();
+    const memoriesToCreate = [];
+
+    for (const m of memories) {
+      if (!existingContents.has(m.content) && !processedContents.has(m.content)) {
+        processedContents.add(m.content);
+        memoriesToCreate.push({
+          userId: user.id,
+          content: m.content,
+          category: m.category,
+          source: 'HealthProfile Sync'
+        });
       }
+    }
+
+    if (memoriesToCreate.length > 0) {
+      await prisma.userMemory.createMany({
+        data: memoriesToCreate
+      });
     }
 
     return NextResponse.json({ success: true, message: 'Clinical memory synchronized.' })
