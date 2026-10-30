@@ -13,9 +13,9 @@ export default function LandingPage() {
   const isRTL = ['ar', 'fa', 'ur', 'he'].includes(lang)
   const [teaserPrompt, setTeaserPrompt] = useState('')
   const [isFocused, setIsFocused] = useState(false)
-  const [terminalText, setTerminalText] = useState('')
   const router = useRouter()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const terminalRef = useRef<HTMLSpanElement>(null)
 
   const fullTerminalText = `> INITIALIZING TRADITION SYNERGY...
 > CROSS-REFERENCING: CHARAKA SAMHITA [CH. 1-4], NEI JING [SEC 2]
@@ -26,7 +26,9 @@ export default function LandingPage() {
   useEffect(() => {
     let currentIndex = 0
     const intervalId = setInterval(() => {
-      setTerminalText(fullTerminalText.slice(0, currentIndex + 1))
+      if (terminalRef.current) {
+        terminalRef.current.textContent = fullTerminalText.slice(0, currentIndex + 1)
+      }
       currentIndex++
       if (currentIndex === fullTerminalText.length) {
         clearInterval(intervalId)
@@ -204,7 +206,7 @@ export default function LandingPage() {
               <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'monospace', opacity: 0.6 }}>ayura_neural_engine_synthesis.v1</span>
             </div>
             <div style={{ padding: '3rem', whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--accent-main)', opacity: 0.8, lineHeight: 1.8 }}>
-              {terminalText}
+              <span ref={terminalRef}></span>
               <motion.span 
                 animate={{ opacity: [1, 0, 1] }} 
                 transition={{ repeat: Infinity, duration: 0.8 }}
