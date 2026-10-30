@@ -44,21 +44,40 @@ export async function POST(req: Request) {
       memories.push({ content: `User follows ${profile.lifestyle.diet} diet`, category: 'Lifestyle' })
     }
 
+    // ⚡ Bolt: Replaced N+1 query loop with bulk findMany and createMany
     // Batch create memories (basic unique check by content to avoid duplicates)
-    for (const mem of memories) {
-      const existing = await prisma.userMemory.findFirst({
-        where: { userId: user.id, content: mem.content }
-      })
-      if (!existing) {
-        await prisma.userMemory.create({
-          data: {
-            userId: user.id,
-            content: mem.content,
-            category: mem.category,
-            source: 'HealthProfile Sync'
-          }
-        })
+
+    // Find all existing memories for this user that match the incoming content
+    const memoryContents = memories.map(m => m.content)
+    const existingMemories = await prisma.userMemory.findMany({
+      where: {
+        userId: user.id,
+        content: { in: memoryContents }
+      },
+      select: { content: true }
+    })
+
+    // Create a Set of existing contents for fast O(1) lookups
+    const existingContentSet = new Set(existingMemories.map(m => m.content))
+
+    // Deduplicate incoming memories both against DB and within the payload itself
+    const newMemoriesToCreate = memories.reduce((acc: { content: string, category: string }[], mem: { content: string, category: string }) => {
+      if (!existingContentSet.has(mem.content)) {
+        acc.push(mem)
+        existingContentSet.add(mem.content) // Prevent intra-payload duplicates
       }
+      return acc
+    }, [])
+
+    if (newMemoriesToCreate.length > 0) {
+      await prisma.userMemory.createMany({
+        data: newMemoriesToCreate.map((mem: { content: string, category: string }) => ({
+          userId: user.id,
+          content: mem.content,
+          category: mem.category,
+          source: 'HealthProfile Sync'
+        }))
+      })
     }
 
     return NextResponse.json({ success: true, message: 'Clinical memory synchronized.' })
