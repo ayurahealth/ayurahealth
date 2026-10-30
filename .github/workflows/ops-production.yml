@@ -19,14 +19,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.30.3
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: pnpm install
 
       - name: Secret Scan
         run: |
@@ -53,14 +58,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.30.3
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: pnpm install
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -75,10 +85,10 @@ jobs:
           CLERK_SECRET_KEY: sk_test_dummy
 
       - name: Type Check
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Next.js Build
-        run: npm run build
+        run: pnpm run build
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
