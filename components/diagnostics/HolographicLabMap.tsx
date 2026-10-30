@@ -83,12 +83,18 @@ const ConnectionLines = () => {
     return p
   }, [])
 
+  // ⚡ Bolt: Memoize the typed array and args to prevent costly WebGL buffer reallocations on every render
+  const lineArgs = useMemo(() => {
+    const positions = new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))
+    return [positions, 3] as [Float32Array, number]
+  }, [points])
+
   return (
     <lineSegments>
       <bufferGeometry attach="geometry">
         <bufferAttribute
           attach="attributes-position"
-          args={[new Float32Array(points.flatMap(p => [p.x, p.y, p.z])), 3]}
+          args={lineArgs}
         />
       </bufferGeometry>
       <lineBasicMaterial attach="material" color="#6abf8a" transparent opacity={0.1} />
