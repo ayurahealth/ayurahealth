@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
+import dns from 'dns/promises'
 
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+
+    const parsedUrl = new URL(url)
+    const { address } = await dns.lookup(parsedUrl.hostname)
+
+    if (
+      address === '::1' ||
+      address.startsWith('127.') ||
+      address.startsWith('169.254.') ||
+      address.startsWith('10.') ||
+      address.startsWith('192.168.') ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(address)
+    ) {
+      return NextResponse.json({ error: 'Access to internal network is not allowed' }, { status: 403 })
+    }
 
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
