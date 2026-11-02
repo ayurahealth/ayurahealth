@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode } from 'react'
+import React, { type CSSProperties, type ReactNode } from 'react'
 
 interface SystemCardProps {
   label: string
@@ -8,7 +8,8 @@ interface SystemCardProps {
   style?: CSSProperties
 }
 
-export default function SystemCard({ label, icon, active, onClick, style }: SystemCardProps) {
+// ⚡ Bolt: Memoized to prevent inactive cards from unnecessarily re-rendering when the parent selection array changes.
+export default React.memo(function SystemCard({ label, icon, active, onClick, style }: SystemCardProps) {
   return (
     <button
       onClick={onClick}
@@ -37,4 +38,4 @@ export default function SystemCard({ label, icon, active, onClick, style }: Syst
       }}>{label}</span>
     </button>
   )
-}
+})
