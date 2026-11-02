@@ -1,0 +1,4 @@
+## 2024-05-18 - [SSRF in fetch-link route]
+**Vulnerability:** Found a Server-Side Request Forgery (SSRF) vulnerability in `app/api/fetch-link/route.ts`. The endpoint accepts an arbitrary URL from user input and fetches it directly without checking if the URL points to an internal or restricted IP address.
+**Learning:** This exposes the application to SSRF attacks, allowing attackers to scan internal networks, access cloud metadata services (like AWS IMDS or GCE metadata), or interact with internal APIs that shouldn't be publicly accessible.
+**Prevention:** Always validate and sanitize user-provided URLs before fetching them. Specifically, resolve the hostname to an IP address and check against a blocklist of private, loopback, and link-local IP addresses (e.g., `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.0.0/16`).
