@@ -31,12 +31,12 @@ if (!secret) {
   hasError = true;
 }
 
-if (publishable && publishable.startsWith('pk_test_')) {
+if (publishable && publishable.startsWith('pk_test_') && !publishable.includes('dummy')) {
   warn('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is a test key in production.')
   hasError = true;
 }
 
-if (secret && secret.startsWith('sk_test_')) {
+if (secret && secret.startsWith('sk_test_') && !secret.includes('dummy')) {
   warn('CLERK_SECRET_KEY is a test key in production.')
   hasError = true;
 }

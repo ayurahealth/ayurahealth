@@ -8,6 +8,7 @@ interface SystemCardProps {
   style?: CSSProperties
 }
 
+// ⚡ Bolt: Memoized to prevent inactive cards from unnecessarily re-rendering when the parent selection array changes.
 export default React.memo(function SystemCard({ label, icon, active, onClick, style }: SystemCardProps) {
   return (
     <button
