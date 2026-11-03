@@ -1,9 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
+import dns from 'dns/promises'
+
+async function isSafeUrl(urlString: string) {
+  try {
+    const url = new URL(urlString)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
+
+    const { address } = await dns.lookup(url.hostname)
+    if (
+      address.startsWith('127.') ||
+      address.startsWith('10.') ||
+      address.startsWith('192.168.') ||
+      address.startsWith('169.254.') ||
+      address.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) ||
+      address === '0.0.0.0' ||
+      address === '::1'
+    ) {
+      return false
+    }
+    return true
+  } catch {
+    return false
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+
+    const isSafe = await isSafeUrl(url)
+    if (!isSafe) {
+      return NextResponse.json({ error: 'Unsafe URL' }, { status: 400 })
+    }
 
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
