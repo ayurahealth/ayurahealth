@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { SafeSignInButton, SafeUserButton, useSafeUser } from '../lib/clerk-client'
 import { useTranslation } from '@/lib/i18n/LanguageContext'
@@ -51,18 +51,25 @@ export default function Nav({ showLangPicker = true, links }: NavProps) {
   const { language: lang, setLanguage, t } = useTranslation()
   const { isSignedIn, isLoaded } = useSafeUser()
 
-  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0]
-  const filtered = LANGUAGES.filter(l =>
+  // ⚡ Bolt Optimization: Memoize active language selection
+  // Impact: Prevents O(N) array search on every scroll/render tick
+  const currentLang = useMemo(() => LANGUAGES.find(l => l.code === lang) || LANGUAGES[0], [lang])
+
+  // ⚡ Bolt Optimization: Memoize search filtering
+  // Impact: Prevents expensive string ops (toLowerCase, includes) on every non-search render tick
+  const filtered = useMemo(() => LANGUAGES.filter(l =>
     l.name.toLowerCase().includes(search.toLowerCase()) ||
     l.native.toLowerCase().includes(search.toLowerCase())
-  )
+  ), [search])
 
-  const defaultLinks = links || [
+  // ⚡ Bolt Optimization: Memoize translation objects
+  // Impact: Prevents object recreation on every render tick
+  const defaultLinks = useMemo(() => links || [
     { label: t('nav_dashboard'), href: '/dashboard', icon: LayoutDashboard },
     { label: t('nav_diet'), href: '/diet', icon: Leaf },
     { label: t('nav_clinic'), href: '/clinic', icon: Hospital },
     { label: t('nav_pricing'), href: '/pricing', icon: CreditCard },
-  ]
+  ], [links, t])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
