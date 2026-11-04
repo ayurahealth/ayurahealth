@@ -51,13 +51,19 @@ export default function Nav({ showLangPicker = true, links }: NavProps) {
   const { language: lang, setLanguage, t } = useTranslation()
   const { isSignedIn, isLoaded } = useSafeUser()
 
+  // ⚡ Bolt Optimization: Memoize active language selection
+  // Impact: Prevents O(N) array search on every scroll/render tick
   const currentLang = useMemo(() => LANGUAGES.find(l => l.code === lang) || LANGUAGES[0], [lang])
 
+  // ⚡ Bolt Optimization: Memoize search filtering
+  // Impact: Prevents expensive string ops (toLowerCase, includes) on every non-search render tick
   const filtered = useMemo(() => LANGUAGES.filter(l =>
     l.name.toLowerCase().includes(search.toLowerCase()) ||
     l.native.toLowerCase().includes(search.toLowerCase())
   ), [search])
 
+  // ⚡ Bolt Optimization: Memoize translation objects
+  // Impact: Prevents object recreation on every render tick
   const defaultLinks = useMemo(() => links || [
     { label: t('nav_dashboard'), href: '/dashboard', icon: LayoutDashboard },
     { label: t('nav_diet'), href: '/diet', icon: Leaf },
