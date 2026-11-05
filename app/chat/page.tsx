@@ -181,7 +181,7 @@ function ChatPageContent() {
     setShowLinkInput(false)
   }
 
-  const handleSpeak = (text: string) => {
+  const handleSpeak = useCallback((text: string) => {
     if (isSpeaking) {
       vaidyaVoice.stop()
       setIsSpeaking(false)
@@ -192,7 +192,7 @@ function ChatPageContent() {
     vaidyaVoice.speak(text, () => {
       setIsSpeaking(false)
     })
-  }
+  }, [isSpeaking, setIsSpeaking])
 
   const handleShare = async () => {
     if (!dosha) return
@@ -219,6 +219,8 @@ function ChatPageContent() {
     setIsSharing(false)
     setTimeout(() => setShareSuccess(false), 3000)
   }
+
+  const handleSelectSource = useCallback(() => {}, [])
 
   const resultLang = (lang === 'en' || lang === 'ja' || lang === 'hi' ? lang : 'en') as SupportedLang & ('en' | 'ja' | 'hi')
 
@@ -298,7 +300,7 @@ function ChatPageContent() {
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={() => {}}
+          onSelectSource={handleSelectSource}
           analyser={analyser}
           userId={clerk.user?.id}
         />
