@@ -91,6 +91,8 @@ export default function ClinicalHistory({ userId, isOpen, onClose }: ClinicalHis
               </div>
               <button 
                 onClick={onClose}
+                aria-label="Close Clinical History"
+                title="Close Clinical History"
                 style={{ 
                   background: 'var(--surface-mid)', 
                   border: 'none', 
