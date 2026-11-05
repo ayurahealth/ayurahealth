@@ -27,7 +27,7 @@ try {
   if (validHttpsUrl && redisToken) {
     redis = Redis.fromEnv()
   }
-} catch (e) {
+} catch {
   console.warn("Invalid Upstash Redis configuration detected, falling back to permissive mode.");
 }
 
