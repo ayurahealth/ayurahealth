@@ -220,6 +220,8 @@ function ChatPageContent() {
     setTimeout(() => setShareSuccess(false), 3000)
   }
 
+  const handleSelectSource = useCallback(() => {}, [])
+
   const resultLang = (lang === 'en' || lang === 'ja' || lang === 'hi' ? lang : 'en') as SupportedLang & ('en' | 'ja' | 'hi')
 
   return (
@@ -298,7 +300,7 @@ function ChatPageContent() {
           onModelPrefChange={setModelPreference}
           onResponseModeChange={setResponseMode}
           onSpeakText={handleSpeak}
-          onSelectSource={useCallback(() => {}, [])}
+          onSelectSource={handleSelectSource}
           analyser={analyser}
           userId={clerk.user?.id}
         />
