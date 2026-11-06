@@ -13,20 +13,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-          run_install: false
-
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: "22"
-          cache: "pnpm"
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install --legacy-peer-deps
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -34,16 +28,16 @@ jobs:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
       - name: Lint
-        run: pnpm lint
+        run: npm run lint
 
       - name: Type Check
-        run: pnpm typecheck
+        run: npm run typecheck
 
       - name: SEO Guard
-        run: pnpm seo:guard
+        run: npm run seo:guard
 
       - name: Build Validation
-        run: pnpm build
+        run: npm run build
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy
           CLERK_SECRET_KEY: sk_test_dummy
