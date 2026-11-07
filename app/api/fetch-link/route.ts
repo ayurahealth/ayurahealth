@@ -1,9 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
+import dns from 'node:dns/promises'
+
+async function isSafeUrl(urlString: string) {
+  try {
+    const parsed = new URL(urlString)
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return false
+    }
+
+    const ips = await dns.resolve4(parsed.hostname)
+    for (const ip of ips) {
+      if (
+        ip === '0.0.0.0' ||
+        ip === '::1' ||
+        ip.startsWith('127.') ||
+        ip.startsWith('10.') ||
+        ip.startsWith('169.254.') ||
+        ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) ||
+        ip.startsWith('192.168.')
+      ) {
+        return false
+      }
+    }
+    return true
+  } catch {
+    return false
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
     if (!url || typeof url !== 'string') return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+
+    if (!(await isSafeUrl(url))) {
+      return NextResponse.json({ error: 'Invalid or forbidden URL' }, { status: 400 })
+    }
 
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 AyuraIntelligence/1.0' },
