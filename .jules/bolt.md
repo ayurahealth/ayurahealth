@@ -1,0 +1,3 @@
+## 2026-11-07 - [React.memo for MessageItem]
+**Learning:** The `MessageItem` component in `components/chat/MessageItem.tsx` is being re-rendered unnecessarily whenever the parent component (`ChatMessagesPanel`) re-renders, such as when new streaming content arrives or when the user types. This causes significant performance issues in a chat interface with a long list of messages. Wrapping `MessageItem` in `React.memo` and memoizing the callback props passed to it (`onSpeakText`, `onSelectSource`) is a standard optimization to prevent this.
+**Action:** Wrapped `MessageItem` in `React.memo` and used `useCallback` for `handleSpeak` and `onSelectSource` in the parent components to prevent unnecessary re-renders.
