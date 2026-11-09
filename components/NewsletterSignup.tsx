@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, Check, AlertCircle } from 'lucide-react'
+import { Mail, Check, AlertCircle, Loader2 } from 'lucide-react'
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState('')
@@ -37,23 +37,29 @@ export default function NewsletterSignup() {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="flex gap-2">
           <div className="flex-1 relative">
-            <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+            <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400" aria-hidden="true" />
             <input
               type="email"
+              aria-label="Email address"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={status === 'loading'}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-50"
             />
           </div>
           <button
             type="submit"
             disabled={status === 'loading' || status === 'success'}
-            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
           >
-            {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+            {status === 'loading' ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <span>Subscribing...</span>
+              </>
+            ) : 'Subscribe'}
           </button>
         </div>
 
